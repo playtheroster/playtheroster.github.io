@@ -415,6 +415,15 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .seg-btn[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--ink); }
 .seg-btn[data-level="easy"][aria-checked="true"] { background: #1f9d55; color: #fff; }
 .seg-btn[data-level="hard"][aria-checked="true"] { background: #d63a2f; color: #fff; }
+.awards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 14px; }
+.award { display: grid; gap: 6px; padding: 16px; border: 2.5px solid var(--ink); border-radius: 18px; background: var(--surface); box-shadow: 4px 4px 0 var(--ink), inset 6px 0 0 var(--pc, var(--accent)); min-width: 0; }
+.award .badge { justify-self: start; padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.award.steal .badge { background: var(--g5); color: var(--g5-ink); }
+.award.reach .badge { background: var(--g1); color: var(--g1-ink); }
+.award h4 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.7rem; line-height: 1; overflow-wrap: anywhere; }
+.award .who { font-weight: 700; color: var(--pc, var(--ink)); }
+.award p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.award .sc.tier { display: inline-block; padding: 1px 7px; font-family: var(--font-mono); font-size: 0.8rem; }
 .chat { display: grid; gap: 10px; padding: 16px; border: 2.5px solid var(--ink); border-radius: 18px; background: var(--tint); }
 .chat-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .chat-list { list-style: none; margin: 0; padding: 4px 2px; display: grid; gap: 6px; max-height: 280px; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
@@ -693,6 +702,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
           <div style="display:grid;gap:20px">
             <div class="t10-focus" id="t10-focus" hidden></div>
             <div class="winner" id="winner" hidden></div>
+            <div class="awards" id="awards" hidden></div>
             <div class="scorebox" id="scorebox"></div>
             <div class="results-grid">
               <div style="display:grid;gap:12px">
@@ -2029,6 +2039,27 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var missing = g.picks.filter(function (p) { return !scores['p' + p.n]; }).length;
     return { scores: scores, summary: summary, missing: missing };
   }
+  /* Steal and reach: compare each chosen pick's draft position with where its score ranks in this draft.
+     A steal scored far better than its pick number; a reach scored far worse. Timed-out picks don't count. */
+  function draftAwards(g, scores) {
+    if (!scores || !g.picks.length) return { steal: null, reach: null };
+    var rows = g.picks.map(function (p) { var s = scores['p' + p.n]; return s ? { p: p, score: s.score, pickNo: p.n + 1 } : null; }).filter(Boolean);
+    if (rows.length < 4) return { steal: null, reach: null };
+    var sorted = rows.slice().sort(function (a, b) { return b.score - a.score; });
+    sorted.forEach(function (r) {
+      var first = -1, last = -1;
+      sorted.forEach(function (x, i) { if (x.score === r.score) { if (first < 0) first = i; last = i; } });
+      r.valueRank = (first + last) / 2 + 1;
+    });
+    var chosen = rows.filter(function (r) { return !r.p.auto; });
+    var steal = null, reach = null;
+    chosen.forEach(function (r) {
+      var d = r.pickNo - r.valueRank;
+      if (d >= 2 && (!steal || d > steal.diff || (d === steal.diff && r.score > steal.score))) steal = { p: r.p, score: r.score, pickNo: r.pickNo, valueRank: r.valueRank, diff: d };
+      if (-d >= 2 && (!reach || -d > reach.diff || (-d === reach.diff && r.score < reach.score))) reach = { p: r.p, score: r.score, pickNo: r.pickNo, valueRank: r.valueRank, diff: -d };
+    });
+    return { steal: steal, reach: reach, total: rows.length };
+  }
   function round1(x) { return Math.round(x * 10) / 10; }
   function fmt1(x) { return (Math.round((Number(x) || 0) * 10) / 10).toFixed(1); }
   function standings(g, scores) {
@@ -2048,7 +2079,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   /* ENGINE END */
 
   if (TEST.exportEngine) {
-    window.__ROSTER_ENGINE__ = { TOPICS: TOPICS, TOPIC_DEFS: TOPIC_DEFS, autoSpec: autoSpec, validOverride: validOverride, SCHEDULE: SCHEDULE, norm: norm, search: search, resolveName: resolveName, dailySpec: dailySpec, topicForDay: topicForDay, snakeIndex: snakeIndex, derive: derive, pickError: pickError, makePick: makePick, autoChoice: autoChoice, botChoice: botChoice, quickScore: quickScore, builtinResults: builtinResults, normalizeScores: normalizeScores, orderByRank: orderByRank, standings: standings, fmt1: fmt1, scoringPrompt: scoringPrompt, rng: rng, PICK_SECONDS: PICK_SECONDS };
+    window.__ROSTER_ENGINE__ = { TOPICS: TOPICS, TOPIC_DEFS: TOPIC_DEFS, autoSpec: autoSpec, validOverride: validOverride, SCHEDULE: SCHEDULE, norm: norm, search: search, resolveName: resolveName, dailySpec: dailySpec, topicForDay: topicForDay, snakeIndex: snakeIndex, derive: derive, pickError: pickError, makePick: makePick, autoChoice: autoChoice, botChoice: botChoice, quickScore: quickScore, builtinResults: builtinResults, normalizeScores: normalizeScores, orderByRank: orderByRank, draftAwards: draftAwards, standings: standings, fmt1: fmt1, scoringPrompt: scoringPrompt, rng: rng, PICK_SECONDS: PICK_SECONDS };
   }
 
   /* ================= APP ================= */
@@ -2292,6 +2323,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     } else rs = '<p class="note">Scores and reasons appear here once Claude has judged the draft.</p>';
     $('reasons').innerHTML = rs;
     renderBoard($('final-board'), g, null, scores);
+    renderAwards(g, scores);
     renderTop10(g);
     var inGame = !!g.players[S.me];
     var saved = S.saved[gameId(g)];
@@ -2423,6 +2455,25 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     }, TEST.botDelay || (1100 + Math.random() * 1600));
   }
   function afterChange() { render(); if (S.ui.open) renderList(); }
+
+  function ordinal(n) { n = Math.round(n); var s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+  function renderAwards(g, scores) {
+    var box = $('awards'), a = draftAwards(g, scores);
+    if (!a.steal && !a.reach) { box.hidden = true; box.innerHTML = ''; return; }
+    var card = function (kind, x) {
+      var label = kind === 'steal' ? 'Steal of the draft' : 'Biggest reach';
+      var rankTxt = ordinal(x.valueRank) + '-best score of ' + a.total;
+      var line = kind === 'steal'
+        ? 'Still on the board at pick ' + x.pickNo + ', but it was the ' + rankTxt + '.'
+        : 'Taken with pick ' + x.pickNo + ', but it was only the ' + rankTxt + '.';
+      return '<div class="award ' + kind + ' pc' + pci(g, x.p.pid) + '"><span class="badge">' + label + '</span>' +
+        '<h4>' + esc(x.p.name) + '</h4>' +
+        '<div><span class="who">' + esc(playerName(g, x.p.pid)) + '</span> · ' + esc(x.p.sub) + ' · ' + scoreBadge(x.score) + '</div>' +
+        '<p>' + esc(line) + '</p></div>';
+    };
+    box.innerHTML = (a.steal ? card('steal', a.steal) : '') + (a.reach ? card('reach', a.reach) : '');
+    box.hidden = false;
+  }
 
   /* ---------- room chat ---------- */
   function renderChat() {
@@ -3036,7 +3087,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-12-8';
+  var BUILD_ID = '2026-10-12-9';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
