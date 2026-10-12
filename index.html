@@ -415,6 +415,19 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .seg-btn[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--ink); }
 .seg-btn[data-level="easy"][aria-checked="true"] { background: #1f9d55; color: #fff; }
 .seg-btn[data-level="hard"][aria-checked="true"] { background: #d63a2f; color: #fff; }
+.chat { display: grid; gap: 10px; padding: 16px; border: 2.5px solid var(--ink); border-radius: 18px; background: var(--tint); }
+.chat-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.chat-list { list-style: none; margin: 0; padding: 4px 2px; display: grid; gap: 6px; max-height: 280px; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+.chat-list li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; align-items: baseline; padding: 7px 10px; border-radius: 12px; background: var(--surface); box-shadow: inset 4px 0 0 var(--pc, var(--line)); min-width: 0; }
+.chat-list li .who { font-weight: 700; color: var(--pc, var(--ink)); white-space: nowrap; }
+.chat-list li .txt { min-width: 0; overflow-wrap: anywhere; }
+.chat-list li.me { background: color-mix(in srgb, var(--pc, var(--accent)) 12%, var(--surface)); }
+.chat-list li.sys { display: block; background: transparent; box-shadow: none; padding: 2px 10px; color: var(--muted); font-size: 0.85rem; }
+.chat-list li.sys strong { color: var(--ink); }
+.chat-list li.empty { background: transparent; box-shadow: none; color: var(--muted); grid-template-columns: minmax(0, 1fr); }
+.chat-quick { display: flex; flex-wrap: wrap; gap: 6px; }
+.chat-form { display: flex; gap: 8px; }
+.chat-form .field { flex: 1 1 auto; min-width: 0; }
 .net-diag { font-size: 0.8rem; overflow-wrap: anywhere; padding: 10px 12px; border: 2px dashed var(--line); border-radius: 12px; }
 button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 18, 56, 0.45); }
 
@@ -707,6 +720,26 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
           </div>
         </div>
 
+        <section class="chat" id="chat" hidden aria-label="Room chat">
+          <div class="chat-head">
+            <span class="mono">Room chat</span>
+            <span class="mono chat-count" id="chat-count"></span>
+          </div>
+          <ol class="chat-list" id="chat-list" aria-live="polite"></ol>
+          <div class="chat-quick" role="group" aria-label="Quick reactions">
+            <button type="button" class="chip mini" data-act="chat-quick" data-text="🔥">🔥</button>
+            <button type="button" class="chip mini" data-act="chat-quick" data-text="😂">😂</button>
+            <button type="button" class="chip mini" data-act="chat-quick" data-text="😬">😬</button>
+            <button type="button" class="chip mini" data-act="chat-quick" data-text="👀">👀</button>
+            <button type="button" class="chip mini" data-act="chat-quick" data-text="Steal!">Steal!</button>
+            <button type="button" class="chip mini" data-act="chat-quick" data-text="Reach.">Reach.</button>
+          </div>
+          <form class="chat-form" id="chat-form">
+            <label class="mono label" for="chat-in" hidden>Message</label>
+            <input class="field" id="chat-in" type="text" maxlength="200" autocomplete="off" placeholder="Talk some trash…" aria-label="Message">
+            <button class="btn small primary" type="submit">Send</button>
+          </form>
+        </section>
         <p class="msg" id="play-msg" role="status" aria-live="polite"></p>
         <p class="note net-diag" id="net-diag" hidden></p>
       </div>
@@ -2099,6 +2132,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     on.className = 'note bad';
     document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online; });
     $('console-label').textContent = scr === 'modes' ? ({ room: 'Join a room', random: 'Play random people', offline: 'Offline vs AI', practice: 'Practice' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
+    renderChat();
     if (scr === 'lobby') renderLobby();
     if (scr === 'draft') renderDraft();
     if (scr === 'results') renderResults();
@@ -2390,6 +2424,43 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   }
   function afterChange() { render(); if (S.ui.open) renderList(); }
 
+  /* ---------- room chat ---------- */
+  function renderChat() {
+    var g = S.game, box = $('chat');
+    var on = !!(g && g.mode === 'shared');
+    box.hidden = !on;
+    if (!on) return;
+    var list = $('chat-list');
+    var nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 40;
+    var items = (g.chat || []).map(function (m) { return { at: m.at || 0, m: m }; });
+    g.picks.forEach(function (p) { items.push({ at: p.at || 0, pick: p }); });
+    items.sort(function (a, b) { return a.at - b.at; });
+    var key = items.length + ':' + (items.length ? items[items.length - 1].at : 0) + ':' + Object.keys(g.players).length;
+    $('chat-count').textContent = (g.chat || []).length ? (g.chat.length + ' message' + (g.chat.length === 1 ? '' : 's')) : '';
+    if (S.ui.chatKey === key) return;
+    S.ui.chatKey = key;
+    list.innerHTML = items.length ? items.map(function (it) {
+      if (it.pick) return '<li class="sys">' + pdot(g, it.pick.pid) + esc(playerName(g, it.pick.pid)) + ' took <strong>' + esc(it.pick.name) + '</strong> for ' + esc(it.pick.sub) + (it.pick.auto ? ' (time ran out)' : '') + '</li>';
+      var m = it.m, known = g.players[m.pid], name = known ? playerName(g, m.pid) : clean(m.name) || 'Player';
+      return '<li class="pc' + pci(g, m.pid) + (m.pid === S.me ? ' me' : '') + '"><span class="who">' + esc(name) + '</span><span class="txt">' + esc(String(m.text).slice(0, 200)) + '</span></li>';
+    }).join('') : '<li class="empty">No messages yet. Say hi, or call out a reach when you see one.</li>';
+    if (nearBottom || S.ui.chatJustSent) { list.scrollTop = list.scrollHeight; S.ui.chatJustSent = false; }
+  }
+  async function sendChat(text) {
+    var g = S.game; if (!g || g.mode !== 'shared') return;
+    text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+    if (!text) return;
+    var wait = 600 - (now() - (S.ui.chatLast || 0));
+    if (wait > 0) { setTimeout(function () { sendChat(text); }, wait); return; }
+    S.ui.chatLast = now();
+    var id = 'm' + now().toString(36) + '_' + String(S.me || 'x').slice(-6);
+    var msg = { pid: S.me, name: myName() || playerName(g, S.me), text: text, at: now() };
+    g.chat = (g.chat || []).concat([msg]);
+    S.ui.chatJustSent = true; renderChat();
+    try { await S.env.db.doc('rooms/' + g.code + '/chat/' + id).set(msg); }
+    catch (e) { setMsg('That message didn’t send. Check your connection.', true); }
+  }
+
   /* ---------- AI scoring ---------- */
   function scoringError(code) {
     if (code === 'not_granted' || code === 'sampling_disabled' || code === 'not_declared' || code === 'capability_disabled' || code === 'capability_removed') return 'Claude isn’t available for scoring here.';
@@ -2557,6 +2628,12 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       g.picks = cleanPicks({ picks: s.docs.map(function (d) { return d.data(); }).filter(function (p) { return p && p.key && p.sub && p.pid; }) });
       afterChange();
     }, onErr));
+    S.unsub.push(db.collection('rooms/' + code + '/chat').onSnapshot(function (s) {
+      if (S.game !== g) return;
+      g.chat = s.docs.map(function (d) { return d.data(); }).filter(function (m) { return m && typeof m.text === 'string' && m.pid; })
+        .sort(function (a, b) { return (a.at || 0) - (b.at || 0); }).slice(-80);
+      renderChat();
+    }, function () {}));
     S.unsub.push(db.doc('rooms/' + code + '/meta/results').onSnapshot(function (s) {
       if (S.game !== g) return;
       var v = s.exists ? s.data() : null;
@@ -2869,6 +2946,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     if (act === 'goto-mode') gotoMode(t.getAttribute('data-mode'));
     else if (act === 'home') { ev.preventDefault(); if (!S.game) showView('home'); else window.scrollTo(0, 0); }
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
+    else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
     else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
     else if (act === 'play-practice') playOffline(parseInt($('practice-bots').value, 10), true);
     else if (act === 'create-room') createRoom(false);
@@ -2958,7 +3036,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-12-7';
+  var BUILD_ID = '2026-10-12-8';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -3316,6 +3394,11 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var on = document.querySelector('.org-save .note');
     if (on) on.textContent = 'Saving downloads an updated index.html. Upload it to your website host, replacing the old file, and everyone sees the new schedule.';
   }
+  $('chat-form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var inp = $('chat-in'), v = inp.value; inp.value = '';
+    sendChat(v); inp.focus();
+  });
   /* ---------- boot ---------- */
   async function boot() {
     var saved = store('roster.name'); if (saved) $('player-name').value = clean(saved);
