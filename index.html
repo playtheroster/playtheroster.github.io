@@ -410,6 +410,11 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .t10 h4 { font-size: 1.6rem; color: var(--accent); }
 .t10-focus { border: 3px solid var(--ink); border-radius: 22px; box-shadow: 6px 6px 0 var(--pop); }
 .t10-focus-title { color: var(--accent); }
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 5px; border: 2.5px solid var(--ink); border-radius: 14px; background: var(--surface); }
+.seg-btn { min-height: 40px; border: 0; border-radius: 10px; background: transparent; font-weight: 700; color: var(--muted); }
+.seg-btn[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--ink); }
+.seg-btn[data-level="easy"][aria-checked="true"] { background: #1f9d55; color: #fff; }
+.seg-btn[data-level="hard"][aria-checked="true"] { background: #d63a2f; color: #fff; }
 .net-diag { font-size: 0.8rem; overflow-wrap: anywhere; padding: 10px 12px; border: 2px dashed var(--line); border-radius: 12px; }
 button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 18, 56, 0.45); }
 
@@ -566,6 +571,15 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                     <option value="7">7 opponents</option>
                   </select>
                 </div>
+                <div>
+                  <span class="mono label" id="level-offline-label">AI difficulty</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="level-offline-label" data-seg="level-offline">
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="level" data-level="easy">Easy</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="level" data-level="medium">Medium</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="level" data-level="hard">Hard</button>
+                  </div>
+                </div>
+                <p class="note level-note"></p>
                 <button class="btn primary block" type="button" data-act="play-offline">Play offline</button>
               </div>
 
@@ -584,6 +598,15 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                     <option value="7">7 opponents</option>
                   </select>
                 </div>
+                <div>
+                  <span class="mono label" id="level-practice-label">AI difficulty</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="level-practice-label" data-seg="level-practice">
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="level" data-level="easy">Easy</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="level" data-level="medium">Medium</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="level" data-level="hard">Hard</button>
+                  </div>
+                </div>
+                <p class="note level-note"></p>
                 <button class="btn primary block" type="button" data-act="play-practice">Start practice</button>
               </div>
             </div>
@@ -1848,13 +1871,20 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   /* AI opponent: goes for the subtopic where the best answer is still on the board, then takes one of the
      top few available shortlist answers (usually the best, never off the shortlist). */
   var BOT_WEIGHTS = [0.5, 0.27, 0.15, 0.08];
-  function weightedIndex(n, rand) {
-    var w = BOT_WEIGHTS.slice(0, n), sum = w.reduce(function (a, b) { return a + b; }, 0), x = rand() * sum;
+  /* AI difficulty: how far down the available list a bot may reach, and how smartly it picks a subtopic. */
+  var BOT_LEVELS = {
+    easy: { weights: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], smartSub: false },
+    medium: { weights: [0.3, 0.24, 0.18, 0.13, 0.09, 0.06], smartSub: true },
+    hard: { weights: [0.92, 0.08], smartSub: true }
+  };
+  function weightedIndex(n, rand, weights) {
+    var w = (weights || BOT_WEIGHTS).slice(0, n), sum = w.reduce(function (a, b) { return a + b; }, 0), x = rand() * sum;
     for (var i = 0; i < w.length; i++) { x -= w[i]; if (x < 0) return i; }
     return w.length - 1;
   }
   function botChoice(g, pid, rand) {
     var d = derive(g, 0), t = TOPICS[g.topicId];
+    var L = BOT_LEVELS[g.botLevel] || BOT_LEVELS.medium, W = L.weights;
     var open = g.subs.filter(function (s) { return !filled(g, pid, s); });
     if (!open.length) return null;
     var options = [];
@@ -1864,17 +1894,17 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       if (avail.length) options.push({ sub: sub, avail: avail, idx: list.indexOf(avail[0]) });
     });
     if (options.length) {
-      var bestIdx = Math.min.apply(null, options.map(function (o) { return o.idx; }));
-      var top = options.filter(function (o) { return o.idx === bestIdx; });
+      var top = options;
+      if (L.smartSub) { var bestIdx = Math.min.apply(null, options.map(function (o) { return o.idx; })); top = options.filter(function (o) { return o.idx === bestIdx; }); }
       var pick = top[Math.floor(rand() * top.length)];
-      return { sub: pick.sub, key: pick.avail[weightedIndex(Math.min(pick.avail.length, BOT_WEIGHTS.length), rand)] };
+      return { sub: pick.sub, key: pick.avail[weightedIndex(Math.min(pick.avail.length, W.length), rand, W)] };
     }
     var comp = t.composite.filter(function (k) { return !d.taken[k]; });
     var sub = open[Math.floor(rand() * open.length)];
-    if (comp.length) return { sub: sub, key: comp[weightedIndex(Math.min(comp.length, BOT_WEIGHTS.length), rand)] };
+    if (comp.length) return { sub: sub, key: comp[weightedIndex(Math.min(comp.length, W.length), rand, W)] };
     var avail = t.pool.filter(function (e) { return !d.taken[e.key]; });
     if (!avail.length) return null;
-    return { sub: sub, key: avail[weightedIndex(Math.min(avail.length, BOT_WEIGHTS.length), rand)].key };
+    return { sub: sub, key: avail[weightedIndex(Math.min(avail.length, W.length), rand, W)].key };
   }
 
   /* Quick score from the ranked lists, used when Claude can't judge. Slides from 10.0 (#1) to 7.0 (last on the list);
@@ -2127,7 +2157,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   function renderDraft() {
     var g = S.game, d = derive(g, now()), t = TOPICS[g.topicId];
     var mine = d.current === S.me;
-    $('draft-meta').textContent = 'Round ' + d.round + ' of ' + g.subs.length + ' · Pick ' + (d.done + 1) + ' of ' + d.total;
+    $('draft-meta').textContent = 'Round ' + d.round + ' of ' + g.subs.length + ' · Pick ' + (d.done + 1) + ' of ' + d.total + (g.mode === 'local' ? ' · ' + (LEVEL_NAMES[g.botLevel] || 'Medium') + ' AI' : '');
     $('draft-status').textContent = mine ? 'You’re up' : playerName(g, d.current) + ' is picking';
     var round = d.round - 1, n = d.n, ord = [];
     for (var i = 0; i < n; i++) ord.push(g.order[snakeIndex(round * n + i, n)]);
@@ -2196,7 +2226,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       $('winner').className = 'winner pcw';
       $('winner').style.setProperty('--pc', wc[0]);
       $('winner').style.background = wc.length > 1 ? 'linear-gradient(90deg, ' + wc.map(function (c, i) { return c + ' ' + (i * 100 / wc.length) + '% ' + ((i + 1) * 100 / wc.length) + '%'; }).join(', ') + ')' : '';
-      $('winner').innerHTML = '<span class="mono">' + (top.length > 1 ? 'Shared win' : 'Winner') + '</span><h3 class="display">' + esc(top.map(function (r) { return r.name; }).join(' & ')) + '</h3><p>' + fmt1(top[0].total) + ' of ' + (g.subs.length * 10) + ' points</p>';
+      $('winner').innerHTML = '<span class="mono">' + (top.length > 1 ? 'Shared win' : 'Winner') + '</span><h3 class="display">' + esc(top.map(function (r) { return r.name; }).join(' & ')) + '</h3><p>' + fmt1(top[0].total) + ' of ' + (g.subs.length * 10) + ' points' + (g.mode === 'local' ? ' · vs ' + (LEVEL_NAMES[g.botLevel] || 'Medium') + ' AI' : '') + '</p>';
       var quick = res.source === 'builtin';
       var why = quick ? (S.scoring.msg ? S.scoring.msg + ' ' : '') + 'These scores come from The Roster’s built-in shortlists, not Claude.' : '';
       sb.innerHTML = '<span class="mono">' + (quick ? 'Quick score' : 'Claude’s verdict') + '</span><p>' + esc(res.summary || 'Every pick has been scored.') + '</p>' +
@@ -2403,6 +2433,14 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   }
 
   /* ---------- offline ---------- */
+  var LEVEL_NOTES = { easy: 'Easy: the AI often settles for decent answers and doesn’t plan ahead.', medium: 'Medium: the AI picks strong answers, usually but not always the best one left.', hard: 'Hard: the AI almost always takes the best answer left, in the subtopic where it matters most.' };
+  var LEVEL_NAMES = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
+  function currentLevel() { var v = store('roster.level'); return BOT_LEVELS[v] ? v : 'medium'; }
+  function renderLevels() {
+    var lv = currentLevel();
+    document.querySelectorAll('.seg-btn[data-level]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-level') === lv)); });
+    document.querySelectorAll('.level-note').forEach(function (n) { n.textContent = LEVEL_NOTES[lv]; });
+  }
   function practiceSpec() {
     var ids = Object.keys(TOPICS).filter(function (id) { return id !== TODAY.topicId && id !== S.lastPracticeTopic; });
     var id = ids[Math.floor(Math.random() * ids.length)];
@@ -2418,11 +2456,12 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var bots = shuffled(BOT_NAMES, Math.random).slice(0, count);
     bots.forEach(function (b, i) { players['bot' + i] = { name: b + ' (AI)', bot: true, joinedAt: i + 1 }; });
     var t0 = now();
-    S.game = { mode: 'local', practice: !!practice, code: 'LOCAL', isPublic: false, hostId: 'you', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, status: 'drafting', order: shuffled(Object.keys(players), Math.random), startedAt: t0, players: players, picks: [], results: null };
+    var level = currentLevel();
+    S.game = { mode: 'local', practice: !!practice, botLevel: level, code: 'LOCAL', isPublic: false, hostId: 'you', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, status: 'drafting', order: shuffled(Object.keys(players), Math.random), startedAt: t0, players: players, picks: [], results: null };
     S.me = 'you';
     S.autoDone = {}; S.botForN = -1; S.scoreWaitSince = 0; S.waitShown = false;
     S.scoring = { state: 'idle', msg: '', forGame: '' };
-    S.lastSettings = { mode: 'local', count: count, practice: !!practice };
+    S.lastSettings = { mode: 'local', count: count, practice: !!practice, level: level };
     setMsg('');
     render();
   }
@@ -2624,7 +2663,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var rows = standings(g, g.results.scores), mine = rows.filter(function (r) { return r.pid === S.me; })[0];
     if (!mine) return;
     var rec = {
-      at: now(), dateKey: g.dateKey, topic: TOPICS[g.topicId].name, mode: g.practice ? 'practice' : g.mode === 'local' ? 'offline' : (g.isPublic ? 'random' : 'room'),
+      at: now(), dateKey: g.dateKey, topic: TOPICS[g.topicId].name, mode: g.practice ? 'practice' : g.mode === 'local' ? 'offline' : (g.isPublic ? 'random' : 'room'), level: g.mode === 'local' ? (g.botLevel || 'medium') : undefined,
       score: mine.total, max: g.subs.length * 10, rank: mine.rank, players: rows.length, won: mine.rank === 1,
       picks: g.picks.filter(function (p) { return p.pid === S.me; }).map(function (p) { var s = g.results.scores['p' + p.n]; return { sub: p.sub, name: p.name, score: s ? s.score : 0 }; })
     };
@@ -2830,6 +2869,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     if (act === 'goto-mode') gotoMode(t.getAttribute('data-mode'));
     else if (act === 'home') { ev.preventDefault(); if (!S.game) showView('home'); else window.scrollTo(0, 0); }
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
+    else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
     else if (act === 'play-practice') playOffline(parseInt($('practice-bots').value, 10), true);
     else if (act === 'create-room') createRoom(false);
     else if (act === 'join-room') joinRoom($('room-code').value);
@@ -2918,7 +2958,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-12-6';
+  var BUILD_ID = '2026-10-12-7';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -3293,6 +3333,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       S.lastSettings = restored.settings || { mode: 'local', count: 3 };
     }
     renderToday();
+    renderLevels();
     render();
     setInterval(function () {
       tick();
