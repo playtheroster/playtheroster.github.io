@@ -711,7 +711,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                 <div class="actions">
                   <button class="btn primary" type="button" id="save-btn" data-act="save">Save my result</button>
                   <button class="btn" type="button" id="again-btn" data-act="again">Play again</button>
-                  <button class="btn ghost" type="button" data-act="leave">Home</button>
+                  <button class="btn" type="button" id="home-btn" data-act="go-home">&larr; Back to homepage</button>
                 </div>
                 <p class="note" id="save-note"></p>
               </div>
@@ -727,6 +727,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
               <div class="top10" id="top10"></div>
             </div>
             <div class="board-wrap"><table class="board" id="final-board"></table></div>
+            <div class="actions"><button class="btn primary" type="button" data-act="go-home">&larr; Back to homepage</button><button class="btn" type="button" data-act="again" data-again2="1">Play again</button></div>
           </div>
         </div>
 
@@ -846,7 +847,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
 </div>
 
 </template>
-<script type="application/json" id="schedule-data">{"version":1,"days":{"2026-10-12":{"topicId":"countries","subs":["Economy","Military","Food","Tourism","Climate"]},"2026-10-13":{"topicId":"celebrities","subs":["Fame","Talent","Wealth","Charisma","Influence"]},"2026-10-14":{"topicId":"animals","subs":["Speed","Strength","Intelligence","Danger","Size"]},"2026-10-15":{"topicId":"monarchs","subs":["Fame","Power","Wealth","Legacy","Military"]},"2026-10-17":{"topicId":"landmarks","subs":["Engineering","Age","Fame","Size","Beauty"]},"2026-10-18":{"topicId":"desserts","subs":["Presentation","Portability","Nostalgia","Indulgence","Taste"]},"2026-10-19":{"topicId":"rappers","subs":["Lyrics","Flow","Influence","Albums","Hits"]},"2026-10-20":{"topicId":"us-states","subs":["Nature","Food","Weather","Cost of living","Cities"]},"2026-10-21":{"topicId":"cheeses","subs":["Pairing","Snacking","Meltability","On pizza","Taste"]},"2026-10-26":{"topicId":"superheroes","subs":["Popularity","Gadgets","Speed","Intelligence","Strength"]},"2026-10-28":{"topicId":"vegetables","subs":["Roasted","Taste","Nutrition","Raw crunch","Versatility"]},"2026-10-29":{"topicId":"animated-movies","subs":["Story","Animation","Villain","Songs","Heart"]},"2026-10-30":{"topicId":"jobs","subs":["Impact","Salary","Job security","Prestige","Fun"]},"2026-11-03":{"topicId":"fashion-brands","subs":["Quality","Celebrity appeal","Luxury","Streetwear cred","Iconic logo"]},"2026-11-11":{"topicId":"countries","subs":["Culture","Sports","Innovation","Natural beauty","Quality of life"]}}}</script>
+<script type="application/json" id="schedule-data">{"version":1,"days":{"2026-10-13":{"topicId":"celebrities","subs":["Fame","Talent","Wealth","Charisma","Influence"]},"2026-10-14":{"topicId":"animals","subs":["Speed","Strength","Intelligence","Cuteness","Danger"]},"2026-10-15":{"topicId":"monarchs","subs":["Fame","Power","Wealth","Legacy","Military"]},"2026-10-17":{"topicId":"landmarks","subs":["Engineering","Age","Fame","Size","Beauty"]},"2026-10-18":{"topicId":"desserts","subs":["Presentation","Portability","Nostalgia","Indulgence","Taste"]},"2026-10-19":{"topicId":"rappers","subs":["Lyrics","Flow","Influence","Albums","Hits"]},"2026-10-20":{"topicId":"us-states","subs":["Nature","Food","Weather","Cost of living","Cities"]},"2026-10-21":{"topicId":"cheeses","subs":["Pairing","Snacking","Meltability","On pizza","Taste"]},"2026-10-26":{"topicId":"superheroes","subs":["Popularity","Gadgets","Speed","Intelligence","Strength"]},"2026-10-28":{"topicId":"vegetables","subs":["Roasted","Taste","Nutrition","Raw crunch","Versatility"]},"2026-10-29":{"topicId":"animated-movies","subs":["Story","Animation","Villain","Songs","Heart"]},"2026-10-30":{"topicId":"jobs","subs":["Impact","Salary","Job security","Prestige","Fun"]},"2026-11-03":{"topicId":"fashion-brands","subs":["Quality","Celebrity appeal","Luxury","Streetwear cred","Iconic logo"]},"2026-11-11":{"topicId":"countries","subs":["Culture","Sports","Innovation","Natural beauty","Quality of life"]}}}</script>
 <script id="app-script">
 (function () {
   'use strict';
@@ -2145,7 +2146,9 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     $('org-btn').hidden = !orgAllowed() || inOrg;
     persistSession();
     ['room', 'random', 'offline', 'practice'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
-    $('back-btn').hidden = !!S.game;
+    var atResults = !!S.game && scr === 'results';
+    $('back-btn').hidden = !!S.game && !atResults;
+    $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
     renderBanner();
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = s !== scr; });
     var online = !!(S.env.db && S.env.uid);
@@ -2164,6 +2167,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online; });
     $('console-label').textContent = scr === 'modes' ? ({ room: 'Join a room', random: 'Play random people', offline: 'Offline vs AI', practice: 'Practice' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
     renderChat();
+    var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && (S.mode === 'room' || S.mode === 'random')));
     if (scr === 'lobby') renderLobby();
     if (scr === 'draft') renderDraft();
     if (scr === 'results') renderResults();
@@ -2331,7 +2335,8 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     $('save-btn').disabled = !res || saved;
     $('save-btn').textContent = saved ? 'Saved to your account' : 'Save my result';
     $('save-note').textContent = (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
-    $('again-btn').textContent = g.practice ? 'New random topic' : g.mode === 'local' ? 'Play again' : 'New game';
+    var againTxt = g.practice ? 'New random topic' : g.mode === 'local' ? 'Play again' : 'New game';
+    document.querySelectorAll('#scr-results [data-act="again"]').forEach(function (b) { b.textContent = againTxt; });
   }
 
   /* ---------- combobox ---------- */
@@ -2995,7 +3000,8 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     if (!t) { if (S.ui.open && !(ev.target.closest && ev.target.closest('#combo'))) closeList(); return; }
     var act = t.getAttribute('data-act');
     if (act === 'goto-mode') gotoMode(t.getAttribute('data-mode'));
-    else if (act === 'home') { ev.preventDefault(); if (!S.game) showView('home'); else window.scrollTo(0, 0); }
+    else if (act === 'home') { ev.preventDefault(); if (!S.game) showView('home'); else if (screenFor() === 'results') leaveGame(false); else window.scrollTo(0, 0); }
+    else if (act === 'go-home') { ev.preventDefault(); leaveGame(false); }
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
     else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
@@ -3087,7 +3093,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-12-9';
+  var BUILD_ID = '2026-10-13-1';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
