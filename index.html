@@ -667,7 +667,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                 <p class="mono" id="draft-meta"></p>
                 <h3 class="display" id="draft-status"></h3>
               </div>
-              <div class="clock" id="clock"><span class="mono">Time left</span><div class="t" id="clock-t">0:45</div></div>
+              <div class="clock" id="clock"><span class="mono">Time left</span><div class="t" id="clock-t">1:00</div></div>
             </div>
             <div class="bar" id="bar"><i id="bar-i"></i></div>
             <div class="order" id="order" aria-label="Draft order this round"></div>
@@ -795,7 +795,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
           <h3>The draft</h3>
           <ul class="rules">
             <li><span><strong>Snake order.</strong> The order is shuffled at the start and reverses every round.</span></li>
-            <li><span><strong>45 seconds a pick.</strong> If time runs out, you get a random available answer for your first open subtopic.</span></li>
+            <li><span><strong>1 minute a pick.</strong> If time runs out, you get a random available answer for your first open subtopic.</span></li>
             <li><span><strong>One answer per subtopic.</strong> Once you fill a subtopic, it's locked for you.</span></li>
             <li><span><strong>No repeats.</strong> Once anyone drafts an answer, nobody can draft it again, under any name. USA and United States count as the same pick.</span></li>
           </ul>
@@ -864,7 +864,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
   if (TEST.schedule) SCHEDULE = TEST.schedule;
 
   /* ENGINE START */
-  var PICK_SECONDS = TEST.pickSeconds || 45;
+  var PICK_SECONDS = TEST.pickSeconds || 60;
   var SUBS_PER_DAY = 5, MAX_PLAYERS = 8, MIN_PLAYERS = 2, GRACE_MS = 5000;
   var ARTIFACT_URL = 'https://claude.ai/artifact/DzXuXVgiVSX84zfRUggkkp';
   var EPOCH = Date.UTC(2026, 0, 1);
@@ -3093,7 +3093,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-1';
+  var BUILD_ID = '2026-10-13-2';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
