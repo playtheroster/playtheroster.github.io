@@ -1,4 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="The Roster: a daily draft game. One topic, five subtopics, draft the best roster against friends or AI."><meta property="og:title" content="The Roster"><meta property="og:description" content="Today's topic is live. Draft the best roster and prove your friends wrong."><meta name="theme-color" content="#6a2cff"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236a2cff'/%3E%3Ctext x='32' y='45' font-family='Arial Black,Arial' font-weight='900' font-size='36' text-anchor='middle' fill='%23ffd02e'%3ER%3C/text%3E%3C/svg%3E"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+
 <title>The Roster</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -475,7 +476,6 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
   .bar i { transition: none; }
 }
 </style>
-
 <template id="shell">
 <header class="wrap nav">
   <div class="brand">
@@ -483,7 +483,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
     <span class="mono">The Daily Draft</span>
   </div>
   <div class="nav-actions">
-    <button class="btn small ghost" id="org-btn" type="button" data-act="organizer" hidden>Organizer</button>
+    <button class="btn small ghost" id="org-btn" type="button" data-act="organizer" hidden="">Organizer</button>
     <button class="btn small" id="account-btn" type="button" data-act="account">Sign in / Join</button>
   </div>
 </header>
@@ -502,7 +502,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
         <div class="cats" id="today-subs"></div>
       </div>
       <div class="tomorrow">
-        <span class="lock"><svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M4 7V5a4 4 0 1 1 8 0v2h1a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1Zm2 0h4V5a2 2 0 1 0-4 0v2Z"/></svg>Tomorrow's topic is hidden</span>
+        <span class="lock"><svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M4 7V5a4 4 0 1 1 8 0v2h1a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1Zm2 0h4V5a2 2 0 1 0-4 0v2Z"></path></svg>Tomorrow's topic is hidden</span>
         <span class="mono" id="next-in"></span>
       </div>
     </div>
@@ -520,13 +520,13 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
   </section>
 
   <!-- GAME -->
-  <section class="play-view" id="play" hidden>
+  <section class="play-view" id="play" hidden="">
     <div class="wrap">
 
       <div class="console" id="console">
         <div class="console-top">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <button class="btn small" type="button" id="back-btn" data-act="home">&larr; Back</button>
+            <button class="btn small" type="button" id="back-btn" data-act="home">← Back</button>
             <span class="mono" id="console-label">Choose a mode</span>
           </div>
           <span class="pill mono" id="conn-pill">Connecting</span>
@@ -551,7 +551,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
               </div>
               <span class="pill soft mono">No account needed</span>
             </div>
-            <p class="note" id="online-note" hidden></p>
+            <p class="note" id="online-note" hidden=""></p>
 
             <div class="modes">
               <div class="mode" id="mode-room">
@@ -586,7 +586,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                   <select class="field" id="bot-count">
                     <option value="1">1 opponent</option>
                     <option value="2">2 opponents</option>
-                    <option value="3" selected>3 opponents</option>
+                    <option value="3" selected="">3 opponents</option>
                     <option value="4">4 opponents</option>
                     <option value="5">5 opponents</option>
                     <option value="6">6 opponents</option>
@@ -613,7 +613,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                   <select class="field" id="practice-bots">
                     <option value="1">1 opponent</option>
                     <option value="2">2 opponents</option>
-                    <option value="3" selected>3 opponents</option>
+                    <option value="3" selected="">3 opponents</option>
                     <option value="4">4 opponents</option>
                     <option value="5">5 opponents</option>
                     <option value="6">6 opponents</option>
@@ -636,14 +636,14 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
         </div>
 
         <!-- LOBBY -->
-        <div id="scr-lobby" hidden>
+        <div id="scr-lobby" hidden="">
           <div class="lobby">
             <div style="display:grid;gap:14px">
               <span class="mono" id="lobby-kind">Private room</span>
               <div class="code" id="lobby-code">ABCD</div>
               <p class="note" id="lobby-hint"></p>
               <div class="copybox" id="lobby-share">
-                <input class="field" id="share-link" type="text" readonly aria-label="Room link">
+                <input class="field" id="share-link" type="text" readonly="" aria-label="Room link">
                 <button class="btn small" type="button" data-act="copy-link">Copy link</button>
               </div>
             </div>
@@ -660,7 +660,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
         </div>
 
         <!-- DRAFT -->
-        <div id="scr-draft" hidden>
+        <div id="scr-draft" hidden="">
           <div style="display:grid;gap:18px">
             <div class="draft-head">
               <div>
@@ -674,18 +674,18 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
             <p class="lastpick" id="lastpick"></p>
             <div class="draft-grid">
               <div>
-                <div class="pickbox" id="pickbox" hidden>
+                <div class="pickbox" id="pickbox" hidden="">
                   <p class="mono">Your pick · choose a subtopic</p>
                   <div class="chips" id="chips" role="group" aria-label="Your subtopics"></div>
-                  <div class="combo" id="combo" hidden>
+                  <div class="combo" id="combo" hidden="">
                     <label class="mono label" for="answer-in" id="answer-label">Answer</label>
                     <div class="combo-row">
                       <input class="field" id="answer-in" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="answer-list" autocomplete="off" spellcheck="false" placeholder="Type or scroll the list">
-                      <button class="btn small toggle" type="button" id="answer-toggle" aria-label="Show all answers" aria-controls="answer-list" aria-expanded="false"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6l4.5 4.5L12.5 6"/></svg></button>
+                      <button class="btn small toggle" type="button" id="answer-toggle" aria-label="Show all answers" aria-controls="answer-list" aria-expanded="false"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6l4.5 4.5L12.5 6"></path></svg></button>
                     </div>
-                    <ul class="list" id="answer-list" role="listbox" aria-label="Valid answers" hidden></ul>
+                    <ul class="list" id="answer-list" role="listbox" aria-label="Valid answers" hidden=""></ul>
                   </div>
-                  <button class="btn primary" type="button" id="lock-btn" data-act="lock" hidden>Lock in</button>
+                  <button class="btn primary" type="button" id="lock-btn" data-act="lock" hidden="">Lock in</button>
                 </div>
                 <div class="waitbox" id="waitbox"></div>
                 <div class="actions" style="margin-top:14px">
@@ -698,11 +698,11 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
         </div>
 
         <!-- RESULTS -->
-        <div id="scr-results" hidden>
+        <div id="scr-results" hidden="">
           <div style="display:grid;gap:20px">
-            <div class="t10-focus" id="t10-focus" hidden></div>
-            <div class="winner" id="winner" hidden></div>
-            <div class="awards" id="awards" hidden></div>
+            <div class="t10-focus" id="t10-focus" hidden=""></div>
+            <div class="winner" id="winner" hidden=""></div>
+            <div class="awards" id="awards" hidden=""></div>
             <div class="scorebox" id="scorebox"></div>
             <div class="results-grid">
               <div style="display:grid;gap:12px">
@@ -730,7 +730,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
           </div>
         </div>
 
-        <section class="chat" id="chat" hidden aria-label="Room chat">
+        <section class="chat" id="chat" hidden="" aria-label="Room chat">
           <div class="chat-head">
             <span class="mono">Room chat</span>
             <span class="mono chat-count" id="chat-count"></span>
@@ -745,24 +745,24 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
             <button type="button" class="chip mini" data-act="chat-quick" data-text="Reach.">Reach.</button>
           </div>
           <form class="chat-form" id="chat-form">
-            <label class="mono label" for="chat-in" hidden>Message</label>
+            <label class="mono label" for="chat-in" hidden="">Message</label>
             <input class="field" id="chat-in" type="text" maxlength="200" autocomplete="off" placeholder="Talk some trash…" aria-label="Message">
             <button class="btn small primary" type="submit">Send</button>
           </form>
         </section>
         <p class="msg" id="play-msg" role="status" aria-live="polite"></p>
-        <p class="note net-diag" id="net-diag" hidden></p>
+        <p class="note net-diag" id="net-diag" hidden=""></p>
       </div>
     </div>
   </section>
 
   <!-- ORGANIZER (owner only) -->
-  <section class="play-view" id="organizer" hidden>
+  <section class="play-view" id="organizer" hidden="">
     <div class="wrap">
       <div class="console">
         <div class="console-top">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <button class="btn small" type="button" data-act="home">&larr; Back</button>
+            <button class="btn small" type="button" data-act="home">← Back</button>
             <span class="mono">Organizer · only you can see this</span>
           </div>
           <span class="pill soft mono" id="org-status">No changes</span>
@@ -774,8 +774,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
         <ol class="org-list" id="org-list"></ol>
         <div><button class="btn small" type="button" id="org-more" data-act="org-more">Show 30 more days</button></div>
         <div class="org-save">
-          <button class="btn primary" type="button" id="org-save" data-act="org-save" disabled>Save schedule</button>
-          <button class="btn ghost" type="button" id="org-discard" data-act="org-discard" disabled>Discard changes</button>
+          <button class="btn primary" type="button" id="org-save" data-act="org-save" disabled="">Save schedule</button>
+          <button class="btn ghost" type="button" id="org-discard" data-act="org-discard" disabled="">Discard changes</button>
           <p class="note">Saving updates the page for everyone. Anyone who has it open reloads, and games in progress pick up where they left off.</p>
         </div>
         <p class="msg" id="org-msg" role="status" aria-live="polite"></p>
@@ -833,7 +833,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
   </div>
 </footer>
 
-<div class="overlay" id="account" hidden>
+<div class="overlay" id="account" hidden="">
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="acct-title">
     <div class="console-top">
       <span class="mono">Your account</span>
@@ -846,7 +846,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
 </div>
 
 </template>
-<script type="application/json" id="schedule-data">{"version":1,"days":{"2026-10-12":{"topicId":"countries","subs":["Economy","Military","Food","Tourism","Climate"]},"2026-10-13":{"topicId":"snacks","subs":["Movie night","Flavor","Road trip","Addictiveness","Crunch"]},"2026-10-14":{"topicId":"bands","subs":["Albums","Influence","Live shows","Hits","Musicianship"]},"2026-10-15":{"topicId":"celebrities","subs":["Fame","Talent","Wealth","Charisma","Influence"]},"2026-10-17":{"topicId":"monarchs","subs":["Power","Wealth","Military","Legacy","Fame"]},"2026-10-18":{"topicId":"desserts","subs":["Presentation","Portability","Nostalgia","Indulgence","Taste"]},"2026-10-19":{"topicId":"rappers","subs":["Lyrics","Flow","Influence","Albums","Hits"]},"2026-10-20":{"topicId":"us-states","subs":["Nature","Food","Weather","Cost of living","Cities"]},"2026-10-11":{"topicId":"tv-shows","subs":["Bingeability","Finale","Characters","Cultural impact","Writing"]},"2026-10-21":{"topicId":"cheeses","subs":["Pairing","Snacking","Meltability","On pizza","Taste"]}}}</script>
+<script type="application/json" id="schedule-data">{"version":1,"days":{"2026-10-12":{"topicId":"countries","subs":["Economy","Military","Food","Tourism","Climate"]},"2026-10-13":{"topicId":"celebrities","subs":["Fame","Talent","Wealth","Charisma","Influence"]},"2026-10-14":{"topicId":"animals","subs":["Speed","Strength","Intelligence","Danger","Size"]},"2026-10-15":{"topicId":"monarchs","subs":["Fame","Power","Wealth","Legacy","Military"]},"2026-10-17":{"topicId":"landmarks","subs":["Engineering","Age","Fame","Size","Beauty"]},"2026-10-18":{"topicId":"desserts","subs":["Presentation","Portability","Nostalgia","Indulgence","Taste"]},"2026-10-19":{"topicId":"rappers","subs":["Lyrics","Flow","Influence","Albums","Hits"]},"2026-10-20":{"topicId":"us-states","subs":["Nature","Food","Weather","Cost of living","Cities"]},"2026-10-21":{"topicId":"cheeses","subs":["Pairing","Snacking","Meltability","On pizza","Taste"]},"2026-10-26":{"topicId":"superheroes","subs":["Popularity","Gadgets","Speed","Intelligence","Strength"]},"2026-10-28":{"topicId":"vegetables","subs":["Roasted","Taste","Nutrition","Raw crunch","Versatility"]},"2026-10-29":{"topicId":"animated-movies","subs":["Story","Animation","Villain","Songs","Heart"]},"2026-10-30":{"topicId":"jobs","subs":["Impact","Salary","Job security","Prestige","Fun"]},"2026-11-03":{"topicId":"fashion-brands","subs":["Quality","Celebrity appeal","Luxury","Streetwear cred","Iconic logo"]},"2026-11-11":{"topicId":"countries","subs":["Culture","Sports","Innovation","Natural beauty","Quality of life"]}}}</script>
 <script id="app-script">
 (function () {
   'use strict';
