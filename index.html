@@ -304,6 +304,7 @@ button.bsub[aria-pressed="true"] .mono { color: var(--hi-ink); }
 .org-title { font-size: clamp(2.2rem, 6vw, 3.6rem); }
 .org-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .org-day { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px; padding: 14px; border: 2px solid var(--line); border-radius: 14px; }
+.org-fast { display: grid; gap: 8px; margin-top: 4px; padding: 12px; border-radius: 14px; background: var(--tint); border: 2px dashed var(--accent); }
 .org-day.custom { border-color: var(--accent); }
 .org-day.edited { border-color: var(--ink); box-shadow: inset 6px 0 0 var(--hi); }
 .org-date { display: grid; gap: 4px; align-content: start; }
@@ -844,7 +845,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
         </div>
         <div style="display:grid;gap:8px">
           <h2 class="display org-title">Upcoming topics</h2>
-          <p class="note">Change the topic or subtopics for any day from tomorrow on. Players only see a day's topic once that day starts.</p>
+          <p class="note">Set the draft topic and the Fast Money topic for any day, starting today. Players only see a day's topics once that day starts. Changing today's Fast Money doesn't affect anyone who already played it.</p>
         </div>
         <ol class="org-list" id="org-list"></ol>
         <div><button class="btn small" type="button" id="org-more" data-act="org-more">Show 30 more days</button></div>
@@ -3004,10 +3005,17 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     Object.keys(days || {}).forEach(function (k) { if (k >= today && validOverride(days[k])) out[k] = { topicId: days[k].topicId, subs: days[k].subs.slice() }; });
     return out;
   }
-  function orgStart() { S.org.draft = JSON.parse(JSON.stringify(futureOnly(SCHEDULE.days))); }
+  function orgStart() { S.org.draft = JSON.parse(JSON.stringify(futureOnly(SCHEDULE.days))); S.org.fast = JSON.parse(JSON.stringify(futureOnly(SCHEDULE.fast || {}))); }
+  function orgFastSpec(key) {
+    var o = S.org.fast[key];
+    if (o) return { topicId: o.topicId, subs: o.subs.slice(), custom: true };
+    var a = fastAutoSpec(key, orgSpec(key).topicId);
+    return { topicId: a.topicId, subs: a.subs, custom: false };
+  }
+  function orgFastConflicts() { return Object.keys(S.org.fast).filter(function (k) { return S.org.fast[k].topicId === orgSpec(k).topicId; }); }
   function orgDays() {
     var out = [], d0 = new Date();
-    for (var i = 1; i <= S.org.days; i++) out.push(dateKey(new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + i)));
+    for (var i = 0; i <= S.org.days; i++) out.push(dateKey(new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + i)));
     return out;
   }
   function orgSpec(key) {
@@ -3019,7 +3027,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   function orgDirty() {
     var draft = {};
     Object.keys(S.org.draft).forEach(function (k) { draft[k] = S.org.draft[k]; });
-    return canon(draft) !== canon(futureOnly(SCHEDULE.days));
+    return canon(draft) !== canon(futureOnly(SCHEDULE.days)) || canon(S.org.fast) !== canon(futureOnly(SCHEDULE.fast || {}));
   }
   function orgMsg(t, bad) { var m = $('org-msg'); m.textContent = t || ''; m.className = 'msg' + (bad ? ' bad' : ''); }
   function keyLabel(key) {
@@ -3028,11 +3036,19 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   }
   function renderOrganizer() {
     if (!S.org.draft) orgStart();
-    var saved = futureOnly(SCHEDULE.days);
+    var saved = futureOnly(SCHEDULE.days), savedF = futureOnly(SCHEDULE.fast || {});
     $('org-list').innerHTML = orgDays().map(function (key, idx) {
       var spec = orgSpec(key), t = TOPICS[spec.topicId], label = keyLabel(key);
-      var edited = JSON.stringify(saved[key] || null) !== JSON.stringify(S.org.draft[key] || null);
-      var status = edited ? 'Unsaved' : spec.custom ? 'Custom' : 'Automatic';
+      var fspec = orgFastSpec(key), ft = TOPICS[fspec.topicId];
+      var edited = JSON.stringify(saved[key] || null) !== JSON.stringify(S.org.draft[key] || null) || JSON.stringify(savedF[key] || null) !== JSON.stringify(S.org.fast[key] || null);
+      var status = edited ? 'Unsaved' : (spec.custom || fspec.custom) ? 'Custom' : 'Automatic';
+      var ffixed = ft.subs.length === SUBS_PER_DAY, clash = fspec.topicId === spec.topicId;
+      var fchips = ft.subs.map(function (sb) {
+        if (ffixed) return '<span class="chip mini" aria-pressed="true">' + esc(sb) + '</span>';
+        return '<button type="button" class="chip mini" data-act="org-fsub" data-day="' + key + '" data-sub="' + esc(sb) + '" aria-pressed="' + (fspec.subs.indexOf(sb) >= 0) + '">' + esc(sb) + '</button>';
+      }).join('');
+      var fopts = TOPIC_SORTED.map(function (x) { return '<option value="' + x.id + '"' + (x.id === fspec.topicId ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('');
+      var fnote = clash ? 'Fast Money has to use a different topic than the draft.' : ffixed ? 'This topic always uses these 5 subtopics.' : 'Pick 5 of ' + ft.subs.length + ' · ' + fspec.subs.length + ' selected';
       var fixed = t.subs.length === SUBS_PER_DAY;
       var chips = t.subs.map(function (sb) {
         if (fixed) return '<span class="chip mini" aria-pressed="true">' + esc(sb) + '</span>';
@@ -3041,11 +3057,15 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       var opts = TOPIC_SORTED.map(function (x) { return '<option value="' + x.id + '"' + (x.id === spec.topicId ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('');
       var count = fixed ? 'This topic always uses these 5 subtopics.' : 'Pick 5 of ' + t.subs.length + ' · ' + spec.subs.length + ' selected';
       return '<li class="org-day' + (edited ? ' edited' : spec.custom ? ' custom' : '') + '" data-day="' + key + '">' +
-        '<div class="org-date"><b>' + esc(label) + '</b><span class="mono">' + (idx === 0 ? 'Tomorrow' : 'In ' + (idx + 1) + ' days') + '</span><span class="mono tag">' + status + '</span></div>' +
+        '<div class="org-date"><b>' + esc(label) + '</b><span class="mono">' + (idx === 0 ? 'Today' : idx === 1 ? 'Tomorrow' : 'In ' + idx + ' days') + '</span><span class="mono tag">' + status + '</span></div>' +
         '<div class="org-edit"><div class="org-row"><label class="mono" for="org-t-' + key + '">Topic</label><select class="field" id="org-t-' + key + '" data-org-topic="' + key + '">' + opts + '</select>' +
         (S.org.draft[key] ? '<button type="button" class="btn small ghost" data-act="org-reset" data-day="' + key + '">Use automatic</button>' : '') + '</div>' +
         '<div class="chips" role="group" aria-label="Subtopics for ' + esc(label) + '">' + chips + '</div>' +
-        '<p class="note' + (!fixed && spec.subs.length !== SUBS_PER_DAY ? ' bad' : '') + '">' + count + '</p></div></li>';
+        '<p class="note' + (!fixed && spec.subs.length !== SUBS_PER_DAY ? ' bad' : '') + '">' + count + '</p>' +
+        '<div class="org-fast"><div class="org-row"><label class="mono" for="org-f-' + key + '">Fast Money ⚡</label><select class="field" id="org-f-' + key + '" data-org-ftopic="' + key + '">' + fopts + '</select>' +
+        (S.org.fast[key] ? '<button type="button" class="btn small ghost" data-act="org-freset" data-day="' + key + '">Use automatic</button>' : '') + '</div>' +
+        '<div class="chips" role="group" aria-label="Fast Money subtopics for ' + esc(label) + '">' + fchips + '</div>' +
+        '<p class="note' + (clash || (!ffixed && fspec.subs.length !== SUBS_PER_DAY) ? ' bad' : '') + '">' + fnote + '</p></div></div></li>';
     }).join('');
     var dirty = orgDirty();
     $('org-save').disabled = !dirty;
@@ -3066,6 +3086,24 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     if (!TOPICS[topicId]) return;
     if (topicId === autoSpec(key).topicId) delete S.org.draft[key];
     else S.org.draft[key] = { topicId: topicId, subs: autoSubs(key, topicId) };
+    orgMsg('');
+    renderOrganizer();
+  }
+  function orgSetFastTopic(key, topicId) {
+    if (!TOPICS[topicId]) return;
+    var auto = fastAutoSpec(key, orgSpec(key).topicId);
+    if (topicId === auto.topicId) delete S.org.fast[key];
+    else S.org.fast[key] = { topicId: topicId, subs: shuffled(TOPICS[topicId].subs, rng(hashStr('fastsubs:' + key + ':' + topicId))).slice(0, SUBS_PER_DAY) };
+    orgMsg(topicId === orgSpec(key).topicId ? 'Fast Money has to use a different topic than that day’s draft.' : '', topicId === orgSpec(key).topicId);
+    renderOrganizer();
+  }
+  function orgToggleFastSub(key, sub) {
+    var spec = orgFastSpec(key), subs = spec.subs.slice(), i = subs.indexOf(sub), t = TOPICS[spec.topicId];
+    if (i >= 0) subs.splice(i, 1);
+    else if (subs.length >= SUBS_PER_DAY) { orgMsg('Fast Money has exactly 5 subtopics. Turn one off first.', true); return; }
+    else subs.push(sub);
+    subs.sort(function (x, y) { return t.subs.indexOf(x) - t.subs.indexOf(y); });
+    S.org.fast[key] = { topicId: spec.topicId, subs: subs };
     orgMsg('');
     renderOrganizer();
   }
@@ -3092,7 +3130,11 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   async function orgSave() {
     var bad = Object.keys(S.org.draft).filter(function (k) { return !validOverride(S.org.draft[k]); });
     if (bad.length) { orgMsg('Pick exactly 5 subtopics for ' + keyLabel(bad[0]) + ' before saving.', true); return; }
-    var schedule = { version: 1, days: futureOnly(S.org.draft) };
+    var badF = Object.keys(S.org.fast).filter(function (k) { return !validOverride(S.org.fast[k]); });
+    if (badF.length) { orgMsg('Pick exactly 5 Fast Money subtopics for ' + keyLabel(badF[0]) + ' before saving.', true); return; }
+    var clash = orgFastConflicts();
+    if (clash.length) { orgMsg('Fast Money on ' + keyLabel(clash[0]) + ' uses the same topic as the draft. Pick a different one before saving.', true); return; }
+    var schedule = { version: 1, days: futureOnly(S.org.draft), fast: futureOnly(S.org.fast) };
     var html = pageSource(schedule);
     if (S.env.web) {
       downloadFile('index.html', html);
@@ -3101,7 +3143,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     }
     $('org-save').disabled = true;
     orgMsg('Saving…');
-    try { sessionStorage.setItem('roster.orgSaved', canon(schedule.days)); } catch (e) {}
+    try { sessionStorage.setItem('roster.orgSaved', canon(schedule.days) + '|' + canon(schedule.fast)); } catch (e) {}
     try {
       await S.env.artifact.publish(html);
       window.__ROSTER_LAST_PUBLISH__ = html;
@@ -3183,6 +3225,8 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     else if (act === 'organizer') openOrganizer();
     else if (act === 'org-sub') orgToggleSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-reset') { delete S.org.draft[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
+    else if (act === 'org-freset') { delete S.org.fast[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
+    else if (act === 'org-fsub') orgToggleFastSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-more') { S.org.days = Math.min(365, S.org.days + 30); renderOrganizer(); }
     else if (act === 'org-discard') { orgStart(); orgMsg('Changes discarded.'); renderOrganizer(); }
     else if (act === 'org-save') orgSave();
@@ -3191,6 +3235,8 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   document.addEventListener('change', function (ev) {
     var k = ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-org-topic') : null;
     if (k) orgSetTopic(k, ev.target.value);
+    var fk = ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-org-ftopic') : null;
+    if (fk) orgSetFastTopic(fk, ev.target.value);
   });
   document.addEventListener('submit', function (ev) {
     if (ev.target.id === 'acct-form') { ev.preventDefault(); createAccount($('acct-name').value); }
@@ -3234,7 +3280,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-8';
+  var BUILD_ID = '2026-10-13-9';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -3596,7 +3642,12 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   var FAST_SECONDS = TEST.fastSeconds || 60, FAST_TARGET = 40;
   /* Fast Money has its own daily topic, never the same as the day's draft topic. */
   function fastSpec(key) {
-    var ids = Object.keys(TOPICS).sort(), daily = dailySpec(key).topicId;
+    var daily = dailySpec(key).topicId, o = !TEST.topic && SCHEDULE.fast ? SCHEDULE.fast[key] : null;
+    if (validOverride(o) && o.topicId !== daily) return { dateKey: key, topicId: o.topicId, subs: o.subs.slice(), custom: true };
+    return fastAutoSpec(key, daily);
+  }
+  function fastAutoSpec(key, daily) {
+    var ids = Object.keys(TOPICS).sort();
     var r = rng(hashStr('fast:' + key)), i = Math.floor(r() * ids.length);
     if (ids[i] === daily) i = (i + 1 + Math.floor(r() * (ids.length - 1))) % ids.length;
     var id = ids[i];
@@ -3794,7 +3845,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     if (orgSaved !== null && orgAllowed() && !S.game) {
       S.org.draft = null;
       openOrganizer();
-      var ok = orgSaved === canon(futureOnly(SCHEDULE.days));
+      var ok = orgSaved === canon(futureOnly(SCHEDULE.days)) + '|' + canon(futureOnly(SCHEDULE.fast || {}));
       orgMsg(ok ? 'Schedule saved.' : 'Your changes didn’t save. Make them again, then save.', !ok);
     }
   }
