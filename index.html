@@ -425,6 +425,8 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .award .who { font-weight: 700; color: var(--pc, var(--ink)); }
 .award p { margin: 0; color: var(--muted); font-size: 0.92rem; }
 .award .sc.tier { display: inline-block; padding: 1px 7px; font-family: var(--font-mono); font-size: 0.8rem; }
+.share-box { display: grid; gap: 8px; padding: 14px; border: 2px dashed var(--accent); border-radius: 16px; background: var(--tint); }
+.share-text { min-height: 0; height: auto; padding: 10px 12px; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.45; resize: none; white-space: pre-wrap; overflow-wrap: anywhere; }
 .chat { display: grid; gap: 10px; padding: 16px; border: 2.5px solid var(--ink); border-radius: 18px; background: var(--tint); }
 .chat-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .chat-list { list-style: none; margin: 0; padding: 4px 2px; display: grid; gap: 6px; max-height: 280px; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
@@ -709,11 +711,17 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                 <span class="mono">Standings</span>
                 <ol class="standings" id="standings"></ol>
                 <div class="actions">
-                  <button class="btn primary" type="button" id="save-btn" data-act="save">Save my result</button>
+                  <button class="btn primary" type="button" id="share-btn" data-act="share">Share my score</button>
+                  <button class="btn" type="button" id="save-btn" data-act="save">Save my result</button>
                   <button class="btn" type="button" id="again-btn" data-act="again">Play again</button>
                   <button class="btn" type="button" id="home-btn" data-act="go-home">&larr; Back to homepage</button>
                 </div>
                 <p class="note" id="save-note"></p>
+                <div class="share-box" id="share-box" hidden>
+                  <span class="mono">Your score card</span>
+                  <textarea class="field share-text" id="share-text" readonly rows="9" aria-label="Score to share"></textarea>
+                  <p class="note" id="share-note"></p>
+                </div>
               </div>
               <div style="display:grid;gap:12px">
                 <span class="mono">Pick-by-pick</span>
@@ -2334,6 +2342,8 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     $('save-btn').hidden = !inGame;
     $('save-btn').disabled = !res || saved;
     $('save-btn').textContent = saved ? 'Saved to your account' : 'Save my result';
+    $('share-btn').hidden = !(res && inGame);
+    if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; }
     $('save-note').textContent = (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
     var againTxt = g.practice ? 'New random topic' : g.mode === 'local' ? 'Play again' : 'New game';
     document.querySelectorAll('#scr-results [data-act="again"]').forEach(function (b) { b.textContent = againTxt; });
@@ -2461,6 +2471,44 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   }
   function afterChange() { render(); if (S.ui.open) renderList(); }
 
+  var SHARE_URL = 'https://playtheroster.github.io';
+  var TIER_SQUARES = { 5: '🟩', 4: '🟢', 3: '🟨', 2: '🟧', 1: '🟥' };
+  function medal(rank) { return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank + '.'; }
+  function shareText(g) {
+    var res = g.results; if (!res) return '';
+    var rows = standings(g, res.scores), me = rows.filter(function (r) { return r.pid === S.me; })[0];
+    if (!me) return '';
+    var t = TOPICS[g.topicId], max = g.subs.length * 10;
+    var dateTxt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    var lines = ['The Roster · ' + t.name + ' · ' + (g.practice ? 'Practice' : dateTxt)];
+    if (g.mode === 'local') {
+      lines.push(medal(me.rank) + ' ' + ordinal(me.rank) + ' place out of ' + rows.length + ' · vs ' + (LEVEL_NAMES[g.botLevel] || 'Medium') + ' AI');
+      lines.push('Score: ' + fmt1(me.total) + '/' + max);
+    } else {
+      lines.push('🏆 Final standings');
+      rows.forEach(function (r) { lines.push(medal(r.rank) + ' ' + r.name + ' ' + fmt1(r.total) + (r.pid === S.me ? ' (me)' : '')); });
+      lines.push('');
+      lines.push('My roster · ' + ordinal(me.rank) + ' of ' + rows.length + ' · ' + fmt1(me.total) + '/' + max);
+    }
+    g.subs.forEach(function (sub) {
+      var p = filled(g, S.me, sub), sc = p ? res.scores['p' + p.n] : null;
+      lines.push((sc ? TIER_SQUARES[tier(sc.score)] : '⬜') + ' ' + sub + ' ' + (sc ? fmt1(sc.score) : '–'));
+    });
+    lines.push(g.practice ? 'Can you beat it? ' + SHARE_URL : 'Play today’s topic: ' + SHARE_URL);
+    return lines.join('\n');
+  }
+  async function shareScore() {
+    var g = S.game; if (!g || !g.results) return;
+    var text = shareText(g); if (!text) return;
+    var box = $('share-box'), ta = $('share-text'), note = $('share-note');
+    box.hidden = false; ta.value = text; ta.rows = text.split('\n').length + 1;
+    if (S.env.web && navigator.share) {
+      try { await navigator.share({ text: text }); note.textContent = 'Shared.'; return; }
+      catch (e) { if (e && e.name === 'AbortError') { note.textContent = ''; return; } }
+    }
+    try { await navigator.clipboard.writeText(text); note.textContent = 'Copied. Paste it into a text, group chat or post.'; }
+    catch (e) { ta.focus(); ta.select(); note.textContent = 'Press and hold (or Ctrl/Cmd+C) to copy the score above.'; }
+  }
   function ordinal(n) { n = Math.round(n); var s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
   function renderAwards(g, scores) {
     var box = $('awards'), a = draftAwards(g, scores);
@@ -3001,6 +3049,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var act = t.getAttribute('data-act');
     if (act === 'goto-mode') gotoMode(t.getAttribute('data-mode'));
     else if (act === 'home') { ev.preventDefault(); if (!S.game) showView('home'); else if (screenFor() === 'results') leaveGame(false); else window.scrollTo(0, 0); }
+    else if (act === 'share') { ev.preventDefault(); shareScore(); }
     else if (act === 'go-home') { ev.preventDefault(); leaveGame(false); }
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
@@ -3093,7 +3142,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-2';
+  var BUILD_ID = '2026-10-13-4';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
