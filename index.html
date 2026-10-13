@@ -2472,7 +2472,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   function afterChange() { render(); if (S.ui.open) renderList(); }
 
   var SHARE_URL = 'https://playtheroster.github.io';
-  var TIER_SQUARES = { 5: '🟩', 4: '🟢', 3: '🟨', 2: '🟧', 1: '🟥' };
+  var TIER_SQUARES = { 5: '🟩', 4: '🟩', 3: '🟨', 2: '🟧', 1: '🟥' };
   function medal(rank) { return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank + '.'; }
   function shareText(g) {
     var res = g.results; if (!res) return '';
@@ -2492,7 +2492,8 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     }
     g.subs.forEach(function (sub) {
       var p = filled(g, S.me, sub), sc = p ? res.scores['p' + p.n] : null;
-      lines.push((sc ? TIER_SQUARES[tier(sc.score)] : '⬜') + ' ' + sub + ' ' + (sc ? fmt1(sc.score) : '–'));
+      var top = p && (t.ranks[sub] || [])[0] === p.key;
+      lines.push((sc ? TIER_SQUARES[tier(sc.score)] : '⬜') + ' ' + sub + ' ' + (sc ? fmt1(sc.score) : '–') + (top ? ' ⭐' : ''));
     });
     lines.push(g.practice ? 'Can you beat it? ' + SHARE_URL : 'Play today’s topic: ' + SHARE_URL);
     return lines.join('\n');
@@ -3142,7 +3143,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-4';
+  var BUILD_ID = '2026-10-13-6';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
