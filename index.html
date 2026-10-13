@@ -304,6 +304,19 @@ button.bsub[aria-pressed="true"] .mono { color: var(--hi-ink); }
 .org-title { font-size: clamp(2.2rem, 6vw, 3.6rem); }
 .org-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .org-day { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px; padding: 14px; border: 2px solid var(--line); border-radius: 14px; }
+.org-glance { display: grid; gap: 8px; }
+.org-glance-wrap { overflow-x: auto; border: 2.5px solid var(--ink); border-radius: 16px; background: var(--surface); }
+.org-glance-table { width: 100%; border-collapse: collapse; min-width: 420px; font-size: 0.95rem; }
+.org-glance-table th, .org-glance-table td { padding: 9px 12px; text-align: left; border-top: 1px solid var(--line); }
+.org-glance-table thead th { border-top: 0; background: var(--deep); color: var(--deep-ink); font-weight: 700; }
+.org-glance-table tbody th { font-weight: 700; white-space: nowrap; }
+.org-glance-table .mono { font-size: 0.62rem; color: var(--accent); }
+.org-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 6px; border: 2.5px solid var(--ink); border-radius: 18px; background: var(--surface); }
+.org-tab { min-height: 52px; border: 0; border-radius: 13px; background: transparent; font-weight: 800; font-size: 1.02rem; color: var(--muted); }
+.org-tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--ink); }
+#org-tab-fast[aria-selected="true"] { background: linear-gradient(100deg, var(--grad-a), var(--grad-b)); color: #fff; }
+.org-day.is-fast { background: color-mix(in srgb, var(--pop) 6%, var(--surface)); }
+.org-other { color: var(--muted); }
 .org-fast { display: grid; gap: 8px; margin-top: 4px; padding: 12px; border-radius: 14px; background: var(--tint); border: 2px dashed var(--accent); }
 .org-day.custom { border-color: var(--accent); }
 .org-day.edited { border-color: var(--ink); box-shadow: inset 6px 0 0 var(--hi); }
@@ -335,7 +348,7 @@ span.chip.mini { cursor: default; }
 .t10 .outside .pdot { vertical-align: 0; }
 .t10 .outside .sc.tier { display: inline-block; padding: 0 5px; margin-left: 2px; }
 .t10 .outside { border-top: 1px dashed var(--line); padding-top: 8px; font-size: 0.84rem; color: var(--muted); display: grid; gap: 2px; }
-@media (max-width: 640px) { .org-day { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+@media (max-width: 640px) { .org-day { grid-template-columns: minmax(0, 1fr); gap: 10px; } .org-save .note { display: none; } .org-save { padding: 10px; flex-wrap: nowrap; } .org-save .btn { flex: 1 1 0; padding: 0 10px; } .org-glance-table { min-width: 0; font-size: 0.85rem; } .org-glance-table th, .org-glance-table td { padding: 7px 8px; } .org-glance-table .mono { display: none; } }
 
 /* ---------- Game-night theme ---------- */
 body { background-color: var(--bg); background-image: radial-gradient(var(--dot) 1.6px, transparent 1.8px); background-size: 22px 22px; font-synthesis: none; }
@@ -843,9 +856,17 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
           </div>
           <span class="pill soft mono" id="org-status">No changes</span>
         </div>
+        <div class="org-glance">
+          <span class="mono">Coming up · next 7 days</span>
+          <div class="org-glance-wrap"><table class="org-glance-table" id="org-glance"></table></div>
+        </div>
+        <div class="org-tabs" role="tablist" aria-label="Which schedule">
+          <button type="button" class="org-tab" role="tab" id="org-tab-daily" data-act="org-tab" data-tab="daily" aria-selected="true">🗓️ Daily draft</button>
+          <button type="button" class="org-tab" role="tab" id="org-tab-fast" data-act="org-tab" data-tab="fast" aria-selected="false">⚡ Fast Money</button>
+        </div>
         <div style="display:grid;gap:8px">
-          <h2 class="display org-title">Upcoming topics</h2>
-          <p class="note">Set the draft topic and the Fast Money topic for any day, starting today. Players only see a day's topics once that day starts. Changing today's Fast Money doesn't affect anyone who already played it.</p>
+          <h2 class="display org-title" id="org-heading">Daily draft schedule</h2>
+          <p class="note" id="org-intro"></p>
         </div>
         <ol class="org-list" id="org-list"></ol>
         <div><button class="btn small" type="button" id="org-more" data-act="org-more">Show 30 more days</button></div>
@@ -3034,38 +3055,49 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var p = key.split('-').map(Number);
     return new Date(p[0], p[1] - 1, p[2]).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   }
+  function orgChips(list, picked, act, key, fixed) {
+    return list.map(function (sb) {
+      if (fixed) return '<span class="chip mini" aria-pressed="true">' + esc(sb) + '</span>';
+      return '<button type="button" class="chip mini" data-act="' + act + '" data-day="' + key + '" data-sub="' + esc(sb) + '" aria-pressed="' + (picked.indexOf(sb) >= 0) + '">' + esc(sb) + '</button>';
+    }).join('');
+  }
+  function orgOpts(sel) { return TOPIC_SORTED.map(function (x) { return '<option value="' + x.id + '"' + (x.id === sel ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join(''); }
   function renderOrganizer() {
     if (!S.org.draft) orgStart();
+    var tab = S.org.tab === 'fast' ? 'fast' : 'daily';
     var saved = futureOnly(SCHEDULE.days), savedF = futureOnly(SCHEDULE.fast || {});
+    ['daily', 'fast'].forEach(function (x) { var b = $('org-tab-' + x); b.setAttribute('aria-selected', String(x === tab)); });
+    $('org-heading').textContent = tab === 'fast' ? 'Fast Money schedule' : 'Daily draft schedule';
+    $('org-intro').textContent = tab === 'fast'
+      ? 'The solo 60-second round, one try per day. Pick each day’s Fast Money topic and its 5 subtopics. It always has to be a different topic from that day’s draft.'
+      : 'The topic everyone drafts against friends and the AI. Pick each day’s topic and its 5 subtopics. Players only see a day’s topic once that day starts.';
+    $('org-glance').innerHTML = '<thead><tr><th>Day</th><th>🗓️ Daily draft</th><th>⚡ Fast Money</th></tr></thead><tbody>' +
+      orgDays().slice(0, 7).map(function (key, i) {
+        var sp = orgSpec(key), fp = orgFastSpec(key);
+        return '<tr><th scope="row">' + (i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : esc(keyLabel(key))) + '</th><td>' + esc(TOPICS[sp.topicId].name) + (sp.custom ? ' <span class="mono">custom</span>' : '') + '</td><td>' + esc(TOPICS[fp.topicId].name) + (fp.custom ? ' <span class="mono">custom</span>' : '') + '</td></tr>';
+      }).join('') + '</tbody>';
     $('org-list').innerHTML = orgDays().map(function (key, idx) {
-      var spec = orgSpec(key), t = TOPICS[spec.topicId], label = keyLabel(key);
-      var fspec = orgFastSpec(key), ft = TOPICS[fspec.topicId];
-      var edited = JSON.stringify(saved[key] || null) !== JSON.stringify(S.org.draft[key] || null) || JSON.stringify(savedF[key] || null) !== JSON.stringify(S.org.fast[key] || null);
-      var status = edited ? 'Unsaved' : (spec.custom || fspec.custom) ? 'Custom' : 'Automatic';
-      var ffixed = ft.subs.length === SUBS_PER_DAY, clash = fspec.topicId === spec.topicId;
-      var fchips = ft.subs.map(function (sb) {
-        if (ffixed) return '<span class="chip mini" aria-pressed="true">' + esc(sb) + '</span>';
-        return '<button type="button" class="chip mini" data-act="org-fsub" data-day="' + key + '" data-sub="' + esc(sb) + '" aria-pressed="' + (fspec.subs.indexOf(sb) >= 0) + '">' + esc(sb) + '</button>';
-      }).join('');
-      var fopts = TOPIC_SORTED.map(function (x) { return '<option value="' + x.id + '"' + (x.id === fspec.topicId ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('');
-      var fnote = clash ? 'Fast Money has to use a different topic than the draft.' : ffixed ? 'This topic always uses these 5 subtopics.' : 'Pick 5 of ' + ft.subs.length + ' · ' + fspec.subs.length + ' selected';
-      var fixed = t.subs.length === SUBS_PER_DAY;
-      var chips = t.subs.map(function (sb) {
-        if (fixed) return '<span class="chip mini" aria-pressed="true">' + esc(sb) + '</span>';
-        return '<button type="button" class="chip mini" data-act="org-sub" data-day="' + key + '" data-sub="' + esc(sb) + '" aria-pressed="' + (spec.subs.indexOf(sb) >= 0) + '">' + esc(sb) + '</button>';
-      }).join('');
-      var opts = TOPIC_SORTED.map(function (x) { return '<option value="' + x.id + '"' + (x.id === spec.topicId ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('');
-      var count = fixed ? 'This topic always uses these 5 subtopics.' : 'Pick 5 of ' + t.subs.length + ' · ' + spec.subs.length + ' selected';
-      return '<li class="org-day' + (edited ? ' edited' : spec.custom ? ' custom' : '') + '" data-day="' + key + '">' +
-        '<div class="org-date"><b>' + esc(label) + '</b><span class="mono">' + (idx === 0 ? 'Today' : idx === 1 ? 'Tomorrow' : 'In ' + idx + ' days') + '</span><span class="mono tag">' + status + '</span></div>' +
-        '<div class="org-edit"><div class="org-row"><label class="mono" for="org-t-' + key + '">Topic</label><select class="field" id="org-t-' + key + '" data-org-topic="' + key + '">' + opts + '</select>' +
-        (S.org.draft[key] ? '<button type="button" class="btn small ghost" data-act="org-reset" data-day="' + key + '">Use automatic</button>' : '') + '</div>' +
-        '<div class="chips" role="group" aria-label="Subtopics for ' + esc(label) + '">' + chips + '</div>' +
-        '<p class="note' + (!fixed && spec.subs.length !== SUBS_PER_DAY ? ' bad' : '') + '">' + count + '</p>' +
-        '<div class="org-fast"><div class="org-row"><label class="mono" for="org-f-' + key + '">Fast Money ⚡</label><select class="field" id="org-f-' + key + '" data-org-ftopic="' + key + '">' + fopts + '</select>' +
-        (S.org.fast[key] ? '<button type="button" class="btn small ghost" data-act="org-freset" data-day="' + key + '">Use automatic</button>' : '') + '</div>' +
-        '<div class="chips" role="group" aria-label="Fast Money subtopics for ' + esc(label) + '">' + fchips + '</div>' +
-        '<p class="note' + (clash || (!ffixed && fspec.subs.length !== SUBS_PER_DAY) ? ' bad' : '') + '">' + fnote + '</p></div></div></li>';
+      var spec = orgSpec(key), fspec = orgFastSpec(key), label = keyLabel(key);
+      var when = idx === 0 ? 'Today' : idx === 1 ? 'Tomorrow' : 'In ' + idx + ' days';
+      var isFast = tab === 'fast';
+      var cur = isFast ? fspec : spec, t = TOPICS[cur.topicId], fixed = t.subs.length === SUBS_PER_DAY;
+      var edited = isFast ? JSON.stringify(savedF[key] || null) !== JSON.stringify(S.org.fast[key] || null)
+                          : JSON.stringify(saved[key] || null) !== JSON.stringify(S.org.draft[key] || null);
+      var status = edited ? 'Unsaved' : cur.custom ? 'Custom' : 'Automatic';
+      var clash = fspec.topicId === spec.topicId;
+      var note = isFast && clash ? 'Same topic as this day’s draft (' + TOPICS[spec.topicId].name + '). Pick a different one.'
+        : fixed ? 'This topic always uses these 5 subtopics.' : 'Pick 5 of ' + t.subs.length + ' · ' + cur.subs.length + ' selected';
+      var bad = (isFast && clash) || (!fixed && cur.subs.length !== SUBS_PER_DAY);
+      var other = isFast ? 'Draft that day: ' + TOPICS[spec.topicId].name : 'Fast Money that day: ' + TOPICS[fspec.topicId].name;
+      var idp = isFast ? 'org-f-' : 'org-t-', dataSel = isFast ? 'data-org-ftopic' : 'data-org-topic';
+      var resetAct = isFast ? 'org-freset' : 'org-reset', hasCustom = isFast ? !!S.org.fast[key] : !!S.org.draft[key];
+      return '<li class="org-day ' + (isFast ? 'is-fast' : 'is-daily') + (edited ? ' edited' : cur.custom ? ' custom' : '') + '" data-day="' + key + '">' +
+        '<div class="org-date"><b>' + esc(label) + '</b><span class="mono">' + when + '</span><span class="mono tag">' + status + '</span></div>' +
+        '<div class="org-edit"><div class="org-row"><label class="mono" for="' + idp + key + '">' + (isFast ? 'Fast Money topic' : 'Draft topic') + '</label><select class="field" id="' + idp + key + '" ' + dataSel + '="' + key + '">' + orgOpts(cur.topicId) + '</select>' +
+        (hasCustom ? '<button type="button" class="btn small ghost" data-act="' + resetAct + '" data-day="' + key + '">Use automatic</button>' : '') + '</div>' +
+        '<div class="chips" role="group" aria-label="Subtopics for ' + esc(label) + '">' + orgChips(t.subs, cur.subs, isFast ? 'org-fsub' : 'org-sub', key, fixed) + '</div>' +
+        '<p class="note' + (bad ? ' bad' : '') + '">' + esc(note) + '</p>' +
+        '<p class="mono org-other">' + esc(other) + '</p></div></li>';
     }).join('');
     var dirty = orgDirty();
     $('org-save').disabled = !dirty;
@@ -3225,6 +3257,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     else if (act === 'organizer') openOrganizer();
     else if (act === 'org-sub') orgToggleSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-reset') { delete S.org.draft[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
+    else if (act === 'org-tab') { S.org.tab = t.getAttribute('data-tab'); renderOrganizer(); window.scrollTo(0, 0); }
     else if (act === 'org-freset') { delete S.org.fast[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
     else if (act === 'org-fsub') orgToggleFastSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-more') { S.org.days = Math.min(365, S.org.days + 30); renderOrganizer(); }
@@ -3280,7 +3313,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-9';
+  var BUILD_ID = '2026-10-13-11';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -3647,6 +3680,17 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     return fastAutoSpec(key, daily);
   }
   function fastAutoSpec(key, daily) {
+    if (key >= '2026-10-14') {
+      /* Its own 100-day rotation (offset from the draft's), so a topic doesn't come back for months. */
+      var di = dayIndex(key), n = TOPIC_DEFS.length, c = Math.floor(di / n), pos = di - c * n;
+      var fo = function (cc) { return shuffled(TOPIC_DEFS.map(function (t) { return t.id; }), rng(hashStr('fastcycle:' + cc))); };
+      var order = fo(c), prevOrder = fo(c - 1);
+      if (order[0] === prevOrder[n - 1]) { var sw = order[0]; order[0] = order[1]; order[1] = sw; }
+      var pick = order[pos], realDaily = dailySpec(key).topicId;
+      if (pick === daily || pick === realDaily) pick = order[(pos + 50) % n];
+      if (pick === daily || pick === realDaily) pick = order[(pos + 25) % n];
+      return { dateKey: key, topicId: pick, subs: shuffled(TOPICS[pick].subs, rng(hashStr('fastsubs:' + key + ':' + pick))).slice(0, SUBS_PER_DAY) };
+    }
     var ids = Object.keys(TOPICS).sort();
     var r = rng(hashStr('fast:' + key)), i = Math.floor(r() * ids.length);
     if (ids[i] === daily) i = (i + 1 + Math.floor(r() * (ids.length - 1))) % ids.length;
