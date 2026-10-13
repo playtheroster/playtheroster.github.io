@@ -425,6 +425,20 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .award .who { font-weight: 700; color: var(--pc, var(--ink)); }
 .award p { margin: 0; color: var(--muted); font-size: 0.92rem; }
 .award .sc.tier { display: inline-block; padding: 1px 7px; font-family: var(--font-mono); font-size: 0.8rem; }
+.fast-sub { font-size: clamp(2.2rem, 9vw, 3.6rem); color: var(--accent); }
+.fast-list { position: static; margin-top: 8px; max-height: 260px; }
+.fast-done-list .bsub { background: var(--tint); }
+.fast-rules li { font-size: 0.92rem; color: var(--muted); }
+.fast-verdict.won { background: var(--g5); color: var(--g5-ink); }
+.fast-verdict.won .mono { color: var(--g5-ink); }
+.fast-verdict.lost { background: var(--g2); color: var(--g2-ink); }
+.fast-verdict.lost .mono { color: var(--g2-ink); }
+.fast-verdict h3 small { font-family: var(--font-body); font-size: 1rem; opacity: 0.8; }
+.fast-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fast-results li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; border: 2.5px solid var(--line); border-radius: 16px; background: var(--surface); }
+.fast-results .fr-main { display: grid; gap: 2px; min-width: 0; }
+.fast-results strong { font-size: 1.1rem; overflow-wrap: anywhere; }
+.fast-results .sc.tier { padding: 4px 9px; font-family: var(--font-mono); font-size: 0.95rem; }
 .share-box { display: grid; gap: 8px; padding: 14px; border: 2px dashed var(--accent); border-radius: 16px; background: var(--tint); }
 .share-text { min-height: 0; height: auto; padding: 10px 12px; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.45; resize: none; white-space: pre-wrap; overflow-wrap: anywhere; }
 .chat { display: grid; gap: 10px; padding: 16px; border: 2.5px solid var(--ink); border-radius: 18px; background: var(--tint); }
@@ -517,6 +531,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
         <button class="btn" type="button" data-act="goto-mode" data-mode="random">Play random people</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="practice">Practice: random topic</button>
+        <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
       </div>
     </div>
   </section>
@@ -633,6 +648,17 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
                 <p class="note level-note"></p>
                 <button class="btn primary block" type="button" data-act="play-practice">Start practice</button>
               </div>
+
+              <div class="mode" id="mode-fast">
+                <h3>Fast Money ⚡</h3>
+                <p>A daily challenge with its own topic. 60 seconds on the clock, one subtopic at a time: answer it and the next one appears, until all 5 are done. Score more than <strong>40.0</strong> to win. One try per day.</p>
+                <ul class="rules fast-rules">
+                  <li><span>Every answer is scored right away against the subtopic’s ranked list.</span></li>
+                  <li><span>No repeats across subtopics. Skip if you’re stuck, but a skip scores 0.</span></li>
+                </ul>
+                <button class="btn primary block" type="button" data-act="fast-start" id="fast-start-btn">Start today’s Fast Money</button>
+                <p class="note">The clock starts as soon as you tap. Leaving doesn’t pause it.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -736,6 +762,46 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(29, 
             </div>
             <div class="board-wrap"><table class="board" id="final-board"></table></div>
             <div class="actions"><button class="btn primary" type="button" data-act="go-home">&larr; Back to homepage</button><button class="btn" type="button" data-act="again" data-again2="1">Play again</button></div>
+          </div>
+        </div>
+
+        <!-- FAST MONEY -->
+        <div id="scr-fast" hidden>
+          <div id="fast-play" style="display:grid;gap:16px">
+            <div class="draft-head">
+              <div>
+                <p class="mono" id="fast-step"></p>
+                <h3 class="display fast-sub" id="fast-sub"></h3>
+              </div>
+              <div class="clock" id="fast-clock"><span class="mono">Time left</span><div class="t" id="fast-clock-t">1:00</div></div>
+            </div>
+            <div class="bar" id="fast-bar"><i id="fast-bar-i"></i></div>
+            <div class="pickbox">
+              <label class="mono label" for="fast-in" id="fast-label">Answer</label>
+              <div class="combo">
+                <div class="combo-row">
+                  <input class="field" id="fast-in" type="text" autocomplete="off" spellcheck="false" placeholder="Start typing…" role="combobox" aria-controls="fast-list" aria-autocomplete="list" aria-expanded="false">
+                  <button class="btn small" type="button" data-act="fast-skip">Skip</button>
+                </div>
+                <ul class="list fast-list" id="fast-list" role="listbox" aria-label="Matching answers" hidden></ul>
+              </div>
+              <p class="note">Type, then tap an answer or press Enter for the top match.</p>
+            </div>
+            <div class="banner-subs fast-done-list" id="fast-done-list"></div>
+          </div>
+          <div id="fast-done" hidden style="display:grid;gap:16px">
+            <div class="winner fast-verdict" id="fast-verdict"></div>
+            <ol class="fast-results" id="fast-results"></ol>
+            <div class="actions">
+              <button class="btn primary" type="button" data-act="fast-share">Share my score</button>
+              <button class="btn" type="button" data-act="go-home">&larr; Back to homepage</button>
+            </div>
+            <p class="note" id="fast-next"></p>
+            <div class="share-box" id="fast-share-box" hidden>
+              <span class="mono">Your score card</span>
+              <textarea class="field share-text" id="fast-share-text" readonly rows="9" aria-label="Score to share"></textarea>
+              <p class="note" id="fast-share-note"></p>
+            </div>
           </div>
         </div>
 
@@ -2153,12 +2219,15 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     $('hero').hidden = inPlay || inOrg; $('how').hidden = inPlay || inOrg; $('play').hidden = !inPlay; $('organizer').hidden = !inOrg;
     $('org-btn').hidden = !orgAllowed() || inOrg;
     persistSession();
-    ['room', 'random', 'offline', 'practice'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    ['room', 'random', 'offline', 'practice', 'fast'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
     var atResults = !!S.game && scr === 'results';
     $('back-btn').hidden = !!S.game && !atResults;
     $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
     renderBanner();
-    ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = s !== scr; });
+    var fastOn = !!S.fast && !S.game;
+    ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
+    $('scr-fast').hidden = !fastOn;
+    if (fastOn) { $('back-btn').hidden = !S.fast.done; $('back-btn').innerHTML = '&larr; Homepage'; }
     var online = !!(S.env.db && S.env.uid);
     var pill = $('conn-pill');
     if (!S.env.ready) { pill.textContent = 'Connecting'; pill.className = 'pill mono'; }
@@ -2173,12 +2242,13 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       : 'Rooms and matchmaking need you signed in to claude.ai with “Can edit” access to this page.';
     on.className = 'note bad';
     document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online; });
-    $('console-label').textContent = scr === 'modes' ? ({ room: 'Join a room', random: 'Play random people', offline: 'Offline vs AI', practice: 'Practice' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
+    $('console-label').textContent = scr === 'modes' ? ({ room: 'Join a room', random: 'Play random people', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
     renderChat();
     var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && (S.mode === 'room' || S.mode === 'random')));
     if (scr === 'lobby') renderLobby();
     if (scr === 'draft') renderDraft();
     if (scr === 'results') renderResults();
+    if (fastOn) { $('console-label').textContent = S.fast.done ? 'Fast Money · results' : 'Fast Money'; renderFast(); }
     renderAccountBtn();
   }
 
@@ -2188,6 +2258,22 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var mineOn = g && g.players[S.me] && g.status === 'drafting';
     $('tb-name').textContent = t.name;
     var tbl = document.querySelector('#topic-banner .banner-main .mono'); if (tbl) tbl.textContent = g && g.practice ? 'Practice topic' : 'Topic';
+    if (!g && S.fast) {
+      var ft = TOPICS[S.fast.topicId];
+      $('tb-name').textContent = ft.name; $('tb-q').textContent = ft.q;
+      if (tbl) tbl.textContent = 'Fast Money · today';
+      $('tb-subs').innerHTML = S.fast.subs.map(function (s, i) {
+        var shown = S.fast.done || i <= S.fast.idx, a = S.fast.answers[i];
+        return '<span class="bsub' + (i < S.fast.idx || S.fast.done ? ' done' : '') + (shown ? '' : ' locked') + '"><span class="mono">0' + (i + 1) + '</span>' + (shown ? esc(s) : '???') + (a && a.name ? '<span class="bpick">' + esc(a.name) + '</span>' : a && a.skipped ? '<span class="bpick">skipped</span>' : '') + '</span>';
+      }).join('');
+      return;
+    }
+    if (!g && S.mode === 'fast') {
+      $('tb-name').textContent = 'Fast Money'; $('tb-q').textContent = 'Today’s challenge: 60 seconds, 5 subtopics, beat 40.0. Its topic is a surprise until you start.';
+      $('tb-subs').innerHTML = '<span class="bsub locked">' + LOCK_SVG + 'Subtopics appear one at a time</span>';
+      if (tbl) tbl.textContent = 'Game mode';
+      return;
+    }
     if (!g && S.mode === 'practice') {
       $('tb-name').textContent = 'Surprise topic';
       $('tb-q').textContent = 'One of 100 topics, picked at random when you start.';
@@ -2759,6 +2845,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     } catch (e) { setMsg('Couldn’t start the draft. Try again.', true); }
   }
   function leaveGame(silent) {
+    if (S.fast) { saveFast(); S.fast = null; }
     var g = S.game;
     S.unsub.forEach(function (u) { try { u(); } catch (e) {} });
     S.unsub = [];
@@ -3048,9 +3135,13 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var t = ev.target.closest ? ev.target.closest('[data-act]') : null;
     if (!t) { if (S.ui.open && !(ev.target.closest && ev.target.closest('#combo'))) closeList(); return; }
     var act = t.getAttribute('data-act');
-    if (act === 'goto-mode') gotoMode(t.getAttribute('data-mode'));
-    else if (act === 'home') { ev.preventDefault(); if (!S.game) showView('home'); else if (screenFor() === 'results') leaveGame(false); else window.scrollTo(0, 0); }
+    if (act === 'goto-mode' && t.getAttribute('data-mode') === 'fast' && !S.game) openFast();
+    else if (act === 'goto-mode') gotoMode(t.getAttribute('data-mode'));
+    else if (act === 'home') { ev.preventDefault(); if (S.fast) { if (S.fast.done) leaveGame(false); else window.scrollTo(0, 0); } else if (!S.game) showView('home'); else if (screenFor() === 'results') leaveGame(false); else window.scrollTo(0, 0); }
     else if (act === 'share') { ev.preventDefault(); shareScore(); }
+    else if (act === 'fast-start') startFast();
+    else if (act === 'fast-skip') fastSubmit(null);
+    else if (act === 'fast-share') { ev.preventDefault(); shareFast(); }
     else if (act === 'go-home') { ev.preventDefault(); leaveGame(false); }
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
@@ -3143,7 +3234,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-6';
+  var BUILD_ID = '2026-10-13-8';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -3501,6 +3592,143 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var on = document.querySelector('.org-save .note');
     if (on) on.textContent = 'Saving downloads an updated index.html. Upload it to your website host, replacing the old file, and everyone sees the new schedule.';
   }
+  /* ---------- Fast Money: 60 seconds, five subtopics in a row, beat the target ---------- */
+  var FAST_SECONDS = TEST.fastSeconds || 60, FAST_TARGET = 40;
+  /* Fast Money has its own daily topic, never the same as the day's draft topic. */
+  function fastSpec(key) {
+    var ids = Object.keys(TOPICS).sort(), daily = dailySpec(key).topicId;
+    var r = rng(hashStr('fast:' + key)), i = Math.floor(r() * ids.length);
+    if (ids[i] === daily) i = (i + 1 + Math.floor(r() * (ids.length - 1))) % ids.length;
+    var id = ids[i];
+    return { dateKey: key, topicId: id, subs: shuffled(TOPICS[id].subs, rng(hashStr('fastsubs:' + key + ':' + id))).slice(0, SUBS_PER_DAY) };
+  }
+  function fastStoreKey(key) { return 'roster.fast.' + key; }
+  if (TEST.exportEngine && window.__ROSTER_ENGINE__) window.__ROSTER_ENGINE__.fastSpec = fastSpec;
+  function loadFastToday() {
+    var key = dateKey(new Date()), f = null;
+    try { f = JSON.parse(store(fastStoreKey(key)) || 'null'); } catch (e) {}
+    return f && f.dateKey === key && TOPICS[f.topicId] ? f : null;
+  }
+  function openFast() {
+    var f = loadFastToday();
+    if (f) { S.fast = f; if (!f.done && now() >= f.endsAt) finishFast(); }
+    else S.fast = null;
+    S.view = 'play'; S.mode = 'fast';
+    render(); window.scrollTo(0, 0);
+    if (S.fast && !S.fast.done) setTimeout(function () { var i = $('fast-in'); if (i) i.focus(); }, 50);
+  }
+  function startFast() {
+    if (loadFastToday()) { openFast(); return; }
+    leaveGame(true);
+    var spec = fastSpec(dateKey(new Date()));
+    var t0 = now();
+    S.fast = { topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, idx: 0, answers: [], startedAt: t0, endsAt: t0 + FAST_SECONDS * 1000, done: false, finishedAt: 0 };
+    S.ui.fastQ = ''; S.ui.fastSel = 0;
+    S.view = 'play'; S.mode = 'fast';
+    saveFast(); setMsg(''); render(); window.scrollTo(0, 0);
+    setTimeout(function () { var i = $('fast-in'); if (i) i.focus(); }, 50);
+  }
+  function saveFast() { if (S.fast) store(fastStoreKey(S.fast.dateKey), JSON.stringify(S.fast)); }
+  function fastUsed() { var u = {}; (S.fast.answers || []).forEach(function (a) { if (a) u[a.key] = 1; }); return u; }
+  function fastMatches() {
+    var f = S.fast, q = S.ui.fastQ || '';
+    if (!q.trim()) return [];
+    var used = fastUsed();
+    return search(f.topicId, q).filter(function (r) { return !used[r.e.key]; }).slice(0, 8);
+  }
+  function fastSubmit(entry) {
+    var f = S.fast; if (!f || f.done) return;
+    if (now() >= f.endsAt) { finishFast(); return; }
+    f.answers[f.idx] = entry ? { key: entry.key, name: entry.name } : { skipped: true };
+    f.idx++;
+    S.ui.fastQ = ''; S.ui.fastSel = 0;
+    if (f.idx >= f.subs.length) finishFast();
+    else { saveFast(); render(); var i = $('fast-in'); if (i) { i.value = ''; i.focus(); } }
+  }
+  function finishFast() {
+    var f = S.fast; if (!f || f.done) return;
+    f.done = true; f.finishedAt = Math.min(now(), f.endsAt);
+    f.results = f.subs.map(function (sub, i) {
+      var a = f.answers[i];
+      if (!a || a.skipped) return { sub: sub, score: 0, rank: -1, skipped: !!(a && a.skipped) };
+      var q = quickScore(f.topicId, sub, a.key), list = TOPICS[f.topicId].ranks[sub] || [];
+      return { sub: sub, name: a.name, key: a.key, score: q.score, rank: list.indexOf(a.key) };
+    });
+    f.total = round1(f.results.reduce(function (m, r) { return m + r.score; }, 0));
+    saveFast(); render();
+  }
+  function fastTick() {
+    var f = S.fast; if (!f || f.done || S.view !== 'play') return;
+    var rem = f.endsAt - now();
+    if (rem <= 0) { finishFast(); return; }
+    var el = $('fast-clock-t'); if (!el) return;
+    el.textContent = fmtClock(rem);
+    var low = rem <= 10000;
+    $('fast-clock').className = 'clock' + (low ? ' low' : '');
+    $('fast-bar').className = 'bar' + (low ? ' low' : '');
+    $('fast-bar-i').style.width = (Math.max(0, Math.min(1, rem / (FAST_SECONDS * 1000))) * 100) + '%';
+  }
+  function renderFast() {
+    var f = S.fast, t = TOPICS[f.topicId];
+    $('fast-play').hidden = f.done; $('fast-done').hidden = !f.done;
+    if (!f.done) {
+      $('fast-step').textContent = 'Subtopic ' + (f.idx + 1) + ' of ' + f.subs.length + ' · Beat ' + fmt1(FAST_TARGET);
+      $('fast-sub').textContent = f.subs[f.idx];
+      $('fast-label').textContent = 'Best ' + t.noun + ' for ' + f.subs[f.idx];
+      var ms = fastMatches();
+      if (!(S.ui.fastSel < ms.length)) S.ui.fastSel = 0;
+      $('fast-list').innerHTML = ms.map(function (r, i) {
+        return '<li class="opt" role="option" data-act="fast-pick" data-key="' + esc(r.e.key) + '" aria-selected="' + (i === S.ui.fastSel) + '"><span class="nm">' + esc(r.e.name) + '</span>' + (r.via ? '<span class="via">' + esc(r.via) + '</span>' : '') + '</li>';
+      }).join('') || ((S.ui.fastQ || '').trim() ? '<li class="opt none">No match. Only answers on the list count.</li>' : '');
+      $('fast-list').hidden = !(S.ui.fastQ || '').trim();
+      $('fast-done-list').innerHTML = f.answers.map(function (a, i) { return '<span class="bsub done"><span class="mono">0' + (i + 1) + '</span>' + esc(f.subs[i]) + '<span class="bpick">' + (a && a.name ? esc(a.name) : 'skipped') + '</span></span>'; }).join('');
+      fastTick();
+      return;
+    }
+    var beat = f.total > FAST_TARGET, used = Math.round((f.finishedAt - f.startedAt) / 1000);
+    $('fast-verdict').className = 'winner fast-verdict ' + (beat ? 'won' : 'lost');
+    $('fast-verdict').innerHTML = '<span class="mono">' + (beat ? 'You beat it' : 'Not this time') + '</span><h3 class="display">' + fmt1(f.total) + ' <small>/ 50</small></h3><p>' +
+      (beat ? 'Beat the ' + fmt1(FAST_TARGET) + ' target by ' + fmt1(f.total - FAST_TARGET) : 'Missed the ' + fmt1(FAST_TARGET) + ' target by ' + fmt1(FAST_TARGET - f.total)) +
+      ' · ' + used + ' seconds</p>';
+    var d = new Date(), mid = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1), mins = Math.max(0, Math.round((mid - d) / 60000));
+    $('fast-next').textContent = 'You’ve played today’s Fast Money. A new topic unlocks in ' + Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm.';
+    $('fast-results').innerHTML = f.results.map(function (r) {
+      var list = TOPICS[f.topicId].ranks[r.sub] || [], topName = list.length ? TOPICS[f.topicId].byKey[list[0]].name : '';
+      var top = r.rank === 0;
+      return '<li><div class="fr-main"><span class="mono">' + esc(r.sub) + '</span><strong>' + (r.name ? esc(r.name) : 'No answer') + (top ? ' ⭐' : '') + '</strong>' +
+        '<span class="note">' + (r.name ? (r.rank >= 0 ? '#' + (r.rank + 1) + ' on the list' : 'Not on this list') : (r.skipped ? 'Skipped' : 'Time ran out')) + (top || !topName ? '' : ' · #1 was ' + esc(topName)) + '</span></div>' +
+        (r.name ? scoreBadge(r.score) : '<span class="sc tier t1">0.0</span>') + '</li>';
+    }).join('');
+  }
+  function fastShareText() {
+    var f = S.fast; if (!f || !f.done) return '';
+    var t = TOPICS[f.topicId], used = Math.round((f.finishedAt - f.startedAt) / 1000);
+    var dateTxt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    var lines = ['The Roster · Fast Money · ' + t.name + ' · ' + dateTxt];
+    lines.push((f.total > FAST_TARGET ? '✅ Beat ' : '❌ Missed ') + fmt1(FAST_TARGET) + ' with ' + fmt1(f.total) + '/50 in ' + used + 's');
+    f.results.forEach(function (r) { lines.push((r.name ? TIER_SQUARES[tier(r.score)] : '⬛') + ' ' + r.sub + ' ' + fmt1(r.score) + (r.rank === 0 ? ' ⭐' : '')); });
+    lines.push('Can you beat ' + fmt1(FAST_TARGET) + ' in 60 seconds? Today’s Fast Money: ' + SHARE_URL);
+    return lines.join('\n');
+  }
+  async function shareFast() {
+    var text = fastShareText(); if (!text) return;
+    var ta = $('fast-share-text'), note = $('fast-share-note');
+    $('fast-share-box').hidden = false; ta.value = text; ta.rows = text.split('\n').length + 1;
+    if (S.env.web && navigator.share) {
+      try { await navigator.share({ text: text }); note.textContent = 'Shared.'; return; }
+      catch (e) { if (e && e.name === 'AbortError') { note.textContent = ''; return; } }
+    }
+    try { await navigator.clipboard.writeText(text); note.textContent = 'Copied. Paste it into a text, group chat or post.'; }
+    catch (e) { ta.focus(); ta.select(); note.textContent = 'Press and hold (or Ctrl/Cmd+C) to copy the score above.'; }
+  }
+  $('fast-in').addEventListener('input', function () { S.ui.fastQ = this.value; S.ui.fastSel = 0; renderFast(); $('fast-in').setAttribute('aria-expanded', String(!!this.value.trim())); });
+  $('fast-in').addEventListener('keydown', function (ev) {
+    var ms = fastMatches();
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); S.ui.fastSel = Math.min(ms.length - 1, S.ui.fastSel + 1); renderFast(); }
+    else if (ev.key === 'ArrowUp') { ev.preventDefault(); S.ui.fastSel = Math.max(0, S.ui.fastSel - 1); renderFast(); }
+    else if (ev.key === 'Enter') { ev.preventDefault(); if (ms.length) fastSubmit(ms[S.ui.fastSel] ? ms[S.ui.fastSel].e : ms[0].e); }
+  });
+  $('fast-list').addEventListener('mousedown', function (ev) { var li = ev.target.closest ? ev.target.closest('[data-key]') : null; if (!li) return; ev.preventDefault(); fastSubmit(TOPICS[S.fast.topicId].byKey[li.getAttribute('data-key')]); });
   $('chat-form').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var inp = $('chat-in'), v = inp.value; inp.value = '';
@@ -3518,6 +3746,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       orgSaved = sessionStorage.getItem('roster.orgSaved');
       sessionStorage.removeItem('roster.orgSaved');
     } catch (e) {}
+    var fr = loadFastToday(); if (!m && fr && !fr.done) { S.fast = fr; S.view = 'play'; S.mode = 'fast'; if (now() >= fr.endsAt) finishFast(); }
     if (!m && restored && restored.game && restored.game.mode === 'local' && TOPICS[restored.game.topicId] && Array.isArray(restored.game.picks)) {
       S.game = restored.game; S.me = 'you'; S.view = 'play';
       S.lastSettings = restored.settings || { mode: 'local', count: 3 };
@@ -3526,7 +3755,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     renderLevels();
     render();
     setInterval(function () {
-      tick();
+      tick(); fastTick();
       var g = S.game;
       if (g && !g.results && g.mode === 'shared' && !S.waitShown && S.scoreWaitSince && now() - S.scoreWaitSince > 20000 && screenFor() === 'results') { S.waitShown = true; renderResults(); }
     }, 250);
