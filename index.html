@@ -417,9 +417,9 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .seg-btn[data-level="easy"][aria-checked="true"] { background: #1f9d55; color: #fff; }
 .seg-btn[data-level="hard"][aria-checked="true"] { background: #d63a2f; color: #fff; }
 /* homepage options: all white; black on hover only where a mouse can hover (not phones) */
-.cta-row .btn { background: var(--surface); color: var(--ink); }
+.cta-row .btn, #account-btn { background: var(--surface); color: var(--ink); }
 @media (hover: hover) and (pointer: fine) {
-  .cta-row .btn:hover { background: var(--ink); color: var(--hi); }
+  .cta-row .btn:hover, #account-btn:hover { background: var(--ink); color: var(--hi); }
 }
 .seg.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .online-opt { display: grid; gap: 8px; padding-top: 14px; border-top: 2px dashed var(--line); }
@@ -3325,7 +3325,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-16';
+  var BUILD_ID = '2026-10-13-17';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
