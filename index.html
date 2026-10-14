@@ -416,6 +416,9 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .seg-btn[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--drop); }
 .seg-btn[data-level="easy"][aria-checked="true"] { background: #1f9d55; color: #fff; }
 .seg-btn[data-level="hard"][aria-checked="true"] { background: #d63a2f; color: #fff; }
+.seg.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.online-opt { display: grid; gap: 8px; padding-top: 14px; border-top: 2px dashed var(--line); }
+.online-opt:first-of-type { padding-top: 0; border-top: 0; }
 .awards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 14px; }
 .award { display: grid; gap: 6px; padding: 16px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); box-shadow: 4px 4px 0 var(--drop), inset 6px 0 0 var(--pc, var(--accent)); min-width: 0; }
 .award .badge { justify-self: start; padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -535,8 +538,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #101010, 0 3px 0 rgba(0
       <p class="display tagline">Build your roster. <span class="mark">Own the debate.</span></p>
       <p class="lede">Draft the best roster from today's topic and prove your friends wrong.</p>
       <div class="cta-row">
-        <button class="btn primary" type="button" data-act="goto-mode" data-mode="room">Join a room</button>
-        <button class="btn" type="button" data-act="goto-mode" data-mode="random">Play random people</button>
+        <button class="btn primary" type="button" data-act="goto-mode" data-mode="room">Join an online game</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="practice">Practice: random topic</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
@@ -580,27 +582,30 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #101010, 0 3px 0 rgba(0
 
             <div class="modes">
               <div class="mode" id="mode-room">
-                <h3>Join a room</h3>
-                <p>Friends on their own devices, 2–8 players.</p>
-                <div style="display:grid;gap:8px">
-                  <span class="mono">Start a new room</span>
+                <h3>Online game</h3>
+                <p>Play live against people on their own devices, 2–8 players.</p>
+                <div class="online-opt">
+                  <span class="mono">1 · Create a room</span>
+                  <span class="mono label" id="privacy-label">Who can join?</span>
+                  <div class="seg two" role="radiogroup" aria-labelledby="privacy-label" data-seg="privacy">
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="privacy" data-privacy="private">Private</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="privacy" data-privacy="public">Public</button>
+                  </div>
+                  <p class="note" id="privacy-note">Only people you share the code or link with can join.</p>
                   <button class="btn primary block" type="button" data-act="create-room">Create a room</button>
-                  <span class="note">You'll get a 5-letter code to share.</span>
                 </div>
-                <p class="mono or">or</p>
-                <div>
-                  <label class="mono label" for="room-code">Have a code? Enter it</label>
+                <div class="online-opt">
+                  <label class="mono" for="room-code">2 · Join a room with a code</label>
                   <div class="row">
                     <input class="field" id="room-code" type="text" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCDE" style="text-transform:uppercase;letter-spacing:0.2em">
                     <button class="btn small primary" type="button" data-act="join-room">Join room</button>
                   </div>
                 </div>
-              </div>
-
-              <div class="mode" id="mode-random">
-                <h3>Play random people</h3>
-                <p>Get matched with other players.</p>
-                <button class="btn primary block" type="button" data-act="find-match">Find a match</button>
+                <div class="online-opt">
+                  <span class="mono">3 · Join a random room</span>
+                  <p class="note">Jump into an open public room with other players. If none are waiting, a new public room opens for you.</p>
+                  <button class="btn block" type="button" data-act="find-match">Join a random room</button>
+                </div>
               </div>
 
               <div class="mode" id="mode-offline">
@@ -2235,7 +2240,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     $('hero').hidden = inPlay || inOrg; $('how').hidden = inPlay || inOrg; $('play').hidden = !inPlay; $('organizer').hidden = !inOrg;
     $('org-btn').hidden = !orgAllowed() || inOrg;
     persistSession();
-    ['room', 'random', 'offline', 'practice', 'fast'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    ['room', 'offline', 'practice', 'fast'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
     var atResults = !!S.game && scr === 'results';
     $('back-btn').hidden = !!S.game && !atResults;
     $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
@@ -2258,9 +2263,9 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       : 'Rooms and matchmaking need you signed in to claude.ai with “Can edit” access to this page.';
     on.className = 'note bad';
     document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online; });
-    $('console-label').textContent = scr === 'modes' ? ({ room: 'Join a room', random: 'Play random people', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
+    $('console-label').textContent = scr === 'modes' ? ({ room: 'Online game', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
     renderChat();
-    var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && (S.mode === 'room' || S.mode === 'random')));
+    var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
     if (scr === 'lobby') renderLobby();
     if (scr === 'draft') renderDraft();
     if (scr === 'results') renderResults();
@@ -2318,9 +2323,9 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   }
   function renderLobby() {
     var g = S.game, ps = sortedPlayers(g), t = TOPICS[g.topicId];
-    $('lobby-kind').textContent = g.isPublic ? 'Public room · random players' : 'Private room';
+    $('lobby-kind').textContent = g.isPublic ? 'Public room · anyone can join' : 'Private room · code only';
     $('lobby-code').textContent = g.code;
-    $('lobby-hint').textContent = (g.isPublic ? 'Waiting for other players to be matched here.' : 'Share the code or the link.') + '';
+    $('lobby-hint').textContent = (g.isPublic ? 'Players who tap “Join a random room” can be matched here. You can also share the code or the link.' : 'Only people with the code or the link can join. Share it with your friends.') + '';
     $('share-link').value = (S.env.web ? location.origin + location.pathname : ARTIFACT_URL) + '#r-' + g.code;
     $('lobby-count').textContent = 'Players · ' + ps.length + ' of ' + MAX_PLAYERS;
     $('lobby-players').innerHTML = ps.map(function (p, i) {
@@ -2714,6 +2719,12 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
   var LEVEL_NOTES = { easy: 'Easy: the AI often settles for decent answers and doesn’t plan ahead.', medium: 'Medium: the AI picks strong answers, usually but not always the best one left.', hard: 'Hard: the AI almost always takes the best answer left, in the subtopic where it matters most.' };
   var LEVEL_NAMES = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
   function currentLevel() { var v = store('roster.level'); return BOT_LEVELS[v] ? v : 'medium'; }
+  function currentPrivacy() { return store('roster.privacy') === 'public' ? 'public' : 'private'; }
+  function renderPrivacy() {
+    var pv = currentPrivacy();
+    document.querySelectorAll('.seg-btn[data-privacy]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-privacy') === pv)); });
+    var n = $('privacy-note'); if (n) n.textContent = pv === 'public' ? 'Anyone can join: players who tap “Join a random room” can be matched into it, and you can still share the code.' : 'Only people you share the code or link with can join.';
+  }
   function renderLevels() {
     var lv = currentLevel();
     document.querySelectorAll('.seg-btn[data-level]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-level') === lv)); });
@@ -2800,7 +2811,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
         var ps = await db.collection('rooms/' + rooms[i].code + '/players').get();
         if (ps.size > 0 && ps.size < MAX_PLAYERS) { await joinRoom(rooms[i].code); return; }
       }
-      setMsg('No open rooms right now, so you opened one. Others who tap “Play random people” will join you here.');
+      setMsg('No open rooms right now, so you opened one. Others who tap “Join a random room” will join you here.');
       await createRoom(true);
     } catch (e) { setMsg('Matchmaking failed. Try again.', true); }
   }
@@ -3194,6 +3205,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     window.scrollTo(0, 0);
   }
   function gotoMode(mode) {
+    if (mode === 'random') mode = 'room';
     if (S.game) { render(); window.scrollTo(0, 0); return; }
     showView('play', mode);
     var f = myName() ? $('mode-' + mode).querySelector('input, select, button:not(:disabled)') : $('player-name');
@@ -3215,7 +3227,8 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
     else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
     else if (act === 'play-practice') playOffline(parseInt($('practice-bots').value, 10), true);
-    else if (act === 'create-room') createRoom(false);
+    else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
+    else if (act === 'privacy') { store('roster.privacy', t.getAttribute('data-privacy')); renderPrivacy(); }
     else if (act === 'join-room') joinRoom($('room-code').value);
     else if (act === 'find-match') findMatch();
     else if (act === 'start') startDraft();
@@ -3307,7 +3320,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-14';
+  var BUILD_ID = '2026-10-13-15';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -3634,7 +3647,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
         var ps = await db.collection('rooms/' + open[i].code + '/players').get();
         if (ps.size > 0 && ps.size < MAX_PLAYERS) { await joinRoom(open[i].code); return; }
       }
-      setMsg('No open rooms right now, so you opened one. Others who tap “Play random people” will join you here.');
+      setMsg('No open rooms right now, so you opened one. Others who tap “Join a random room” will join you here.');
       await createRoom(true);
     } catch (e) { setMsg('Matchmaking failed. Check your connection and try again.', true); }
   }
@@ -3842,7 +3855,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
       S.lastSettings = restored.settings || { mode: 'local', count: 3 };
     }
     renderToday();
-    renderLevels();
+    renderLevels(); renderPrivacy();
     render();
     setInterval(function () {
       tick(); fastTick();
