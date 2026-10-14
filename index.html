@@ -811,7 +811,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #101010, 0 3px 0 rgba(0
             <div class="winner fast-verdict" id="fast-verdict"></div>
             <ol class="fast-results" id="fast-results"></ol>
             <div class="actions">
-              <button class="btn primary" type="button" data-act="fast-share">Share my score</button>
+              <button class="btn primary" type="button" id="fast-share-btn" data-act="fast-share">Share my score</button>
               <button class="btn" type="button" data-act="go-home">← Back to homepage</button>
             </div>
             <p class="note" id="fast-next"></p>
@@ -2615,12 +2615,30 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var text = shareText(g); if (!text) return;
     var box = $('share-box'), ta = $('share-text'), note = $('share-note');
     box.hidden = false; ta.value = text; ta.rows = text.split('\n').length + 1;
-    if (S.env.web && navigator.share) {
-      try { await navigator.share({ text: text }); note.textContent = 'Shared.'; return; }
-      catch (e) { if (e && e.name === 'AbortError') { note.textContent = ''; return; } }
+    await copyScore(text, ta, note, $('share-btn'));
+  }
+  /* Copy the score straight to the clipboard on tap, so the player only has to paste. */
+  async function copyScore(text, ta, note, btn) {
+    var ok = false;
+    try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; } } catch (e) {}
+    if (!ok) {
+      try {
+        ta.removeAttribute('readonly'); ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+        ok = document.execCommand('copy');
+        ta.setAttribute('readonly', '');
+      } catch (e) { ok = false; }
     }
-    try { await navigator.clipboard.writeText(text); note.textContent = 'Copied. Paste it into a text, group chat or post.'; }
-    catch (e) { ta.focus(); ta.select(); note.textContent = 'Press and hold (or Ctrl/Cmd+C) to copy the score above.'; }
+    if (ok) {
+      note.textContent = 'Copied! Now just paste it into a text, group chat or post.';
+      if (btn) {
+        if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+        btn.textContent = 'Copied ✓';
+        clearTimeout(btn._copyT); btn._copyT = setTimeout(function () { btn.textContent = btn.dataset.label; }, 2500);
+      }
+    } else {
+      ta.focus(); ta.select();
+      note.textContent = 'Couldn’t copy automatically here. Press and hold the score above (or Ctrl/Cmd+C) to copy it.';
+    }
   }
   function ordinal(n) { n = Math.round(n); var s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
   function renderAwards(g, scores) {
@@ -3325,7 +3343,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-17';
+  var BUILD_ID = '2026-10-13-18';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -3822,12 +3840,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
     var text = fastShareText(); if (!text) return;
     var ta = $('fast-share-text'), note = $('fast-share-note');
     $('fast-share-box').hidden = false; ta.value = text; ta.rows = text.split('\n').length + 1;
-    if (S.env.web && navigator.share) {
-      try { await navigator.share({ text: text }); note.textContent = 'Shared.'; return; }
-      catch (e) { if (e && e.name === 'AbortError') { note.textContent = ''; return; } }
-    }
-    try { await navigator.clipboard.writeText(text); note.textContent = 'Copied. Paste it into a text, group chat or post.'; }
-    catch (e) { ta.focus(); ta.select(); note.textContent = 'Press and hold (or Ctrl/Cmd+C) to copy the score above.'; }
+    await copyScore(text, ta, note, $('fast-share-btn'));
   }
   $('fast-in').addEventListener('input', function () { S.ui.fastQ = this.value; S.ui.fastSel = 0; renderFast(); $('fast-in').setAttribute('aria-expanded', String(!!this.value.trim())); });
   $('fast-in').addEventListener('keydown', function (ev) {
