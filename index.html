@@ -416,6 +416,11 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .seg-btn[aria-checked="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--drop); }
 .seg-btn[data-level="easy"][aria-checked="true"] { background: #1f9d55; color: #fff; }
 .seg-btn[data-level="hard"][aria-checked="true"] { background: #d63a2f; color: #fff; }
+/* homepage options: all white; black on hover only where a mouse can hover (not phones) */
+.cta-row .btn { background: var(--surface); color: var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+  .cta-row .btn:hover { background: var(--ink); color: var(--hi); }
+}
 .seg.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .online-opt { display: grid; gap: 8px; padding-top: 14px; border-top: 2px dashed var(--line); }
 .online-opt:first-of-type { padding-top: 0; border-top: 0; }
@@ -538,7 +543,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #101010, 0 3px 0 rgba(0
       <p class="display tagline">Build your roster. <span class="mark">Own the debate.</span></p>
       <p class="lede">Draft the best roster from today's topic and prove your friends wrong.</p>
       <div class="cta-row">
-        <button class="btn primary" type="button" data-act="goto-mode" data-mode="room">Join an online game</button>
+        <button class="btn" type="button" data-act="goto-mode" data-mode="room">Join an online game</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="practice">Practice: random topic</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
@@ -3320,7 +3325,7 @@ T("colors","Colors","color","Which colors make the ultimate palette?",["Beauty",
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-13-15';
+  var BUILD_ID = '2026-10-13-16';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
