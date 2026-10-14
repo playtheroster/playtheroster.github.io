@@ -525,7 +525,11 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 @media (max-width: 480px) { .nav .wordmark { font-size: 1.45rem; gap: 8px; } }
 
 /* ---------- Game Day Red: red band up top, white topic card, black subtopic chips with gold numbers ---------- */
-.band { background-color: var(--pop); background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 2px, transparent 2px 128px); color: #ffffff; }
+.band { position: relative; overflow: hidden; background-color: var(--pop); background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 2px, transparent 2px); background-size: 128px 100%; background-position: calc(50% + 63px) 0; color: #ffffff; }
+/* Midfield logo: a very faint jersey on the 50-yard line (the yard line through the middle of the band). */
+.band::before { content: ""; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Cpath d=%22M72 36 L46 46 L22 74 L42 96 L58 86 L58 168 L142 168 L142 86 L158 96 L178 74 L154 46 L128 36 Q100 62 72 36 Z%22 fill=%22%23ffb612%22 stroke=%22%23000000%22 stroke-width=%226%22 stroke-linejoin=%22round%22/%3E%3Cpath d=%22M78 40 Q100 60 122 40%22 fill=%22none%22 stroke=%22%23000000%22 stroke-width=%227%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M30 78 L44 92 M170 78 L156 92%22 stroke=%22%23000000%22 stroke-width=%227%22 stroke-linecap=%22round%22/%3E%3Ctext x=%22100%22 y=%22146%22 text-anchor=%22middle%22 font-family=%22Arial Black, Arial, sans-serif%22 font-weight=%22900%22 font-size=%2260%22 fill=%22%23000000%22%3E01%3C/text%3E%3C/svg%3E") 50% 34% / auto 40% no-repeat; opacity: 0.055; pointer-events: none; }
+.band > * { position: relative; }
+.hero { position: relative; z-index: 1; }
 .band .nav { border-bottom: 0; }
 .band .wordmark { color: #ffffff; }
 .band .wordmark i, .band .wordmark .dot { color: var(--hi); }
@@ -548,8 +552,11 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .topic-head .mono:first-child { color: var(--pop); }
 .topic-body { padding-top: 6px; }
 .subs-label { display: none; }
-.cats { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-.cat, .cats .cat:last-child:nth-child(odd) { grid-column: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px; background: #000000; color: #ffffff; border: 0; border-radius: 14px; overflow-wrap: anywhere; }
+/* Every subtopic box is the same size; a long word shrinks its text instead (fitCats). */
+.cats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 8px; }
+.cat, .cats .cat:last-child:nth-child(odd) { grid-column: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 10px; background: #000000; color: #ffffff; border: 0; border-radius: 14px; min-width: 0; }
+.cat-name { display: block; max-width: 100%; overflow-wrap: normal; word-break: normal; hyphens: none; }
+.cat-name.one-word { white-space: nowrap; }
 .cat .mono { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; letter-spacing: 0; line-height: 1; color: var(--hi); }
 .tomorrow { border-top: 3px dashed var(--line); }
 .hero-side { align-content: start; padding-top: 8px; }
@@ -569,8 +576,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   .hero { grid-template-columns: minmax(0, 1fr); margin-top: -70px; }
   .band-hero { padding-block: 8px 100px; align-items: flex-start; }
   .band-clock { justify-items: start; }
-  .cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .cats .cat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .cats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 </style>
 <template id="shell">
@@ -2439,12 +2445,26 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     el.textContent = pad(Math.floor(sec / 3600)) + ':' + pad(Math.floor(sec / 60) % 60) + ':' + pad(sec % 60);
   }
   setInterval(bandClock, 1000);
+  /* A one-word subtopic never wraps: shrink its text until it fits its chip. */
+  function fitCats() {
+    var els = document.querySelectorAll('#today-subs .cat-name.one-word');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i], box = el.parentNode, cs = getComputedStyle(box);
+      var room = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      el.style.fontSize = '';
+      var size = parseFloat(getComputedStyle(el).fontSize);
+      while (el.scrollWidth > room + 0.5 && size > 9) { size -= 0.5; el.style.fontSize = size + 'px'; }
+    }
+  }
+  window.addEventListener('resize', fitCats);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCats);
   function renderToday() {
     var t = TOPICS[TODAY.topicId];
     $('today-name').textContent = t.name;
     $('today-q').textContent = t.q;
     $('today-date').textContent = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-    $('today-subs').innerHTML = TODAY.subs.map(function (s, i) { return '<div class="cat"><span class="mono">0' + (i + 1) + '</span>' + esc(s) + '</div>'; }).join('');
+    $('today-subs').innerHTML = TODAY.subs.map(function (s, i) { return '<div class="cat"><span class="mono">0' + (i + 1) + '</span><span class="cat-name' + (/\s/.test(s.trim()) ? '' : ' one-word') + '">' + esc(s) + '</span></div>'; }).join('');
+    fitCats();
     var d = new Date(), mid = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
     var mins = Math.max(0, Math.round((mid - d) / 60000));
     $('next-in').textContent = 'New topic in ' + Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm';
@@ -3606,7 +3626,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-14-08';
+  var BUILD_ID = '2026-10-14-11';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
