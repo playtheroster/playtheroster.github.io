@@ -106,7 +106,8 @@ select.field { padding-right: 8px; }
 .cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
 .cat { display: flex; align-items: baseline; gap: 10px; padding: 11px 14px; background: var(--tint); border-radius: 10px; font-weight: 600; min-width: 0; }
 .cat:last-child:nth-child(odd) { grid-column: 1 / -1; }
-.cat .mono { color: var(--accent); }
+.cat .mono { color: var(--pop); font-weight: 700; }
+.subs-label .subs-count { color: var(--pop); }
 .tomorrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 20px; border-top: 2px dashed var(--line); }
 .lock { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
 .lock svg { width: 16px; height: 16px; }
@@ -365,11 +366,6 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .topic-head .mono { color: var(--grad-ink); }
 .topic-title { font-size: clamp(2.6rem, 11vw, 5.6rem); overflow-wrap: break-word; color: var(--ink); }
 .cat { background: var(--tint); border-radius: 14px; border: 2px solid transparent; }
-.cat:nth-child(5n+1) .mono { color: var(--accent); }
-.cat:nth-child(5n+2) .mono { color: var(--pop); }
-.cat:nth-child(5n+3) .mono { color: #0b8797; }
-.cat:nth-child(5n+4) .mono { color: #c45a10; }
-.cat:nth-child(5n+5) .mono { color: #2457e6; }
 .tagline { font-size: clamp(2.4rem, 5.4vw, 3.8rem); }
 .tomorrow { border-top: 3px dashed var(--line); }
 
@@ -548,7 +544,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #101010, 0 3px 0 rgba(0
       <div class="topic-body">
         <h1 class="display topic-title" id="today-name">Countries</h1>
         <p class="q" id="today-q"></p>
-        <p class="mono subs-label">Today's 5 subtopics</p>
+        <p class="mono subs-label">Today's <span class="subs-count">5</span> subtopics</p>
         <div class="cats" id="today-subs"></div>
       </div>
       <div class="tomorrow">
@@ -3544,7 +3540,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-14-04';
+  var BUILD_ID = '2026-10-14-05';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
