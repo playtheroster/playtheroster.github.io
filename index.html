@@ -142,6 +142,8 @@ select.field { padding-right: 8px; }
 .players { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .players li { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; background: var(--tint); border-radius: 999px; min-width: 0; }
 .players .pn { font-weight: 700; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.players .kick { min-height: 32px; padding: 0 12px; font-size: 0.82rem; color: var(--bad); flex: none; }
+.players .kick.armed { background: var(--bad); border-color: var(--bad); color: #fff; }
 .av { width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; }
 .av { background: var(--pc, var(--accent)); color: var(--pi, var(--p-ink)); }
 .pc0 { --pc: var(--p0); } .pc1 { --pc: var(--p1); } .pc2 { --pc: var(--p2); } .pc3 { --pc: var(--p3); }
@@ -1036,7 +1038,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 </div>
 
 </template>
-<script type="application/json" id="schedule-data">{"version": 1, "days": {"2026-10-14": {"topicId": "animals", "subs": ["Speed", "Strength", "Intelligence", "Cuteness", "Danger"]}, "2026-10-15": {"topicId": "monarchs", "subs": ["Fame", "Power", "Wealth", "Legacy", "Military"]}, "2026-10-17": {"topicId": "landmarks", "subs": ["Engineering", "Age", "Fame", "Size", "Beauty"]}, "2026-10-18": {"topicId": "desserts", "subs": ["Presentation", "Portability", "Nostalgia", "Indulgence", "Taste"]}, "2026-10-19": {"topicId": "rappers", "subs": ["Lyrics", "Flow", "Influence", "Albums", "Hits"]}, "2026-10-20": {"topicId": "us-states", "subs": ["Nature", "Food", "Weather", "Cost of living", "Cities"]}, "2026-10-21": {"topicId": "cheeses", "subs": ["Pairing", "Snacking", "Meltability", "On pizza", "Taste"]}, "2026-10-26": {"topicId": "superheroes", "subs": ["Popularity", "Gadgets", "Speed", "Intelligence", "Strength"]}, "2026-10-28": {"topicId": "vegetables", "subs": ["Roasted", "Taste", "Nutrition", "Raw crunch", "Versatility"]}, "2026-10-29": {"topicId": "animated-movies", "subs": ["Story", "Animation", "Villain", "Songs", "Heart"]}, "2026-10-30": {"topicId": "jobs", "subs": ["Impact", "Salary", "Job security", "Prestige", "Fun"]}, "2026-11-03": {"topicId": "fashion-brands", "subs": ["Quality", "Celebrity appeal", "Luxury", "Streetwear cred", "Iconic logo"]}, "2026-11-11": {"topicId": "countries", "subs": ["Culture", "Sports", "Innovation", "Natural beauty", "Quality of life"]}}, "fast": {"2026-10-14": {"topicId": "sports-movies", "subs": ["Story", "Inspiration", "Rewatchability", "Quotes", "Sports action"]}, "2026-10-15": {"topicId": "us-cities", "subs": ["Food scene", "Nightlife", "Sports", "Culture", "Population"]}}}</script>
+<script type="application/json" id="schedule-data">{"version":1,"days":{"2026-10-15":{"topicId":"fast-food","subs":["Taste","Speed","Value","Popularity","Menu variety"]},"2026-10-17":{"topicId":"landmarks","subs":["Engineering","Age","Fame","Size","Beauty"]},"2026-10-18":{"topicId":"desserts","subs":["Presentation","Portability","Nostalgia","Indulgence","Taste"]},"2026-10-19":{"topicId":"rappers","subs":["Lyrics","Flow","Influence","Albums","Hits"]},"2026-10-20":{"topicId":"us-states","subs":["Nature","Food","Weather","Cost of living","Cities"]},"2026-10-21":{"topicId":"cheeses","subs":["Pairing","Snacking","Meltability","On pizza","Taste"]},"2026-10-26":{"topicId":"superheroes","subs":["Popularity","Gadgets","Speed","Intelligence","Strength"]},"2026-10-28":{"topicId":"vegetables","subs":["Roasted","Taste","Nutrition","Raw crunch","Versatility"]},"2026-10-29":{"topicId":"animated-movies","subs":["Story","Animation","Villain","Songs","Heart"]},"2026-10-30":{"topicId":"jobs","subs":["Impact","Salary","Job security","Prestige","Fun"]},"2026-11-03":{"topicId":"fashion-brands","subs":["Quality","Celebrity appeal","Luxury","Streetwear cred","Iconic logo"]},"2026-11-11":{"topicId":"countries","subs":["Culture","Sports","Innovation","Natural beauty","Quality of life"]}},"fast":{"2026-10-15":{"topicId":"us-cities","subs":["Food scene","Nightlife","Sports","Culture","Population"]}}}</script>
 <script id="app-script">
 (function () {
   'use strict';
@@ -2885,9 +2887,11 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     $('lobby-hint').textContent = (g.isPublic ? 'Players who tap “Join a random room” can be matched here. You can also share the code or the link.' : 'Only people with the code or the link can join. Share it with your friends.') + '';
     $('share-link').value = (S.env.web ? location.origin + location.pathname : ARTIFACT_URL) + '#r-' + g.code;
     $('lobby-count').textContent = 'Players · ' + ps.length + ' of ' + MAX_PLAYERS;
+    var canKick = g.mode === 'shared' && g.hostId === S.me && g.status === 'lobby';
     $('lobby-players').innerHTML = ps.map(function (p, i) {
       return '<li>' + avatar(p.name, i % 8) + '<span class="pn">' + esc(p.name) + '</span>' +
-        (p.id === S.me ? '<span class="mono tag">You</span>' : '') + (p.id === g.hostId ? '<span class="mono tag">Host</span>' : '') + '</li>';
+        (p.id === S.me ? '<span class="mono tag">You</span>' : '') + (p.id === g.hostId ? '<span class="mono tag">Host</span>' : '') +
+        (canKick && p.id !== S.me ? (function () { var armed = S.ui.kickArm && S.ui.kickArm.pid === p.id && now() - S.ui.kickArm.at < 5000; return '<button type="button" class="btn small kick' + (armed ? ' armed' : '') + '" data-act="kick" data-pid="' + esc(p.id) + '" aria-label="' + (armed ? 'Confirm removing ' : 'Remove ') + esc(p.name) + ' from the room">' + (armed ? 'Tap again to remove' : 'Remove') + '</button>'; })() : '') + '</li>';
     }).join('') || '<li><span class="pn">Waiting for players</span></li>';
     var inRoom = !!g.players[S.me];
     $('start-btn').disabled = !inRoom || ps.length < MIN_PLAYERS;
@@ -3414,6 +3418,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       var snap = await db.doc('rooms/' + code).get();
       if (!snap.exists) { setMsg('No room with code ' + code + '. Check the code with your host' + (S.env.web ? '. If it’s right, make sure their page is open on the room screen, then try again.' : '.'), true); return; }
       var room = snap.data();
+      if (Array.isArray(room.kicked) && room.kicked.indexOf(S.env.uid) >= 0) { setMsg('The host removed you from room ' + code + ', so you can’t rejoin it.', true); return; }
       var mine = await db.doc('rooms/' + code + '/players/' + S.env.uid).get();
       if (room.status !== 'lobby' && !mine.exists) { setMsg('That draft has already started. You can watch it.'); enterRoom(code); return; }
       if (!mine.exists) {
@@ -3433,7 +3438,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     try {
       var snap = await db.collection('rooms').where('isPublic', '==', true).where('status', '==', 'lobby').get();
       var rooms = snap.docs.map(function (d) { return d.data(); })
-        .filter(function (r) { return r && r.dateKey === today && now() - (r.createdAt || 0) < 20 * 60000; })
+        .filter(function (r) { return r && r.dateKey === today && now() - (r.createdAt || 0) < 20 * 60000 && !(Array.isArray(r.kicked) && r.kicked.indexOf(S.env.uid) >= 0); })
         .sort(function (a, b) { return b.createdAt - a.createdAt; });
       for (var i = 0; i < rooms.length; i++) {
         var ps = await db.collection('rooms/' + rooms[i].code + '/players').get();
@@ -3460,12 +3465,15 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       if (TOPICS[r.topicId]) g.topicId = r.topicId;
       if (Array.isArray(r.subs) && r.subs.length) g.subs = r.subs.map(String);
       g.dateKey = r.dateKey; g.order = Array.isArray(r.order) ? r.order.map(String) : []; g.startedAt = Number(r.startedAt) || 0;
+      g.kicked = Array.isArray(r.kicked) ? r.kicked.map(String) : [];
+      if (g.kicked.indexOf(S.me) >= 0) { kickedOut(code); return; }
+      g.kicked.forEach(function (id) { delete g.players[id]; });
       afterChange();
     }, onErr));
     S.unsub.push(db.collection('rooms/' + code + '/players').onSnapshot(function (s) {
       if (S.game !== g) return;
       var ps = {};
-      s.docs.forEach(function (d) { var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; });
+      s.docs.forEach(function (d) { if ((g.kicked || []).indexOf(d.id) >= 0) return; var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; });
       g.players = ps;
       afterChange();
     }, onErr));
@@ -3490,6 +3498,26 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     S.view = 'play';
     render();
     window.scrollTo(0, 0);
+  }
+  /* The host can remove a player while the room is still in the lobby. Removed players are listed on the
+     room, so they're sent back out and can't rejoin that room. */
+  async function kickPlayer(pid) {
+    var g = S.game;
+    if (!g || g.mode !== 'shared' || g.hostId !== S.me || pid === S.me || g.status !== 'lobby' || !g.players[pid]) return;
+    var name = playerName(g, pid), list = (g.kicked || []).slice();
+    if (list.indexOf(pid) < 0) list.push(pid);
+    S.ui.kickArm = null;
+    try {
+      await S.env.db.doc('rooms/' + g.code).update({ kicked: list });
+      await S.env.db.doc('rooms/' + g.code + '/players/' + pid).delete();
+      setMsg(name + ' was removed from the room.');
+    } catch (e) { setMsg('Couldn’t remove ' + name + '. Try again.', true); }
+  }
+  function kickedOut(code) {
+    leaveGame(true);
+    S.view = 'play'; S.mode = 'room';
+    render(); window.scrollTo(0, 0);
+    setMsg('The host removed you from room ' + code + '.', true);
   }
   async function startDraft() {
     var g = S.game; if (!g || g.mode !== 'shared') return;
@@ -3860,6 +3888,11 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     else if (act === 'join-room') joinRoom($('room-code').value);
     else if (act === 'find-match') findMatch();
     else if (act === 'start') startDraft();
+    else if (act === 'kick') {
+      var kp = t.getAttribute('data-pid');
+      if (S.ui.kickArm && S.ui.kickArm.pid === kp && now() - S.ui.kickArm.at < 5000) kickPlayer(kp);
+      else { S.ui.kickArm = { pid: kp, at: now() }; render(); setTimeout(function () { if (S.ui.kickArm && S.ui.kickArm.pid === kp && now() - S.ui.kickArm.at >= 5000) { S.ui.kickArm = null; if (S.game) render(); } }, 5100); }
+    }
     else if (act === 'leave') leaveGame(false);
     else if (act === 'copy-link') {
       var inp = $('share-link');
@@ -3949,7 +3982,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-14-46';
+  var BUILD_ID = '2026-10-15-01';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -4272,7 +4305,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       for (var i = 0; i < open.length; i++) {
         var snap = await db.doc('rooms/' + open[i].code).get();
         var r = snap.exists ? snap.data() : null;
-        if (!r || r.status !== 'lobby') continue;
+        if (!r || r.status !== 'lobby' || (Array.isArray(r.kicked) && r.kicked.indexOf(S.env.uid) >= 0)) continue;
         var ps = await db.collection('rooms/' + open[i].code + '/players').get();
         if (ps.size > 0 && ps.size < MAX_PLAYERS) { await joinRoom(open[i].code); return; }
       }
