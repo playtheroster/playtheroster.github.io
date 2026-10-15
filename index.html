@@ -2908,7 +2908,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       : S.env.canWrite === false ? 'You can open this page but can’t join rooms yet. Ask the person who shared it to invite your Claude email with “Can edit” access, then reload this page.'
       : 'Rooms and matchmaking need you signed in to claude.ai with “Can edit” access to this page.';
     on.className = 'note bad';
-    document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online; });
+    document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online || (S.creating && b.getAttribute('data-act') === 'create-room'); });
     $('console-label').textContent = scr === 'modes' ? ({ room: 'Online game', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
     renderChat();
     var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
@@ -3532,8 +3532,30 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   }
   function newCode() { var s = ''; for (var i = 0; i < CODE_LEN; i++) s += CODE_CHARS.charAt(Math.floor(Math.random() * CODE_CHARS.length)); return s; }
   async function createRoom(isPublic, fixedCode) {
+    if (S.creating) return null;
     var name = requireName(); if (!name) return null;
+    S.creating = true; creatingUi(true);
+    if (!fixedCode) setMsg('Creating your room…');
+    try {
+      var code = await createRoomOnce(isPublic, fixedCode, name);
+      /* One quiet retry for a hiccup, but not when the relay can't be reached at all (that already waited). */
+      if (!code && !fixedCode && S.lastCreateErr && !/no-broker|mqtt-lib/.test(String(S.lastCreateErr.message))) code = await createRoomOnce(isPublic, fixedCode, name);
+      if (code) { if (/^Creating your room/.test($('play-msg').textContent)) setMsg(''); return code; }
+      if (!fixedCode) setMsg(S.env.web ? 'Couldn’t create a room. Check your internet connection and try again.' : 'Couldn’t create a room. Check that you can edit this page and try again.', true);
+      return null;
+    } finally { S.creating = false; creatingUi(false); }
+  }
+  function creatingUi(on) {
+    document.querySelectorAll('[data-act="create-room"]').forEach(function (b) {
+      if (!b.getAttribute('data-label')) b.setAttribute('data-label', b.textContent);
+      b.textContent = on ? 'Creating room…' : b.getAttribute('data-label');
+      b.disabled = on || !(S.env.db && S.env.uid);
+      b.setAttribute('aria-busy', on ? 'true' : 'false');
+    });
+  }
+  async function createRoomOnce(isPublic, fixedCode, name) {
     var db = S.env.db, spec = dailySpec(dateKey(new Date()));
+    S.lastCreateErr = null;
     try {
       var code = null;
       if (fixedCode) code = fixedCode;
@@ -3543,7 +3565,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       await db.doc('rooms/' + code + '/players/' + S.env.uid).set({ name: name, joinedAt: now() });
       enterRoom(code);
       return code;
-    } catch (e) { if (fixedCode) return null; setMsg(S.env.web ? 'Couldn’t create a room. Check your internet connection and try again.' : 'Couldn’t create a room. Check that you can edit this page and try again.', true); return null; }
+    } catch (e) { S.lastCreateErr = e; return null; }
   }
   async function joinRoom(code) {
     var name = requireName(); if (!name) return;
@@ -4001,6 +4023,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (mode === 'random') mode = 'room';
     if (S.game) { render(); window.scrollTo(0, 0); return; }
     showView('play', mode);
+    if (mode === 'room' && S.env.web && S.env.db && S.env.db.net) S.env.db.net.warm();
     var f = myName() ? $('mode-' + mode).querySelector('input, select, button:not(:disabled)') : $('player-name');
     if (f) setTimeout(function () { f.focus({ preventScroll: true }); }, 60);
   }
@@ -4143,7 +4166,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-15-10';
+  var BUILD_ID = '2026-10-15-11';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -4223,34 +4246,90 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       return S.env.mqttLibP;
     }
     function netFail() { if (!S.env.netError) { S.env.netError = true; render(); } }
-    function netOk() { if (S.env.netError) { S.env.netError = false; render(); } }
+    function netOk() { clearTimeout(downTimer); if (S.env.netError) { S.env.netError = false; render(); } }
     function live() { return conns.filter(function (c) { return c.connected; }); }
-    /* Connect to every relay at once; ready as soon as one answers. Writes go to all of them and
-       reads come from all of them, so two phones meet as long as they share any one relay. */
-    function client() {
-      if (connP) return connP;
-      connP = loadLib().then(function (mqtt) {
-        return new Promise(function (resolve, reject) {
-          var failed = 0, done = false;
-          MQTT_BROKERS.forEach(function (url) {
-            var c = mqtt.connect(url, { clientId: ('rs' + uid.replace(/[^a-z0-9]/gi, '').slice(-8) + Math.random().toString(36).slice(2, 10)).slice(0, 22), clean: true, keepalive: 30, connectTimeout: 8000, reconnectPeriod: 3000 });
-            var gaveUp = false; diag.relays[url] = 'connecting'; showDiag();
-            var timer = setTimeout(function () { if (!c.connected && !gaveUp) { gaveUp = true; failed++; if (failed === MQTT_BROKERS.length && !done) { done = true; connP = null; netFail(); reject(new Error('no-broker')); } } }, 9000);
-            c.on('connect', function () {
-              clearTimeout(timer); diag.relays[url] = 'on'; showDiag();
-              if (conns.indexOf(c) < 0) conns.push(c);
-              netOk();
-              Object.keys(subs).forEach(function (t) { c.subscribe(t, { qos: 1 }); });
-              Object.keys(rooms).forEach(function (code) { requestSync(rooms[code], c); });
-              if (!done) { done = true; resolve(true); }
-            });
-            c.on('message', function (topic, payload) { diag.msgs++; onMessage(String(topic), payload); showDiag(); });
-            c.on('offline', function () { diag.relays[url] = 'offline'; showDiag(); if (!live().length) netFail(); });
-            c.on('error', function (e) { diag.relays[url] = 'error'; diag.errs.push(String((e && e.message) || e).slice(0, 80)); showDiag(); });
+    /* Connect to every relay at once and keep the connections up (they reconnect by themselves).
+       Writes go to all of them and reads come from all of them, so two phones meet as long as they share any one relay.
+       Anything that needs the relay waits for a live connection instead of failing straight away: phones drop
+       the connection when they switch apps or sleep, and it takes a few seconds to come back. */
+    var all = [], started = false, waiters = [], downTimer = null;
+    var CONNECT_WAIT_MS = 20000, ACK_NUDGE_MS = 5000, ACK_GIVEUP_MS = 20000;
+    function flushWaiters(err) { var w = waiters; waiters = []; w.forEach(function (x) { clearTimeout(x.t); if (err) x.reject(err); else x.resolve(true); }); }
+    function nudge() { all.forEach(function (c) { if (!c.connected && !c.reconnecting && !c.disconnecting && !c._rsBusy && c.reconnect) { try { c.reconnect(); } catch (e) {} } }); }
+    /* A connection that looks connected but stopped answering (common after a phone sleeps): drop it so it reconnects.
+       Unanswered messages are sent again once it is back. */
+    function revive(c) {
+      diag.errs.push('no answer from ' + String(c.url || (c.options && c.options.hostname) || 'relay').replace(/^wss:\/\/(broker\.)?/, '').replace(/[:/].*$/, ''));
+      try { if (c.stream && c.stream.destroy) c.stream.destroy(); else if (c.reconnect) c.reconnect(); } catch (e) {}
+    }
+    function start() {
+      if (started) return; started = true;
+      loadLib().then(function (mqtt) {
+        MQTT_BROKERS.forEach(function (url) {
+          var c = mqtt.connect(url, { clientId: ('rs' + uid.replace(/[^a-z0-9]/gi, '').slice(-8) + Math.random().toString(36).slice(2, 10)).slice(0, 22), clean: true, keepalive: 30, connectTimeout: 8000, reconnectPeriod: 2000 });
+          c.url = c.url || url; c._rsBusy = true; all.push(c);
+          c.on('reconnect', function () { c._rsBusy = true; });
+          diag.relays[url] = 'connecting'; showDiag();
+          c.on('connect', function () {
+            c._rsBusy = false; diag.relays[url] = 'on'; showDiag();
+            if (conns.indexOf(c) < 0) conns.push(c);
+            netOk();
+            Object.keys(subs).forEach(function (t) { c.subscribe(t, { qos: 1 }); });
+            Object.keys(rooms).forEach(function (code) { requestSync(rooms[code], c); });
+            flushWaiters();
           });
+          c.on('message', function (topic, payload) { diag.msgs++; onMessage(String(topic), payload); showDiag(); });
+          function down(state) {
+            diag.relays[url] = state; showDiag();
+            /* Only warn if every relay stays down for a while, not for a quick reconnect. */
+            if (!live().length) { clearTimeout(downTimer); downTimer = setTimeout(function () { if (!live().length) netFail(); }, 8000); }
+          }
+          c.on('close', function () { c._rsBusy = false; if (!c.connected) down('reconnecting'); });
+          c.on('offline', function () { down('offline'); });
+          c.on('error', function (e) { diag.relays[url] = 'error'; diag.errs.push(String((e && e.message) || e).slice(0, 80)); showDiag(); });
         });
-      }, function (e) { connP = null; netFail(); throw e; });
-      return connP;
+      }, function (e) { started = false; netFail(); flushWaiters(e); });
+    }
+    function whenLive(ms) {
+      start();
+      if (live().length) return Promise.resolve(true);
+      nudge();
+      return new Promise(function (resolve, reject) {
+        var w = { resolve: resolve, reject: reject };
+        w.t = setTimeout(function () { waiters = waiters.filter(function (x) { return x !== w; }); netFail(); reject(new Error('no-broker')); }, ms || CONNECT_WAIT_MS);
+        waiters.push(w);
+      });
+    }
+    function client() { return whenLive(); }
+    /* Send something that the relay acknowledges (publish or subscribe) on every live connection; done when any
+       one answers. Connections that don't answer in a few seconds are restarted, and the request is retried. */
+    function acked(send) {
+      return client().then(function () {
+        return new Promise(function (resolve, reject) {
+          var done = false, tried = [], left = 0, lastErr = null;
+          function go(c) {
+            if (tried.indexOf(c) >= 0) return; tried.push(c); left++;
+            send(c, function (err) {
+              left--;
+              if (done) return;
+              if (!err) { done = true; clearTimeout(t1); clearTimeout(t2); resolve(); }
+              else { lastErr = err; if (!left && !live().some(function (x) { return tried.indexOf(x) < 0; })) { done = true; clearTimeout(t1); clearTimeout(t2); reject(err); } }
+            });
+          }
+          live().forEach(go);
+          var t1 = setTimeout(function () {
+            if (done) return;
+            tried.forEach(function (c) { if (c.connected) revive(c); });
+            /* Also use any relay that came up meanwhile. */
+            whenLive(ACK_GIVEUP_MS - ACK_NUDGE_MS).then(function () { if (!done) live().forEach(go); }, function () {});
+          }, ACK_NUDGE_MS);
+          var t2 = setTimeout(function () { if (!done) { done = true; netFail(); reject(lastErr || new Error('no-answer')); } }, ACK_GIVEUP_MS);
+        });
+      });
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && started) nudge(); });
+      window.addEventListener('online', function () { if (started) nudge(); });
     }
     function topicFor(path) { return MQTT_ROOT + path; }
     function parse(path) {
@@ -4338,17 +4417,10 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       }, 0);
     }
     function subscribe(topic) {
-      return client().then(function () {
-        if (subs[topic]) return subs[topic];
-        subs[topic] = new Promise(function (resolve, reject) {
-          var cs = live(), left = cs.length, ok = false;
-          if (!cs.length) { delete subs[topic]; reject(new Error('offline')); return; }
-          cs.forEach(function (c) {
-            c.subscribe(topic, { qos: 1 }, function (err) { left--; if (!err && !ok) { ok = true; resolve(true); } else if (!left && !ok) { delete subs[topic]; reject(err || new Error('sub')); } });
-          });
-        });
-        return subs[topic];
-      });
+      if (subs[topic]) return subs[topic];
+      subs[topic] = acked(function (c, cb) { c.subscribe(topic, { qos: 1 }, function (err) { cb(err); }); })
+        .then(function () { return true; }, function (e) { delete subs[topic]; throw e; });
+      return subs[topic];
     }
     /* Subscribe to a room, then gather its documents: stored copies from the relay, plus a copy
        from anyone already in the room (asked for with a sync request). */
@@ -4369,17 +4441,10 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       return R.ready;
     }
     function publish(path, data) {
-      return client().then(function () {
-        var cs = live();
-        if (!cs.length) throw new Error('offline');
-        var body = data === undefined ? '' : JSON.stringify(data);
-        return new Promise(function (resolve, reject) {
-          var left = cs.length, ok = false;
-          cs.forEach(function (c) {
-            diag.sent++;
-            c.publish(topicFor(path), body, { qos: 1, retain: true }, function (err) { if (err) diag.errs.push('publish ' + String(err.message || err).slice(0, 60)); left--; if (!err && !ok) { ok = true; resolve(); } else if (!left && !ok) reject(err || new Error('pub')); });
-          });
-        });
+      var body = data === undefined ? '' : JSON.stringify(data);
+      return acked(function (c, cb) {
+        diag.sent++; showDiag();
+        c.publish(topicFor(path), body, { qos: 1, retain: true }, function (err) { if (err) diag.errs.push('publish ' + String(err.message || err).slice(0, 60)); cb(err); });
       });
     }
     function indexRoom(code, r) {
@@ -4443,7 +4508,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
         return new Promise(function (resolve) { setTimeout(function () { resolve(jclone(S.env.pubIndex) || {}); }, 2000); });
       });
     }
-    return { doc: doc, collection: collection, publicRooms: publicRooms };
+    return { doc: doc, collection: collection, publicRooms: publicRooms, warm: start };
   }
   function makeWebDb(uid) {
     var local = makeLocalStore(), net = makeNetStore(uid);
