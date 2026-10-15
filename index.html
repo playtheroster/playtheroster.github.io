@@ -31,7 +31,7 @@
   --grad-ink: #000000;
   --shadow: rgba(0, 0, 0, 0.2);
   /* player colors */
-  --p0: #ca2430; --p1: #000000; --p2: #ffb612; --p3: #ca2430; --p4: #000000; --p5: #ffb612; --p6: #ca2430; --p7: #000000; --p-ink: #ffffff;
+  --p0: #ca2430; --p1: #000000; --p2: #ffb612; --p3: #1f4fbf; --p4: #f07a1a; --p5: #7b2cbf; --p6: #0c7c7c; --p7: #d2386f; --p-ink: #ffffff;
   /* score tiers: dark green, light green, yellow, orange, red */
   --g5: #16733a; --g5-ink: #ffffff; --g4: #7cc957; --g4-ink: #10131c; --g3: #f5c935; --g3-ink: #10131c; --g2: #f28c28; --g2-ink: #10131c; --g1: #d63a2f; --g1-ink: #ffffff;
   --font-display: "Lilita One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
@@ -148,8 +148,10 @@ select.field { padding-right: 8px; }
 .av { background: var(--pc, var(--accent)); color: var(--pi, var(--p-ink)); }
 .pc0 { --pc: var(--p0); } .pc1 { --pc: var(--p1); } .pc2 { --pc: var(--p2); } .pc3 { --pc: var(--p3); }
 .pc4 { --pc: var(--p4); } .pc5 { --pc: var(--p5); } .pc6 { --pc: var(--p6); } .pc7 { --pc: var(--p7); }
-/* Players cycle red, black, gold. Ink is the text on the player color; --pt is the player color used as text on white. */
-.pc0, .pc3, .pc6 { --pi: #ffffff; --pt: #ca2430; } .pc1, .pc4, .pc7 { --pi: #ffb612; --pt: #000000; } .pc2, .pc5 { --pi: #000000; --pt: #000000; }
+/* Eight bold game-day colors, one per player: red, black, gold, blue, orange, purple, teal, pink.
+   Ink is the text on the player color; --pt is the player color used as text on white. */
+.pc0 { --pi: #ffffff; --pt: #ca2430; } .pc1 { --pi: #ffb612; --pt: #000000; } .pc2 { --pi: #000000; --pt: #8a5a00; } .pc3 { --pi: #ffffff; --pt: #1f4fbf; }
+.pc4 { --pi: #000000; --pt: #b5530a; } .pc5 { --pi: #ffffff; --pt: #7b2cbf; } .pc6 { --pi: #ffffff; --pt: #0b7373; } .pc7 { --pi: #ffffff; --pt: #c22f63; }
 .pdot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--pc, var(--muted)); flex: 0 0 auto; margin-right: 6px; }
 .pname { color: var(--pt, var(--pc, inherit)); font-weight: 700; }
 .sc.tier { border-radius: 6px; font-variant-numeric: tabular-nums; }
@@ -3982,7 +3984,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-15-01';
+  var BUILD_ID = '2026-10-15-03';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
