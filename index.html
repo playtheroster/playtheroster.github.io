@@ -3190,7 +3190,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       var g = S.game; if (!g || g.mode !== 'local' || g.picks.length !== n) return;
       var c = botChoice(g, pid, Math.random);
       if (c) submitPick(pid, c.sub, c.key, false);
-    }, TEST.botDelay || (1100 + Math.random() * 1600));
+    }, TEST.botDelay || (2000 + Math.random() * 2000));
   }
   function afterChange() { render(); if (S.ui.open) renderList(); }
 
@@ -3984,7 +3984,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-15-03';
+  var BUILD_ID = '2026-10-15-04';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
