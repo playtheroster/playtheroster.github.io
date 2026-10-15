@@ -448,10 +448,10 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .countdown .cd-first { font-weight: 700; }
 @keyframes cdpop { from { transform: scale(1.35); } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .countdown .cd-n.pop { animation: none; } }
-/* full-screen draft intro */
-.intro { position: fixed; inset: 0; z-index: 80; overflow-y: auto; display: grid; place-items: center; padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--pop); color: #ffffff; animation: introflash 0.9s steps(1, end) both; }
+/* full-screen draft intro (no flashing: it simply appears for the countdown) */
+.intro { position: fixed; inset: 0; z-index: 80; overflow-y: auto; display: grid; place-items: center; padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--pop); color: #ffffff; }
 .intro::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,0.08) 79px 81px); }
-.intro-in { position: relative; width: 100%; max-width: 900px; display: grid; justify-items: center; gap: clamp(12px, 2.4vh, 22px); text-align: center; animation: introin 0.5s cubic-bezier(.2,1.4,.4,1) 0.75s both; }
+.intro-in { position: relative; width: 100%; max-width: 900px; display: grid; justify-items: center; gap: clamp(12px, 2.4vh, 22px); text-align: center; }
 .intro .mono { color: var(--hi); letter-spacing: 0.14em; }
 .intro-topic { margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 13vw, 8.5rem); line-height: 0.88; text-transform: uppercase; text-wrap: balance; color: #ffffff; text-shadow: 5px 5px 0 #000000; overflow-wrap: anywhere; }
 .intro-q { margin: 0; font-size: clamp(1rem, 2.6vw, 1.3rem); font-weight: 600; max-width: 34ch; }
@@ -469,9 +469,7 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .intro-n.pop { animation: cdpop 0.35s ease-out; }
 .intro-x { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; min-height: 40px; padding: 0 16px; border: 2.5px solid #000000; border-radius: 999px; background: #ffffff; color: #000000; font: inherit; font-weight: 800; cursor: pointer; z-index: 1; }
 html.intro-on, html.intro-on body { overflow: hidden; }
-@keyframes introflash { 0% { background: #ffffff; } 15% { background: var(--hi); } 30% { background: #000000; } 45% { background: var(--pop); } 60% { background: var(--hi); } 75%, 100% { background: var(--pop); } }
-@keyframes introin { from { opacity: 0; transform: scale(1.25); } to { opacity: 1; transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { .intro, .intro-in, .intro-n.pop { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .intro-n.pop { animation: none; } }
 @media (max-height: 640px) { .intro-q { display: none; } }
 /* browse answers while waiting */
 .browse { display: grid; gap: 8px; margin-top: 14px; }
@@ -4145,7 +4143,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-15-09';
+  var BUILD_ID = '2026-10-15-10';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
