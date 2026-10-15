@@ -448,6 +448,31 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .countdown .cd-first { font-weight: 700; }
 @keyframes cdpop { from { transform: scale(1.35); } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .countdown .cd-n.pop { animation: none; } }
+/* full-screen draft intro */
+.intro { position: fixed; inset: 0; z-index: 80; overflow-y: auto; display: grid; place-items: center; padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--pop); color: #ffffff; animation: introflash 0.9s steps(1, end) both; }
+.intro::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,0.08) 79px 81px); }
+.intro-in { position: relative; width: 100%; max-width: 900px; display: grid; justify-items: center; gap: clamp(12px, 2.4vh, 22px); text-align: center; animation: introin 0.5s cubic-bezier(.2,1.4,.4,1) 0.75s both; }
+.intro .mono { color: var(--hi); letter-spacing: 0.14em; }
+.intro-topic { margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 13vw, 8.5rem); line-height: 0.88; text-transform: uppercase; text-wrap: balance; color: #ffffff; text-shadow: 5px 5px 0 #000000; overflow-wrap: anywhere; }
+.intro-q { margin: 0; font-size: clamp(1rem, 2.6vw, 1.3rem); font-weight: 600; max-width: 34ch; }
+.intro-subs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.intro-subs li { display: inline-flex; align-items: baseline; gap: 6px; padding: 8px 14px; border: 3px solid #000000; border-radius: 12px; background: #ffffff; color: #000000; font-weight: 800; font-size: clamp(0.95rem, 2.4vw, 1.15rem); box-shadow: 0 4px 0 #000000; }
+.intro-subs li b { font-family: var(--font-mono, monospace); font-size: 0.72em; color: var(--pop); }
+.intro-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 14px; width: 100%; }
+.intro-clock, .intro-cd { display: grid; align-content: center; justify-items: center; gap: 4px; padding: 14px 22px; border: 3px solid #000000; border-radius: 20px; box-shadow: 6px 6px 0 #000000; min-width: 0; }
+.intro-clock { background: #000000; color: #ffffff; flex: 1 1 260px; max-width: 440px; }
+.intro-clock .who { font-family: var(--font-display); font-size: clamp(1.8rem, 6vw, 3rem); line-height: 1; overflow-wrap: anywhere; }
+.intro-clock .you { font-weight: 800; color: var(--hi); }
+.intro-cd { background: var(--hi); color: #000000; flex: 0 1 200px; }
+.intro-cd .mono { color: #000000; }
+.intro-n { font-family: var(--font-display); font-size: clamp(4.5rem, 16vw, 8rem); line-height: 0.85; font-variant-numeric: tabular-nums; color: var(--pop); text-shadow: 4px 4px 0 #000000; }
+.intro-n.pop { animation: cdpop 0.35s ease-out; }
+.intro-x { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; min-height: 40px; padding: 0 16px; border: 2.5px solid #000000; border-radius: 999px; background: #ffffff; color: #000000; font: inherit; font-weight: 800; cursor: pointer; z-index: 1; }
+html.intro-on, html.intro-on body { overflow: hidden; }
+@keyframes introflash { 0% { background: #ffffff; } 15% { background: var(--hi); } 30% { background: #000000; } 45% { background: var(--pop); } 60% { background: var(--hi); } 75%, 100% { background: var(--pop); } }
+@keyframes introin { from { opacity: 0; transform: scale(1.25); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .intro, .intro-in, .intro-n.pop { animation: none; } }
+@media (max-height: 640px) { .intro-q { display: none; } }
 /* browse answers while waiting */
 .browse { display: grid; gap: 8px; margin-top: 14px; }
 .browse-list { list-style: none; margin: 0; padding: 6px; max-height: 320px; overflow-y: auto; overscroll-behavior: contain; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--surface); }
@@ -744,10 +769,10 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note level-note"></p>
                 <div>
-                  <span class="mono label" id="list-offline-label">Answer list during the draft</span>
+                  <span class="mono label" id="list-offline-label">Show draft options?</span>
                   <div class="seg two" role="radiogroup" aria-labelledby="list-offline-label">
-                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="list" data-list="show">Show it</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="list" data-list="hide">Hide it</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="list" data-list="show">Yes</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="list" data-list="hide">No</button>
                   </div>
                 </div>
                 <p class="note list-note"></p>
@@ -779,10 +804,10 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note level-note"></p>
                 <div>
-                  <span class="mono label" id="list-practice-label">Answer list during the draft</span>
+                  <span class="mono label" id="list-practice-label">Show draft options?</span>
                   <div class="seg two" role="radiogroup" aria-labelledby="list-practice-label">
-                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="list" data-list="show">Show it</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="list" data-list="hide">Hide it</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="list" data-list="show">Yes</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="list" data-list="hide">No</button>
                   </div>
                 </div>
                 <p class="note list-note"></p>
@@ -819,10 +844,10 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <span class="mono" id="lobby-count">Players</span>
               <ul class="players" id="lobby-players"></ul>
               <div class="lobby-list">
-                <span class="mono label" id="list-room-label">Answer list during the draft</span>
+                <span class="mono label" id="list-room-label">Show draft options?</span>
                 <div class="seg two" role="radiogroup" aria-labelledby="list-room-label" id="lobby-list-seg">
-                  <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="room-list" data-list="show">Show it</button>
-                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-list" data-list="hide">Hide it</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="room-list" data-list="show">Yes</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-list" data-list="hide">No</button>
                 </div>
                 <p class="note" id="lobby-list-note"></p>
               </div>
@@ -1065,6 +1090,20 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
     </div>
   </section>
 </main>
+
+<div class="intro" id="intro" hidden="" role="dialog" aria-modal="true" aria-labelledby="intro-topic">
+  <button type="button" class="intro-x" data-act="intro-close">Close</button>
+  <div class="intro-in">
+    <span class="mono" id="intro-kicker">The draft is on</span>
+    <h2 class="intro-topic" id="intro-topic"></h2>
+    <p class="intro-q" id="intro-q"></p>
+    <ul class="intro-subs" id="intro-subs" aria-label="Subtopics, one per round"></ul>
+    <div class="intro-row">
+      <div class="intro-clock"><span class="mono">On the clock first</span><span class="who" id="intro-who"></span><span class="you" id="intro-you" hidden="">That’s you. Get ready.</span></div>
+      <div class="intro-cd" role="status" aria-live="polite"><span class="mono">Starts in</span><div class="intro-n" id="intro-n">5</div></div>
+    </div>
+  </div>
+</div>
 
 <footer class="footer">
   <div class="wrap">
@@ -2855,6 +2894,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     renderBanner();
     var fastOn = !!S.fast && !S.game;
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
+    if (fastOn || scr !== 'draft') hideIntro();
     $('scr-fast').hidden = !fastOn;
     if (fastOn) { $('back-btn').hidden = !S.fast.done; $('back-btn').innerHTML = '&larr; Homepage'; }
     var online = !!(S.env.db && S.env.uid);
@@ -2951,10 +2991,29 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   }
 
   /* ---------- draft ---------- */
+  /* Full-screen intro that flashes up for the countdown: topic, subtopics, who picks first, seconds left. */
+  function hideIntro() { var el = $('intro'); if (el && !el.hidden) { el.hidden = true; document.documentElement.classList.remove('intro-on'); } }
+  function renderIntro(g, d, t, cd) {
+    var gid = gameId(g);
+    if (!cd || S.introClosed === gid) { hideIntro(); return; }
+    var el = $('intro');
+    if (S.introFor !== gid) {
+      S.introFor = gid;
+      $('intro-kicker').textContent = 'The draft is on · ' + g.subs.length + ' rounds · ' + d.n + ' players';
+      $('intro-topic').textContent = t.name;
+      $('intro-q').textContent = t.q || '';
+      $('intro-subs').innerHTML = g.subs.map(function (s, i) { return '<li><b>' + (i < 9 ? '0' : '') + (i + 1) + '</b>' + esc(s) + '</li>'; }).join('');
+      $('intro-n').textContent = String(Math.ceil(d.countdownMs / 1000));
+    }
+    $('intro-who').textContent = playerName(g, d.first);
+    $('intro-you').hidden = d.first !== S.me;
+    if (el.hidden) { el.hidden = false; document.documentElement.classList.add('intro-on'); }
+  }
   function renderDraft() {
     var g = S.game, d = derive(g, now()), t = TOPICS[g.topicId];
     var mine = d.current === S.me;
     var cd = d.countdownMs > 0;
+    renderIntro(g, d, t, cd);
     $('countdown').hidden = !cd;
     $('clock').hidden = cd; $('bar').hidden = cd;
     if (cd) {
@@ -3214,6 +3273,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (d.countdownMs > 0) {
       var secs = Math.ceil(d.countdownMs / 1000), el = $('cd-n');
       if (el.textContent !== String(secs)) { el.textContent = String(secs); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+      var inEl = $('intro-n');
+      if (inEl.textContent !== String(secs)) { inEl.textContent = String(secs); inEl.classList.remove('pop'); void inEl.offsetWidth; inEl.classList.add('pop'); }
       S.cdFor = gameId(g);
       return;
     }
@@ -3964,6 +4025,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
     else if (act === 'list') { store('roster.list', t.getAttribute('data-list')); renderListPref(); }
     else if (act === 'room-list') setRoomList(t.getAttribute('data-list') === 'show');
+    else if (act === 'intro-close') { if (S.game) S.introClosed = gameId(S.game); hideIntro(); }
     else if (act === 'privacy') { store('roster.privacy', t.getAttribute('data-privacy')); renderPrivacy(); }
     else if (act === 'join-room') joinRoom($('room-code').value);
     else if (act === 'find-match') findMatch();
@@ -4030,6 +4092,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (ev.target.id === 'acct-form') { ev.preventDefault(); createAccount($('acct-name').value); }
   });
   document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && !$('intro').hidden) { if (S.game) S.introClosed = gameId(S.game); hideIntro(); return; }
     if (ev.key === 'Escape' && !$('account').hidden) closeAccount();
   });
   $('account').addEventListener('click', function (ev) { if (ev.target === $('account')) closeAccount(); });
@@ -4082,7 +4145,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-15-07';
+  var BUILD_ID = '2026-10-15-09';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
