@@ -670,6 +670,43 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .org-connect ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
 .org-connect code { font-size: 0.85em; padding: 1px 6px; border-radius: 6px; background: var(--tint); overflow-wrap: anywhere; }
 .org-connect .row .field { font-family: var(--font-mono); }
+/* sign-in */
+.google-btn { gap: 10px; background: #ffffff; color: #000000; }
+.google-btn svg { width: 20px; height: 20px; flex: 0 0 auto; }
+.or-line { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.or-line::before, .or-line::after { content: ""; flex: 1; height: 2px; background: var(--line); }
+.acct-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+/* leagues */
+#mode-league { gap: 16px; }
+.setup.wide { max-width: 980px; }
+#mode-league > *, #league-body > * { min-width: 0; }
+#league-body { display: grid; gap: 14px; min-width: 0; }
+.lg-table { min-width: 560px; }
+#mode-league > *, #league-body > * { min-width: 0; }
+#league-body { display: grid; gap: 14px; min-width: 0; }
+.lg-table { min-width: 560px; }
+.lg-block { display: grid; gap: 8px; padding-top: 14px; border-top: 2px dashed var(--line); }
+.lg-block:first-child { padding-top: 0; border-top: 0; }
+.lg-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lg-list .btn { width: 100%; justify-content: space-between; text-align: left; gap: 10px; }
+.lg-list .btn .mono { color: inherit; opacity: 0.8; white-space: nowrap; }
+.lg-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 2px solid currentColor; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.lg-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; justify-content: space-between; }
+.lg-name { font-family: var(--font-display); font-weight: 400; font-size: clamp(2rem, 7vw, 3rem); line-height: 0.95; text-transform: uppercase; overflow-wrap: anywhere; }
+.lg-code { font-family: var(--font-display); font-size: 1.6rem; letter-spacing: 0.14em; color: var(--pop); }
+.lg-table td, .lg-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.lg-table td.pl, .lg-table th.pl { text-align: left; }
+.lg-table tr.me th, .lg-table tr.me td { background: var(--tint); }
+.lg-table .rk { font-family: var(--font-display); font-size: 1.2rem; color: var(--pop); }
+.lg-games { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lg-games li { display: grid; gap: 4px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 14px; background: var(--surface); }
+.lg-games .who { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.95rem; }
+.lg-games .who b { color: var(--pop); }
+.lg-people { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lg-people li { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 14px; background: var(--tint); }
+.lg-people .acts { display: flex; gap: 8px; }
+.lg-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.lg-owner { display: grid; gap: 10px; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; }
 /* ---------- Hover colors: every clickable thing turns black under a mouse (not on touch screens, so taps don't stick).
    White things go black with gold text; things that are already black stay black and their text turns white. ---------- */
 @media (hover: hover) and (pointer: fine) {
@@ -739,6 +776,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
         <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="practice">Practice Mode</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
+        <button class="btn" type="button" data-act="goto-mode" data-mode="league" id="league-cta" hidden="">Leagues 🏆</button>
       </div>
     </div>
   </section>
@@ -875,6 +913,12 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <button class="btn primary block" type="button" data-act="play-practice">Start practice</button>
               </div>
 
+              <div class="mode" id="mode-league" hidden="">
+                <h3 id="league-heading">Leagues</h3>
+                <div id="league-body"></div>
+                <p class="msg" id="league-msg" role="status" aria-live="polite"></p>
+              </div>
+
               <div class="mode" id="mode-fast">
                 <h3>Fast Money ⚡</h3>
                 <p>A daily challenge with its own topic. 60 seconds on the clock, one subtopic at a time: answer it and the next one appears, until all 5 are done. Score more than <strong>40.0</strong> to win. One try per day.</p>
@@ -987,6 +1031,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                   <button class="btn" type="button" id="home-btn" data-act="go-home">← Back to homepage</button>
                 </div>
                 <p class="note" id="save-note"></p>
+                <p class="note" id="league-note" hidden=""></p>
                 <div class="share-box" id="share-box" hidden="">
                   <span class="mono">Your score card</span>
                   <textarea class="field share-text" id="share-text" readonly="" rows="9" aria-label="Score to share"></textarea>
@@ -2984,7 +3029,12 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     $('hero').hidden = inPlay || inOrg; $('band-hero').hidden = inPlay || inOrg; $('how').hidden = inPlay || inOrg; $('play').hidden = !inPlay; $('organizer').hidden = !inOrg;
     $('org-btn').hidden = !orgAllowed() || inOrg;
     persistSession();
-    ['room', 'offline', 'practice', 'fast'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    ['room', 'offline', 'practice', 'fast', 'league'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    $('league-cta').hidden = !fbOn();
+    document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league';
+    document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league');
+    if (!S.game && !S.fast && inPlay && S.mode === 'league') renderLeague(); else leagueUnwatch();
+    if (scr !== 'results' && $('league-note')) $('league-note').hidden = true;
     var atResults = !!S.game && scr === 'results';
     $('back-btn').hidden = !!S.game && !atResults;
     $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
@@ -3009,7 +3059,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       : 'Rooms and matchmaking need you signed in to claude.ai with “Can edit” access to this page.';
     on.className = 'note bad';
     document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online || (S.creating && b.getAttribute('data-act') === 'create-room'); });
-    $('console-label').textContent = scr === 'modes' ? ({ room: 'Online game', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
+    $('console-label').textContent = scr === 'modes' ? ({ room: 'Online game', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money', league: 'Leagues' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
     renderChat();
     var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
     if (scr === 'lobby') renderLobby();
@@ -3259,7 +3309,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     $('save-btn').textContent = saved ? 'Saved to your account' : 'Save my result';
     $('share-btn').hidden = !(res && inGame);
     if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; }
-    $('save-note').textContent = (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
+    $('save-note').textContent = (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (fbOn() ? 'Sign in to save this result to your account.' : S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
     var againTxt = g.practice ? 'New random topic' : g.mode === 'local' ? 'Play again' : 'New game';
     document.querySelectorAll('#scr-results [data-act="again"]').forEach(function (b) { b.textContent = againTxt; });
   }
@@ -3662,7 +3712,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       for (var i = 0; i < 6 && !code; i++) { var c = newCode(); var ex = await db.doc('rooms/' + c).get(); if (!ex.exists) code = c; }
       if (!code) throw new Error('no code');
       await db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' });
-      await db.doc('rooms/' + code + '/players/' + S.env.uid).set({ name: name, joinedAt: now() });
+      await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name));
       enterRoom(code);
       if (!fixedCode) statBump(function (r) { r.rooms = (r.rooms || 0) + 1; });
       return code;
@@ -3683,7 +3733,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       if (!mine.exists) {
         var ps = await db.collection('rooms/' + code + '/players').get();
         if (ps.size >= MAX_PLAYERS) { setMsg('That room is full (8 players).', true); return; }
-        await db.doc('rooms/' + code + '/players/' + S.env.uid).set({ name: name, joinedAt: now() });
+        await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name));
         statBump(function (r) { r.joins = (r.joins || 0) + 1; });
       }
       setMsg('');
@@ -3734,7 +3784,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     S.unsub.push(db.collection('rooms/' + code + '/players').onSnapshot(function (s) {
       if (S.game !== g) return;
       var ps = {};
-      s.docs.forEach(function (d) { if ((g.kicked || []).indexOf(d.id) >= 0) return; var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; });
+      s.docs.forEach(function (d) { if ((g.kicked || []).indexOf(d.id) >= 0) return; var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; if (typeof v.acct === 'string' && /^[A-Za-z0-9_-]{6,128}$/.test(v.acct)) ps[d.id].acct = v.acct; });
       g.players = ps;
       afterChange();
     }, onErr));
@@ -3754,6 +3804,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       var v = s.exists ? s.data() : null;
       g.results = v && v.scores ? { scores: v.scores, summary: v.summary || '', missing: Number(v.missing) || 0, source: v.source === 'builtin' ? 'builtin' : 'claude' } : null;
       afterChange();
+      if (g.results) leagueRecord(g);
     }, onErr));
     try { history.replaceState(null, '', '#r-' + code); } catch (e) {}
     S.view = 'play';
@@ -3810,6 +3861,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   }
   function acctMsg(t, bad) { var m = $('acct-msg'); m.textContent = t || ''; m.className = 'msg' + (bad ? ' bad' : ''); }
   async function loadAccount() {
+    if (fbOn()) { fbStart(); return; }
     var db = S.env.db, uid = S.env.uid;
     if (!db || !uid) { S.account.loaded = true; return; }
     try {
@@ -3830,8 +3882,9 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var f = $('account').querySelector('input, button.primary');
     if (f) f.focus();
   }
-  function closeAccount() { $('account').hidden = true; S.pendingSave = false; $('account-btn').focus(); }
+  function closeAccount() { $('account').hidden = true; S.pendingSave = false; S.pendingLeague = null; $('account-btn').focus(); if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague(); }
   function renderAccount(reason) {
+    if (fbOn()) { renderAccountFB(reason); return; }
     var body = $('acct-body'), p = S.account.profile;
     if (!S.env.db || !S.env.uid) {
       $('acct-title').textContent = 'Sign in / Join';
@@ -3871,7 +3924,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   async function saveResult() {
     var g = S.game; if (!g || !g.results) return;
     if (!S.env.db || !S.env.uid) { openAccount(); return; }
-    if (!S.account.profile) { S.pendingSave = true; openAccount('Create an account to save this result.'); return; }
+    if (fbOn()) { if (!FB.user || !S.account.profile) { S.pendingSave = true; openAccount('Sign in to save this result to your account.'); return; } }
+    else if (!S.account.profile) { S.pendingSave = true; openAccount('Create an account to save this result.'); return; }
     var id = gameId(g); if (S.saved[id]) return;
     var rows = standings(g, g.results.scores), mine = rows.filter(function (r) { return r.pid === S.me; })[0];
     if (!mine) return;
@@ -3881,12 +3935,561 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       picks: g.picks.filter(function (p) { return p.pid === S.me; }).map(function (p) { var s = g.results.scores['p' + p.n]; return { sub: p.sub, name: p.name, score: s ? s.score : 0 }; })
     };
     try {
-      await S.env.db.doc('data/users/' + S.env.uid + '/profile').collection('games').doc('g' + rec.at).set(rec);
+      if (fbOn()) await FB.db.collection('users').doc(FB.user.uid).collection('games').doc('g' + rec.at).set(JSON.parse(JSON.stringify(rec)));
+      else await S.env.db.doc('data/users/' + S.env.uid + '/profile').collection('games').doc('g' + rec.at).set(rec);
       S.saved[id] = true; S.account.games.unshift(rec);
-      setMsg(S.env.web ? 'Result saved on this device.' : 'Result saved to your account.');
+      setMsg(S.env.web && !fbOn() ? 'Result saved on this device.' : 'Result saved to your account.');
     } catch (e) { setMsg('Couldn’t save your result. Try again.', true); }
     render();
   }
+
+  /* ---------- accounts (Firebase: Google or an emailed sign-in link) ----------
+     On the websites, signing in uses Firebase, so an account works on every device. You can play everything
+     without an account; you need one to save results and to create or join leagues. No passwords: either
+     "Continue with Google" or we email you a link. Emails are never shown to other players. */
+  var FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyBOzG--zN2AWSObFba8vifhud9KFsGC9SU',
+    authDomain: 'the-roster-3b12e.firebaseapp.com',
+    projectId: 'the-roster-3b12e',
+    storageBucket: 'the-roster-3b12e.firebasestorage.app',
+    messagingSenderId: '487662440970',
+    appId: '1:487662440970:web:3f21fac4ee04e74dce85f3'
+  };
+  var FB_SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
+  var FB = { ready: null, auth: null, db: null, user: null, started: false };
+  function fbOn() { return !!S.env.web && (!window.__ROSTER_TEST__ || !!TEST.firebase); }
+  function fbLoad() {
+    if (FB.ready) return FB.ready;
+    FB.ready = new Promise(function (resolve, reject) {
+      function init() {
+        try {
+          var fb = window.firebase;
+          if (!fb.apps || !fb.apps.length) fb.initializeApp(FIREBASE_CONFIG);
+          FB.auth = fb.auth(); FB.db = fb.firestore();
+          resolve(FB);
+        } catch (e) { FB.ready = null; reject(e); }
+      }
+      if (window.firebase && window.firebase.auth && window.firebase.firestore) { init(); return; }
+      var files = ['firebase-app-compat.js', 'firebase-auth-compat.js', 'firebase-firestore-compat.js'];
+      (function next(i) {
+        if (i >= files.length) { init(); return; }
+        var sc = document.createElement('script'); sc.src = FB_SDK + files[i]; sc.async = true;
+        sc.onload = function () { next(i + 1); };
+        sc.onerror = function () { FB.ready = null; reject(new Error('sdk')); };
+        document.head.appendChild(sc);
+      })(0);
+    });
+    return FB.ready;
+  }
+  function fbStart() {
+    if (!fbOn()) return Promise.resolve();
+    if (FB.started) return FB.ready || Promise.resolve();
+    FB.started = true;
+    return fbLoad().then(function () {
+      S.fbError = false;
+      try { if (FB.auth.isSignInWithEmailLink(location.href)) fbFinishEmailLink(); } catch (e) {}
+      try { FB.auth.getRedirectResult && FB.auth.getRedirectResult().catch(function () {}); } catch (e) {}
+      FB.auth.onAuthStateChanged(function (u) { fbUserChanged(u); });
+    }, function () { FB.started = false; S.fbError = true; S.account.loaded = true; renderAccountBtn(); if (!$('account').hidden) renderAccount(); });
+  }
+  async function fbUserChanged(u) {
+    var was = FB.user ? FB.user.uid : '';
+    FB.user = u || null;
+    if ((u ? u.uid : '') !== was && S.league) { S.leagueOpenCode = S.league.code; leagueUnwatch(); S.league = null; }
+    if (!u) {
+      S.account.profile = null; S.account.games = []; S.myLeagues = {}; S.account.loaded = true;
+      renderAccountBtn(); if (!$('account').hidden) renderAccount();
+      if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague();
+      return;
+    }
+    var prof = null, ref = FB.db.collection('users').doc(u.uid);
+    try { var d = await ref.get(); if (d.exists) prof = d.data(); } catch (e) {}
+    if (!prof) {
+      var nm = clean(store('roster.nameForSignIn') || u.displayName || myName() || '', 20);
+      if (nm.length >= 2) { prof = { name: nm, createdAt: now() }; try { await ref.set(prof); } catch (e) { prof = null; } }
+    }
+    try { localStorage.removeItem('roster.nameForSignIn'); } catch (e) {}
+    S.account.profile = prof ? { username: clean(prof.name, 20) || 'Player', uid: u.uid, email: u.email || '', createdAt: Number(prof.createdAt) || now() } : null;
+    if (S.account.profile && !myName()) { $('player-name').value = S.account.profile.username; store('roster.name', S.account.profile.username); }
+    try {
+      var gs = await ref.collection('games').orderBy('at', 'desc').limit(50).get();
+      S.account.games = gs.docs.map(function (x) { return x.data(); });
+    } catch (e) { S.account.games = []; }
+    await loadMyLeagues();
+    S.account.loaded = true;
+    renderAccountBtn();
+    if (S.account.profile && S.pendingSave) { S.pendingSave = false; closeAccount(); saveResult(); }
+    else if (S.account.profile && S.pendingLeague) { var next = S.pendingLeague; S.pendingLeague = null; closeAccount(); next(); }
+    else if (!$('account').hidden) renderAccount();
+    if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague();
+  }
+  var GOOGLE_G = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.9 6.1C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.6 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.2-8.5 2.2-6.3 0-11.6-4.2-13.5-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
+  function renderAccountFB(reason) {
+    var body = $('acct-body'), u = FB.user, p = S.account.profile;
+    var lead = reason ? '<p><strong>' + esc(reason) + '</strong></p>' : '';
+    if (S.fbError) { $('acct-title').textContent = 'Sign in'; body.innerHTML = '<p>Sign-in isn’t available right now. Check your internet connection, then reload the page.</p>'; return; }
+    if (!FB.auth) { $('acct-title').textContent = 'Sign in'; body.innerHTML = '<p class="note">Loading…</p>'; if (!FB.started) fbStart().then(function () { if (!$('account').hidden && FB.auth) renderAccount(reason); }); return; }
+    if (S.ui.emailConfirm) {
+      $('acct-title').textContent = 'Finish signing in';
+      body.innerHTML = '<p>You opened the sign-in link on a different device or browser. Enter the email address you used, to finish signing in here.</p>' +
+        '<form id="email-confirm-form" style="display:grid;gap:10px"><label class="mono label" for="acct-confirm-email">Email</label><input class="field" id="acct-confirm-email" type="email" autocomplete="email"><button class="btn primary" type="submit">Sign in</button></form>';
+      return;
+    }
+    if (!u) {
+      $('acct-title').textContent = 'Sign in / Join';
+      body.innerHTML = lead + '<p>Sign in to save your results on every device and to create or join leagues. You can always play without an account.</p>' +
+        '<button class="btn block google-btn" type="button" data-act="google-signin">' + GOOGLE_G + 'Continue with Google</button>' +
+        '<div class="or-line mono">or use your email</div>' +
+        (S.ui.linkSent
+          ? '<p><strong>Check your email.</strong> We sent a sign-in link to <strong>' + esc(S.ui.linkSent) + '</strong>. Open it on this device to finish. It can take a minute, so check your spam folder too.</p><button class="btn small ghost" type="button" data-act="email-again">Use a different email</button>'
+          : '<form id="email-form" style="display:grid;gap:10px"><label class="mono label" for="acct-fname">Your name</label><input class="field" id="acct-fname" type="text" maxlength="20" autocomplete="name" value="' + esc(myName()) + '">' +
+            '<label class="mono label" for="acct-email">Email</label><input class="field" id="acct-email" type="email" autocomplete="email" placeholder="you@example.com">' +
+            '<button class="btn primary" type="submit">Email me a sign-in link</button></form>' +
+            '<p class="note">No password: we email you a link and you tap it to sign in. Your email is never shown to other players.</p>');
+      return;
+    }
+    if (!p) {
+      $('acct-title').textContent = 'Pick your name';
+      body.innerHTML = lead + '<p>This is the name other players see in leagues.</p><form id="name-form" class="row"><input class="field" id="acct-newname" type="text" maxlength="20" autocomplete="nickname" value="' + esc(clean(u.displayName || myName(), 20)) + '"><button class="btn primary small" type="submit">Save</button></form>';
+      return;
+    }
+    var gs = S.account.games, wins = gs.filter(function (x) { return x.won; }).length;
+    var best = gs.reduce(function (m, x) { return Math.max(m, x.score || 0); }, 0);
+    var avg = gs.length ? fmt1(gs.reduce(function (m, x) { return m + (x.score || 0); }, 0) / gs.length) : '—';
+    $('acct-title').textContent = p.username;
+    body.innerHTML = lead +
+      '<div class="acct-meta"><span class="note">' + esc(p.email || 'Signed in') + '</span><button class="btn small ghost" type="button" data-act="sign-out">Sign out</button></div>' +
+      '<div class="stats"><div class="stat"><b>' + gs.length + '</b><span class="mono">Games</span></div><div class="stat"><b>' + wins + '</b><span class="mono">Wins</span></div><div class="stat"><b>' + (gs.length ? fmt1(best) : '—') + '</b><span class="mono">Best</span></div><div class="stat"><b>' + avg + '</b><span class="mono">Average</span></div></div>' +
+      '<div><p class="mono" style="margin-bottom:6px">Saved results</p><ul class="history">' + (gs.length ? gs.slice(0, 12).map(function (x) {
+        return '<li><span>' + esc(x.topic || '') + ' · ' + esc(x.dateKey || '') + ' · ' + (x.won ? 'Won' : ('#' + x.rank + ' of ' + x.players)) + '</span><strong>' + fmt1(x.score) + '/' + (x.max || 50) + '</strong></li>';
+      }).join('') : '<li><span class="note">No saved results yet. Finish a draft and tap “Save my result”.</span></li>') + '</ul></div>' +
+      '<form id="name-form" style="display:grid;gap:8px"><label class="mono label" for="acct-newname">Your name</label><div class="row"><input class="field" id="acct-newname" type="text" maxlength="20" value="' + esc(p.username) + '"><button class="btn small" type="submit">Change name</button></div></form>';
+  }
+  async function fbGoogle() {
+    acctMsg('Opening Google…');
+    var prov = null;
+    try {
+      await fbLoad();
+      prov = new window.firebase.auth.GoogleAuthProvider();
+      if (prov.setCustomParameters) prov.setCustomParameters({ prompt: 'select_account' });
+      await FB.auth.signInWithPopup(prov);
+      acctMsg('');
+    } catch (e) {
+      var c = (e && e.code) || '';
+      if ((c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment') && prov) { try { await FB.auth.signInWithRedirect(prov); return; } catch (x) {} }
+      if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') { acctMsg(''); return; }
+      acctMsg(c === 'auth/unauthorized-domain' ? 'Google sign-in isn’t set up for this website address yet. Use your email for now.' : 'Google sign-in didn’t work. Try again, or use your email.', true);
+    }
+  }
+  async function fbSendLink(name, email) {
+    name = clean(name, 20); email = String(email || '').trim();
+    if (name.length < 2) { acctMsg('Enter your name (at least 2 characters).', true); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { acctMsg('Enter a valid email address.', true); return; }
+    acctMsg('Sending…');
+    try {
+      await fbLoad();
+      await FB.auth.sendSignInLinkToEmail(email, { url: location.origin + location.pathname + '?signin=1', handleCodeInApp: true });
+      store('roster.emailForSignIn', email); store('roster.nameForSignIn', name); store('roster.name', name); $('player-name').value = name;
+      S.ui.linkSent = email; acctMsg(''); renderAccount();
+    } catch (e) {
+      var c = (e && e.code) || '';
+      acctMsg(c === 'auth/invalid-email' ? 'That email address doesn’t look right.'
+        : c === 'auth/quota-exceeded' ? 'Too many sign-in emails were sent today. Use Google, or try again tomorrow.'
+        : (c === 'auth/unauthorized-continue-uri' || c === 'auth/unauthorized-domain') ? 'Email sign-in isn’t set up for this website address yet.'
+        : 'Couldn’t send the email. Check the address and try again.', true);
+    }
+  }
+  function cleanSignInUrl() { try { history.replaceState(null, '', location.pathname + (location.hash || '')); } catch (e) {} }
+  async function fbFinishEmailLink(typed) {
+    var email = String(typed || store('roster.emailForSignIn') || '').trim();
+    if (!email) { S.ui.emailConfirm = true; openAccount(); return; }
+    try {
+      await FB.auth.signInWithEmailLink(email, location.href);
+      try { localStorage.removeItem('roster.emailForSignIn'); } catch (e) {}
+      S.ui.emailConfirm = false; S.ui.linkSent = null; cleanSignInUrl();
+      openAccount(); acctMsg('You’re signed in.');
+    } catch (e) {
+      S.ui.emailConfirm = false; cleanSignInUrl(); openAccount();
+      acctMsg((e && e.code) === 'auth/invalid-email' ? 'That email doesn’t match the one the link was sent to. Send a new link.' : 'That sign-in link didn’t work (it may have expired or been used already). Send a new one.', true);
+    }
+  }
+  async function fbSaveName(name) {
+    name = clean(name, 20);
+    if (name.length < 2) { acctMsg('Names need at least 2 characters.', true); return; }
+    if (!FB.user) return;
+    try {
+      var created = S.account.profile ? S.account.profile.createdAt : now();
+      await FB.db.collection('users').doc(FB.user.uid).set({ name: name, createdAt: created });
+      S.account.profile = { username: name, uid: FB.user.uid, email: FB.user.email || '', createdAt: created };
+      store('roster.name', name); $('player-name').value = name;
+      renderAccountBtn(); acctMsg('Saved.');
+      if (S.pendingSave) { S.pendingSave = false; closeAccount(); saveResult(); return; }
+      if (S.pendingLeague) { var next = S.pendingLeague; S.pendingLeague = null; closeAccount(); next(); return; }
+      renderAccount();
+    } catch (e) { acctMsg('Couldn’t save your name. Try again.', true); }
+  }
+  async function fbSignOut() {
+    try { await FB.auth.signOut(); } catch (e) {}
+    leagueUnwatch(); S.league = null;
+    acctMsg('Signed out.'); renderAccount();
+  }
+  /* The room player record carries the account, so league games know who played. */
+  function playerDoc(name) {
+    var d = { name: name, joinedAt: now() };
+    if (fbOn() && FB.user && S.account.profile) d.acct = FB.user.uid;
+    return d;
+  }
+
+  /* ---------- leagues ----------
+     A league is a group that plays online rooms together and keeps a shared leaderboard. It has a unique,
+     searchable name and a 6-letter code. Public leagues: anyone signed in can join. Private leagues: you ask to
+     join and the creator approves or declines. Every online room game where 2 or more members play is added
+     automatically. All of this lives in Firebase, whose rules (not just this page) decide who can do what. */
+  var LG_LEN = 6;
+  function lgMsg(t, bad) { var m = $('league-msg'); if (m) { m.textContent = t || ''; m.className = 'msg' + (bad ? ' bad' : ''); } }
+  function lgCode(x) { return String(x || '').toUpperCase().replace(/[^A-Z]/g, ''); }
+  function lgNameKey(n) { return String(n || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40); }
+  function lgUid() { return FB.user ? FB.user.uid : ''; }
+  function lgSignedIn() { return !!(fbOn() && FB.user && S.account.profile); }
+  function lgRef(code) { return FB.db.collection('leagues').doc(code); }
+  function myLeagueRef(code) { return FB.db.collection('users').doc(lgUid()).collection('leagues').doc(code); }
+  async function loadMyLeagues() {
+    S.myLeagues = {};
+    if (!FB.user) return;
+    try {
+      var sn = await FB.db.collection('users').doc(FB.user.uid).collection('leagues').get();
+      sn.docs.forEach(function (d) { var v = d.data() || {}; if (/^[A-Z]{6}$/.test(d.id)) S.myLeagues[d.id] = { name: clean(v.name, 30) || d.id, role: v.role === 'owner' ? 'owner' : 'member', status: v.status === 'pending' ? 'pending' : v.status === 'denied' ? 'denied' : 'member', at: Number(v.at) || 0 }; });
+    } catch (e) {}
+  }
+  function newLeagueCode() { var c = ''; for (var i = 0; i < LG_LEN; i++) c += CODE_CHARS.charAt(Math.floor(Math.random() * CODE_CHARS.length)); return c; }
+  function lgCleanInfo(v) {
+    if (!v || typeof v !== 'object') return null;
+    return { name: clean(v.name, 30) || 'League', visibility: v.visibility === 'public' ? 'public' : 'private', ownerUid: String(v.ownerUid || ''), ownerName: clean(v.ownerName, 20) || 'the creator', createdAt: Number(v.createdAt) || 0 };
+  }
+  function lgCleanGame(v) {
+    if (!v || typeof v !== 'object' || !Array.isArray(v.players)) return null;
+    var max = Math.min(100, Math.max(10, Number(v.max) || 50)), seen = {};
+    var ps = v.players.filter(function (x) { if (!x || typeof x.uid !== 'string' || seen[x.uid]) return false; seen[x.uid] = 1; return true; }).slice(0, 8)
+      .map(function (x) { var t = Number(x.total); return { uid: x.uid, name: clean(x.name, 20) || 'Player', total: isFinite(t) ? Math.max(0, Math.min(max, Math.round(t * 10) / 10)) : 0 }; });
+    if (ps.length < 2) return null;
+    return { at: Number(v.at) || 0, dateKey: /^\d{4}-\d{2}-\d{2}$/.test(String(v.dateKey)) ? v.dateKey : '', topicId: TOPICS[v.topicId] ? v.topicId : '', max: max, players: ps };
+  }
+  function leagueUnwatch() { if (S.leagueUnsub) { S.leagueUnsub.forEach(function (u) { try { u(); } catch (e) {} }); S.leagueUnsub = null; } }
+  function leagueOpen(code) {
+    code = lgCode(code);
+    if (code.length !== LG_LEN) return;
+    if (!FB.db) { S.leagueOpenCode = code; if (!FB.started) fbStart(); return; }
+    leagueUnwatch();
+    var L = S.league = { code: code, info: null, missing: false, members: {}, games: {}, requests: {}, myReq: null, canRead: true, range: 'all', loaded: {} };
+    try { history.replaceState(null, '', '#league-' + code); } catch (e) {}
+    var me = lgUid();
+    function upd() { if (S.league === L) renderLeague(); }
+    function denied() { L.canRead = false; upd(); }
+    S.leagueUnsub = [
+      lgRef(code).onSnapshot(function (sn) {
+        L.loaded.info = true;
+        L.info = sn.exists ? lgCleanInfo(sn.data()) : null; L.missing = !sn.exists;
+        if (L.info && me && L.info.ownerUid === me && !L.reqWatch) watchRequests(L);
+        upd();
+      }, function () { L.loaded.info = true; L.missing = true; upd(); }),
+      lgRef(code).collection('members').onSnapshot(function (sn) {
+        var m = {}; sn.docs.forEach(function (d) { var v = d.data() || {}; m[d.id] = { name: clean(v.name, 20) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; });
+        L.members = m; L.canRead = true; L.loaded.members = true;
+        if (me && m[me]) syncMyLeague(code, L);
+        upd();
+      }, denied),
+      lgRef(code).collection('games').orderBy('at', 'desc').limit(400).onSnapshot(function (sn) {
+        var gm = {}; sn.docs.forEach(function (d) { var v = lgCleanGame(d.data()); if (v) gm[d.id] = v; });
+        L.games = gm; L.loaded.games = true; upd();
+      }, function () { L.loaded.games = true; upd(); })
+    ];
+    if (me) S.leagueUnsub.push(lgRef(code).collection('requests').doc(me).onSnapshot(function (sn) {
+      var prev = L.myReq;
+      L.myReq = sn.exists ? ((sn.data() || {}).status === 'denied' ? 'denied' : 'pending') : null;
+      /* Approved: the request is gone. Open the league again so the leaderboard loads now that I'm a member. */
+      if (prev === 'pending' && !L.myReq && S.league === L) { setTimeout(function () { if (S.league === L) leagueOpen(L.code); }, 300); return; }
+      upd();
+    }, function () {}));
+    renderLeague();
+    window.scrollTo(0, 0);
+  }
+  function watchRequests(L) {
+    L.reqWatch = true;
+    S.leagueUnsub.push(lgRef(L.code).collection('requests').onSnapshot(function (sn) {
+      var r = {}; sn.docs.forEach(function (d) { var v = d.data() || {}; if (v.status === 'pending') r[d.id] = { name: clean(v.name, 20) || 'Player', at: Number(v.at) || 0 }; });
+      L.requests = r; if (S.league === L) renderLeague();
+    }, function () {}));
+  }
+  /* Keep my own list of leagues in step (an approval happens on the creator's device). */
+  function syncMyLeague(code, L) {
+    var mine = S.myLeagues && S.myLeagues[code];
+    if (mine && mine.status === 'member') return;
+    var rec = { name: (L.info && L.info.name) || code, role: L.info && L.info.ownerUid === lgUid() ? 'owner' : 'member', status: 'member', at: now() };
+    S.myLeagues = S.myLeagues || {}; S.myLeagues[code] = rec;
+    myLeagueRef(code).set(rec).catch(function () {});
+  }
+  async function leagueSearch(q, explicit) {
+    q = String(q || '').trim().toLowerCase();
+    S.ui.lgQuery = q;
+    if (!q) { S.ui.lgResults = null; renderLeague(); return; }
+    if (!FB.db) { if (!FB.started) await fbStart(); if (!FB.db) return; }
+    try {
+      var sn = await FB.db.collection('leagues').orderBy('nameLower').startAt(q).endAt(q + '').limit(15).get();
+      if (S.ui.lgQuery !== q) return;
+      S.ui.lgResults = sn.docs.map(function (d) { var v = lgCleanInfo(d.data()); return v && /^[A-Z]{6}$/.test(d.id) ? Object.assign({ code: d.id }, v) : null; }).filter(Boolean);
+    } catch (e) { S.ui.lgResults = []; if (explicit) lgMsg('Search didn’t work. Check your connection and try again.', true); }
+    renderLeague();
+    var i = $('league-search'); if (i && document.activeElement !== i && explicit) i.focus();
+  }
+  async function leagueCreate(name) {
+    if (!lgSignedIn()) { S.pendingLeague = function () { renderLeague(); }; openAccount('Sign in to create a league.'); return; }
+    name = clean(name, 30);
+    var key = lgNameKey(name), vis = S.ui.lgVis === 'public' ? 'public' : 'private';
+    if (name.length < 2 || !key) { lgMsg('Give your league a name (at least 2 letters or numbers).', true); var i = $('league-new'); if (i) i.focus(); return; }
+    if (S.leagueBusy) return; S.leagueBusy = true; lgMsg('Creating your league…');
+    try {
+      var taken = await FB.db.collection('leagueNames').doc(key).get();
+      if (taken.exists) { lgMsg('A league called “' + name + '” already exists. Pick another name, or search for it to join.', true); S.leagueBusy = false; return; }
+      var code = null;
+      for (var k = 0; k < 6 && !code; k++) { var c = newLeagueCode(); var ex = await lgRef(c).get(); if (!ex.exists) code = c; }
+      if (!code) throw new Error('code');
+      var me = lgUid(), uname = S.account.profile.username, b = FB.db.batch();
+      b.set(lgRef(code), { name: name, nameLower: name.toLowerCase(), nameKey: key, visibility: vis, ownerUid: me, ownerName: uname, createdAt: now() });
+      b.set(FB.db.collection('leagueNames').doc(key), { leagueId: code, ownerUid: me });
+      b.set(lgRef(code).collection('members').doc(me), { name: uname, joinedAt: now() });
+      b.set(myLeagueRef(code), { name: name, role: 'owner', status: 'member', at: now() });
+      await b.commit();
+      S.myLeagues[code] = { name: name, role: 'owner', status: 'member', at: now() };
+      lgMsg('League created. Share the code or invite link with your friends.');
+      S.leagueBusy = false;
+      leagueOpen(code);
+    } catch (e) { S.leagueBusy = false; lgMsg((e && e.code) === 'permission-denied' ? 'That name was just taken. Try another.' : 'Couldn’t create the league. Check your connection and try again.', true); }
+  }
+  function needSignIn(what) {
+    if (lgSignedIn()) return false;
+    var code = S.league && S.league.code;
+    S.pendingLeague = function () { if (code) leagueOpen(code); else renderLeague(); };
+    openAccount('Sign in to ' + what + '.');
+    return true;
+  }
+  async function leagueJoin() {
+    var L = S.league; if (!L || !L.info) return;
+    if (needSignIn('join this league')) return;
+    if (L.info.visibility !== 'public') { leagueRequest(); return; }
+    var me = lgUid(), uname = S.account.profile.username, b = FB.db.batch();
+    b.set(lgRef(L.code).collection('members').doc(me), { name: uname, joinedAt: now() });
+    b.set(myLeagueRef(L.code), { name: L.info.name, role: 'member', status: 'member', at: now() });
+    try { await b.commit(); S.myLeagues[L.code] = { name: L.info.name, role: 'member', status: 'member', at: now() }; lgMsg('You joined ' + L.info.name + '.'); }
+    catch (e) { lgMsg('Couldn’t join the league. Try again.', true); }
+  }
+  async function leagueRequest() {
+    var L = S.league; if (!L || !L.info) return;
+    if (needSignIn('ask to join this league')) return;
+    var me = lgUid(), b = FB.db.batch();
+    b.set(lgRef(L.code).collection('requests').doc(me), { name: S.account.profile.username, at: now(), status: 'pending' });
+    b.set(myLeagueRef(L.code), { name: L.info.name, role: 'member', status: 'pending', at: now() });
+    try { await b.commit(); S.myLeagues[L.code] = { name: L.info.name, role: 'member', status: 'pending', at: now() }; lgMsg('Request sent. ' + L.info.ownerName + ' will approve or decline it.'); }
+    catch (e) { lgMsg('Couldn’t send the request. Try again.', true); }
+  }
+  async function leagueCancelRequest() {
+    var L = S.league; if (!L) return;
+    var b = FB.db.batch();
+    b.delete(lgRef(L.code).collection('requests').doc(lgUid()));
+    b.delete(myLeagueRef(L.code));
+    try { await b.commit(); delete S.myLeagues[L.code]; lgMsg('Request cancelled.'); renderLeague(); } catch (e) { lgMsg('Couldn’t cancel the request. Try again.', true); }
+  }
+  async function leagueDismiss(code) {
+    code = lgCode(code);
+    try { await myLeagueRef(code).delete(); } catch (e) {}
+    try { await lgRef(code).collection('requests').doc(lgUid()).delete(); } catch (e) {}
+    delete S.myLeagues[code]; renderLeague();
+  }
+  async function leagueApprove(uid) {
+    var L = S.league; if (!L || !L.requests[uid]) return;
+    var b = FB.db.batch();
+    b.set(lgRef(L.code).collection('members').doc(uid), { name: L.requests[uid].name, joinedAt: now() });
+    b.delete(lgRef(L.code).collection('requests').doc(uid));
+    try { await b.commit(); lgMsg(L.requests[uid] ? L.requests[uid].name + ' is in.' : 'Approved.'); } catch (e) { lgMsg('Couldn’t approve. Try again.', true); }
+  }
+  async function leagueDecline(uid) {
+    var L = S.league; if (!L) return;
+    var nm = L.requests[uid] ? L.requests[uid].name : 'The request';
+    try { await lgRef(L.code).collection('requests').doc(uid).update({ status: 'denied' }); lgMsg(nm + ' was declined.'); } catch (e) { lgMsg('Couldn’t decline. Try again.', true); }
+  }
+  async function leagueRemove(uid) {
+    var L = S.league; if (!L || uid === lgUid()) return;
+    var nm = L.members[uid] ? L.members[uid].name : 'They';
+    try { await lgRef(L.code).collection('members').doc(uid).delete(); lgMsg(nm + ' was removed from the league.'); } catch (e) { lgMsg('Couldn’t remove them. Try again.', true); }
+  }
+  async function leagueSetVis(vis) {
+    var L = S.league; if (!L || !L.info || L.info.ownerUid !== lgUid()) return;
+    vis = vis === 'public' ? 'public' : 'private';
+    if (L.info.visibility === vis) return;
+    try { await lgRef(L.code).update({ visibility: vis }); lgMsg(vis === 'public' ? 'Your league is public: anyone signed in can join.' : 'Your league is private: people ask to join and you approve them.'); }
+    catch (e) { lgMsg('Couldn’t change the setting. Try again.', true); }
+  }
+  async function leagueLeave() {
+    var L = S.league; if (!L) return;
+    var name = (L.info && L.info.name) || L.code, b = FB.db.batch();
+    b.delete(lgRef(L.code).collection('members').doc(lgUid()));
+    b.delete(myLeagueRef(L.code));
+    try { await b.commit(); delete S.myLeagues[L.code]; leagueUnwatch(); S.league = null; try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} renderLeague(); lgMsg('You left ' + name + '.'); }
+    catch (e) { lgMsg('Couldn’t leave the league. Try again.', true); }
+  }
+  function leagueLink(code) { return location.origin + location.pathname + '#league-' + code; }
+  async function leagueCopy() {
+    var L = S.league; if (!L) return;
+    var text = leagueLink(L.code), ok = false;
+    try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; } } catch (e) {}
+    if (ok) lgMsg('Invite link copied. Send it to your friends.');
+    else { var i = $('league-link'); if (i) { i.focus(); i.select(); } lgMsg('Press Ctrl+C or Cmd+C to copy the selected link.'); }
+  }
+  /* Add a finished online draft to each of my leagues where 2 or more members played. Whoever writes it first
+     wins; the others find it already there. */
+  async function leagueRecord(g) {
+    if (!g || g.mode !== 'shared' || !g.results || !lgSignedIn()) return;
+    var codes = Object.keys(S.myLeagues || {}).filter(function (c) { return S.myLeagues[c].status === 'member'; });
+    if (!codes.length) return;
+    var rows = standings(g, g.results.scores), me = lgUid();
+    var id = (g.code + '-' + g.startedAt).replace(/[^A-Za-z0-9-]/g, '').slice(0, 40);
+    S.leagueDone = S.leagueDone || {};
+    for (var i = 0; i < codes.length; i++) {
+      var code = codes[i], key = code + ':' + id;
+      if (S.leagueDone[key]) continue;
+      S.leagueDone[key] = true;
+      try {
+        var ms = await lgRef(code).collection('members').get(), members = {};
+        ms.docs.forEach(function (d) { members[d.id] = clean((d.data() || {}).name, 20) || 'Player'; });
+        if (!members[me]) continue;
+        var seen = {}, ps = [];
+        rows.forEach(function (r) { var a = g.players[r.pid] && g.players[r.pid].acct; if (a && members[a] && !seen[a]) { seen[a] = 1; ps.push({ uid: a, name: members[a], total: r.total }); } });
+        if (ps.length < 2) continue;
+        var ref = lgRef(code).collection('games').doc(id), ex = await ref.get();
+        if (!ex.exists) await ref.set({ at: now(), dateKey: g.dateKey, topicId: g.topicId, room: g.code, max: g.subs.length * 10, players: ps, by: me });
+        var n = $('league-note'); if (n) { n.textContent = 'This game counts in your league ' + S.myLeagues[code].name + '.'; n.hidden = false; }
+      } catch (e) { if (!((e && e.code) === 'permission-denied')) S.leagueDone[key] = false; }
+    }
+  }
+  /* Standings. Avg finish is weighted by how many league members played: in each game you score the share of
+     the other members you finished ahead of (ties count half). 1st = 100, last = 0, so 2nd of 5 (75) beats
+     2nd of 3 (50). The table is ranked by Avg finish, then wins, then average score. */
+  function leagueTable(L) {
+    var cut = L.range === 'all' ? '' : dateKey(new Date(Date.now() - (Number(L.range) - 1) * 864e5));
+    var games = Object.keys(L.games).map(function (k) { return L.games[k]; }).filter(function (gm) { return !cut || gm.dateKey >= cut; });
+    var st = {};
+    function row(uid) { return st[uid] = st[uid] || { uid: uid, name: L.members[uid].name, games: 0, wins: 0, sum: 0, best: 0, fin: 0 }; }
+    Object.keys(L.members).forEach(row);
+    games.forEach(function (gm) {
+      gm.players.forEach(function (p) {
+        if (!L.members[p.uid]) return;
+        var others = gm.players.filter(function (q) { return q !== p && L.members[q.uid]; }), n = others.length;
+        if (!n) return;
+        var beat = others.filter(function (q) { return q.total < p.total; }).length, tied = others.filter(function (q) { return q.total === p.total; }).length;
+        var r = row(p.uid);
+        r.games++; r.sum += p.total; r.best = Math.max(r.best, p.total); r.fin += (beat + tied / 2) / n;
+        if (!others.some(function (q) { return q.total > p.total; })) r.wins++;
+      });
+    });
+    function f(r) { return r.games ? r.fin / r.games : -1; }
+    function avg(r) { return r.games ? r.sum / r.games : -1; }
+    var list = Object.keys(st).map(function (k) { return st[k]; });
+    list.sort(function (a, b) { return f(b) - f(a) || b.wins - a.wins || avg(b) - avg(a) || b.games - a.games || a.name.localeCompare(b.name); });
+    return { list: list, games: games.sort(function (a, b) { return b.at - a.at; }) };
+  }
+  function lgBadge(v) { return '<span class="lg-badge">' + (v === 'public' ? 'Public' : 'Private') + '</span>'; }
+  function renderLeague() {
+    var body = $('league-body'); if (!body) return;
+    $('league-heading').textContent = 'Leagues';
+    if (!fbOn()) { body.innerHTML = '<p>Leagues are only available on the website.</p>'; return; }
+    if (S.fbError) { body.innerHTML = '<p>Leagues can’t load right now. Check your internet connection, then reload the page.</p>'; return; }
+    /* Still finding out who is signed in: show Loading and wait (the sign-in check calls renderLeague when done). */
+    if (!FB.db || !S.account.loaded) { body.innerHTML = '<p class="note">Loading…</p>'; if (!FB.started) fbStart(); return; }
+    if (S.leagueOpenCode && !S.league) { var oc = S.leagueOpenCode; S.leagueOpenCode = null; leagueOpen(oc); return; }
+    if (S.league) { renderLeagueView(body); return; }
+    var signed = lgSignedIn(), mine = S.myLeagues || {};
+    var codes = Object.keys(mine).sort(function (a, b) { return (mine[b].at || 0) - (mine[a].at || 0); });
+    var res = S.ui.lgResults;
+    body.innerHTML = '<p>Play with the same friends a lot? A league keeps a running leaderboard of your online games together: wins, win %, average score and average finish.</p>' +
+      (!signed ? '<div class="lg-block"><p>You need an account to create or join a league, so your stats follow you on any device.</p><button class="btn primary block" type="button" data-act="league-signin">Sign in or create an account</button></div>' : '') +
+      (signed && codes.length ? '<div class="lg-block"><span class="mono">Your leagues</span><ul class="lg-list">' + codes.map(function (c) {
+        var m = mine[c], tag = m.status === 'pending' ? 'Waiting for approval' : m.status === 'denied' ? 'Declined' : (m.role === 'owner' ? 'Creator' : 'Member');
+        return '<li><button class="btn" type="button" data-act="league-open" data-code="' + c + '"><span>' + esc(m.name) + '</span><span class="mono">' + tag + '</span></button>' +
+          (m.status === 'denied' ? '<button class="btn small ghost" type="button" data-act="league-dismiss" data-code="' + c + '">Remove from my list</button>' : '') + '</li>';
+      }).join('') + '</ul></div>' : '') +
+      '<div class="lg-block"><label class="mono" for="league-search">Find a league</label><form id="league-search-form" class="row"><input class="field" id="league-search" type="search" maxlength="30" autocomplete="off" placeholder="Search by name" value="' + esc(S.ui.lgQuery || '') + '"><button class="btn small primary" type="submit">Search</button></form>' +
+      (res ? (res.length ? '<ul class="lg-list">' + res.map(function (r) {
+        return '<li><button class="btn" type="button" data-act="league-open" data-code="' + r.code + '"><span>' + esc(r.name) + '</span><span class="mono">' + (r.visibility === 'public' ? 'Public' : 'Private') + ' · by ' + esc(r.ownerName) + '</span></button></li>';
+      }).join('') + '</ul>' : '<p class="note">No leagues start with “' + esc(S.ui.lgQuery) + '”.</p>') : '') + '</div>' +
+      (signed ? '<div class="lg-block"><label class="mono" for="league-new">Create a league</label>' +
+        '<div class="seg two" role="radiogroup" aria-label="Who can join"><button type="button" class="seg-btn" role="radio" aria-checked="' + (S.ui.lgVis !== 'public') + '" data-act="league-vis" data-vis="private">Private</button><button type="button" class="seg-btn" role="radio" aria-checked="' + (S.ui.lgVis === 'public') + '" data-act="league-vis" data-vis="public">Public</button></div>' +
+        '<p class="note">' + (S.ui.lgVis === 'public' ? 'Public: anyone signed in can find it and join right away.' : 'Private: people can find it by name, but you approve who joins.') + ' League names are unique and can’t be changed later.</p>' +
+        '<form id="league-new-form" class="row"><input class="field" id="league-new" type="text" maxlength="30" autocomplete="off" placeholder="League name"><button class="btn small primary" type="submit">Create</button></form></div>' +
+        '<p class="note">Signed in as <strong>' + esc(S.account.profile.username) + '</strong>.</p>' : '');
+  }
+  function renderLeagueView(body) {
+    var L = S.league, me = lgUid();
+    $('league-heading').textContent = 'League';
+    if (!L.loaded.info) { body.innerHTML = '<p class="note">Loading…</p>'; return; }
+    if (L.missing || !L.info) { body.innerHTML = '<p>No league with code ' + L.code + '. Check the link or code with whoever invited you.</p><div class="lg-actions"><button class="btn small" type="button" data-act="league-back">← Leagues</button></div>'; return; }
+    var I = L.info, owner = me && I.ownerUid === me, member = !!(me && L.members[me]), n = Object.keys(L.members).length;
+    var readable = L.canRead && ((I.visibility === 'public' && lgSignedIn()) || member);
+    var arm = function (k) { return S.ui.lgArm === k && now() - S.ui.lgArmAt < 5000; };
+    var html = '<div class="lg-head"><div><div class="lg-name">' + esc(I.name) + '</div><span class="mono">' + lgBadge(I.visibility) + ' · created by ' + esc(I.ownerName) + (readable ? ' · ' + n + ' member' + (n === 1 ? '' : 's') : '') + '</span></div>' +
+      '<div><span class="mono">League code</span><div class="lg-code">' + L.code + '</div></div></div>';
+    if (member || owner) html += '<div class="copybox"><input class="field" id="league-link" readonly value="' + esc(leagueLink(L.code)) + '" aria-label="Invite link"><button class="btn small" type="button" data-act="league-copy">Copy invite link</button></div>';
+    if (owner) {
+      var reqs = Object.keys(L.requests);
+      html += '<div class="lg-owner"><span class="mono">You created this league</span>' +
+        '<div class="seg two" role="radiogroup" aria-label="Who can join"><button type="button" class="seg-btn" role="radio" aria-checked="' + (I.visibility === 'private') + '" data-act="league-setvis" data-vis="private">Private</button><button type="button" class="seg-btn" role="radio" aria-checked="' + (I.visibility === 'public') + '" data-act="league-setvis" data-vis="public">Public</button></div>' +
+        '<p class="note">' + (I.visibility === 'public' ? 'Anyone signed in can join right away.' : 'People ask to join and you approve or decline them here.') + '</p>' +
+        (reqs.length ? '<span class="mono">Requests to join (' + reqs.length + ')</span><ul class="lg-people">' + reqs.map(function (u) {
+          return '<li><strong>' + esc(L.requests[u].name) + '</strong><span class="acts"><button class="btn small primary" type="button" data-act="league-approve" data-uid="' + esc(u) + '">Approve</button><button class="btn small" type="button" data-act="league-decline" data-uid="' + esc(u) + '">Decline</button></span></li>';
+        }).join('') + '</ul>' : (I.visibility === 'private' ? '<p class="note">No requests waiting.</p>' : '')) +
+        (n > 1 ? '<div><button class="btn small" type="button" data-act="league-manage" aria-expanded="' + !!S.ui.lgManage + '">' + (S.ui.lgManage ? 'Hide members' : 'Manage members') + '</button></div>' +
+          (S.ui.lgManage ? '<ul class="lg-people">' + Object.keys(L.members).filter(function (u) { return u !== me; }).map(function (u) {
+            return '<li><span>' + esc(L.members[u].name) + '</span><button class="btn small ghost" type="button" data-act="league-remove" data-uid="' + esc(u) + '">' + (arm('league-remove:' + u) ? 'Tap again to remove' : 'Remove') + '</button></li>';
+          }).join('') + '</ul>' : '') : '') + '</div>';
+    } else if (!member) {
+      if (!lgSignedIn()) html += '<div class="lg-block"><p>Sign in to ' + (I.visibility === 'public' ? 'join this league.' : 'ask to join this league.') + '</p><button class="btn primary block" type="button" data-act="league-signin">Sign in or create an account</button></div>';
+      else if (I.visibility === 'public') html += '<div class="lg-block"><button class="btn primary block" type="button" data-act="league-join">Join ' + esc(I.name) + '</button></div>';
+      else if (L.myReq === 'pending') html += '<div class="lg-block"><p><strong>Request sent.</strong> Waiting for ' + esc(I.ownerName) + ' to approve it.</p><button class="btn small ghost" type="button" data-act="league-cancel">Cancel request</button></div>';
+      else if (L.myReq === 'denied') html += '<div class="lg-block"><p>Your request to join was declined.</p></div>';
+      else html += '<div class="lg-block"><p>This league is private. Ask to join and ' + esc(I.ownerName) + ' can approve you.</p><button class="btn primary block" type="button" data-act="league-request">Request to join</button></div>';
+    }
+    if (!readable) {
+      html += '<p class="note">' + (I.visibility === 'public' ? 'Sign in to see this league’s leaderboard.' : 'The leaderboard is only visible to members of this private league.') + '</p>';
+    } else {
+      var T = leagueTable(L), lbl = { all: 'All time', '30': 'Last 30 days', '7': 'Last 7 days' };
+      html += '<div class="seg" role="radiogroup" aria-label="Time period">' + ['all', '30', '7'].map(function (r) { return '<button type="button" class="seg-btn" role="radio" aria-checked="' + (L.range === r) + '" data-act="league-range" data-range="' + r + '">' + lbl[r] + '</button>'; }).join('') + '</div>' +
+        '<div class="org-glance-wrap"><table class="org-glance-table lg-table"><thead><tr><th class="num">#</th><th class="pl">Player</th><th class="num">Games</th><th class="num">Wins</th><th class="num">Win %</th><th class="num">Avg score</th><th class="num">Best</th><th class="num">Avg finish <span class="mono">/100</span></th></tr></thead><tbody>' +
+        T.list.map(function (r, i) {
+          var g = r.games;
+          return '<tr' + (r.uid === me ? ' class="me"' : '') + '><td class="rk">' + (g ? i + 1 : '–') + '</td><td class="pl"><strong>' + esc(r.name) + '</strong>' + (r.uid === me ? ' (you)' : '') + '</td><td>' + g + '</td><td>' + r.wins + '</td><td>' + (g ? Math.round(100 * r.wins / g) + '%' : '–') + '</td><td>' + (g ? fmt1(r.sum / g) : '–') + '</td><td>' + (g ? fmt1(r.best) : '–') + '</td><td>' + (g ? Math.round(100 * r.fin / g) : '–') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' +
+        '<div class="lg-block"><span class="mono">Recent games · ' + lbl[L.range].toLowerCase() + '</span>' +
+        (T.games.length ? '<ul class="lg-games">' + T.games.slice(0, 10).map(function (gm) {
+          var ps = gm.players.filter(function (p) { return L.members[p.uid]; }).sort(function (a, b) { return b.total - a.total; });
+          if (!ps.length) return '';
+          var top = ps[0].total;
+          return '<li><span class="mono">' + esc(gm.dateKey ? keyLabel(gm.dateKey) : '') + (gm.topicId ? ' · ' + esc(TOPICS[gm.topicId].name) : '') + '</span><span class="who">' + ps.map(function (p) {
+            return '<span>' + (p.total === top ? '<b>🏆 ' + esc(L.members[p.uid].name) + '</b>' : esc(L.members[p.uid].name)) + ' ' + fmt1(p.total) + '</span>';
+          }).join('') + '</span></li>';
+        }).join('') + '</ul>' : '<p class="note">No league games yet. Play an online room together: once 2 or more members finish a draft in the same room (signed in), it shows up here.</p>') + '</div>' +
+        '<p class="note">Every online room game counts automatically when 2 or more league members finish it together while signed in. Players are ranked only against the other league members in that game; offline and practice games don’t count.</p>' +
+        '<p class="note"><strong>Avg finish</strong> rates where you place out of 100, adjusted for how many league members played: 100 means first every game, 0 means last every game. Coming 2nd of 5 scores 75, but 2nd of 3 scores 50, because beating more people counts for more. The table is ranked by Avg finish, then wins, then average score.</p>';
+    }
+    html += '<div class="lg-actions"><button class="btn small" type="button" data-act="league-back">← Leagues</button>' +
+      (member && !owner ? '<button class="btn small ghost" type="button" data-act="league-leave">' + (arm('league-leave:') ? 'Tap again to leave' : 'Leave league') + '</button>' : '') + '</div>';
+    body.innerHTML = html;
+  }
+  window.addEventListener('hashchange', function () {
+    var h = /^#league-([A-Z]{6})$/i.exec(location.hash || '');
+    if (!h || S.game || S.fast || !fbOn()) return;
+    var c = h[1].toUpperCase();
+    if (S.league && S.league.code === c && S.mode === 'league') return;
+    leagueUnwatch(); S.league = null; S.leagueOpenCode = c;
+    S.view = 'play'; S.mode = 'league'; render(); window.scrollTo(0, 0);
+  });
 
   /* ---------- top 10 per subtopic ---------- */
   function t10Focus(g) {
@@ -4355,7 +4958,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (S.game) { render(); window.scrollTo(0, 0); return; }
     showView('play', mode);
     if (mode === 'room' && S.env.web && S.env.db && S.env.db.net) S.env.db.net.warm();
-    var f = myName() ? $('mode-' + mode).querySelector('input, select, button:not(:disabled)') : $('player-name');
+    var f = (mode === 'league' || myName()) ? $('mode-' + mode).querySelector('input, select, button:not(:disabled)') : $('player-name');
     if (f) setTimeout(function () { f.focus({ preventScroll: true }); }, 60);
   }
   document.addEventListener('click', function (ev) {
@@ -4427,6 +5030,28 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     else if (act === 'org-sub') orgToggleSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-reset') { delete S.org.draft[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
     else if (act === 'org-tab') { S.org.tab = t.getAttribute('data-tab'); renderOrganizer(); window.scrollTo(0, 0); }
+    else if (act === 'google-signin') fbGoogle();
+    else if (act === 'email-again') { S.ui.linkSent = null; renderAccount(); }
+    else if (act === 'sign-out') fbSignOut();
+    else if (act === 'league-signin') { S.pendingLeague = function () { renderLeague(); }; openAccount('Sign in to create or join a league. Your league stats follow your account on any device.'); }
+    else if (act === 'league-vis') { S.ui.lgVis = t.getAttribute('data-vis'); renderLeague(); }
+    else if (act === 'league-manage') { S.ui.lgManage = !S.ui.lgManage; renderLeague(); }
+    else if (act === 'league-open') leagueOpen(t.getAttribute('data-code'));
+    else if (act === 'league-back') { leagueUnwatch(); S.league = null; try { if (/^#league-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); } catch (e) {} renderLeague(); }
+    else if (act === 'league-range') { if (S.league) { S.league.range = t.getAttribute('data-range'); renderLeague(); } }
+    else if (act === 'league-copy') leagueCopy();
+    else if (act === 'league-join') leagueJoin();
+    else if (act === 'league-request') leagueRequest();
+    else if (act === 'league-cancel') leagueCancelRequest();
+    else if (act === 'league-approve') leagueApprove(t.getAttribute('data-uid'));
+    else if (act === 'league-decline') leagueDecline(t.getAttribute('data-uid'));
+    else if (act === 'league-setvis') leagueSetVis(t.getAttribute('data-vis'));
+    else if (act === 'league-dismiss') leagueDismiss(t.getAttribute('data-code'));
+    else if (act === 'league-remove' || act === 'league-leave') {
+      var armKey = act + ':' + (t.getAttribute('data-uid') || '');
+      if (S.ui.lgArm === armKey && now() - S.ui.lgArmAt < 5000) { S.ui.lgArm = null; if (act === 'league-leave') leagueLeave(); else leagueRemove(t.getAttribute('data-uid')); }
+      else { S.ui.lgArm = armKey; S.ui.lgArmAt = now(); renderLeague(); setTimeout(function () { if (S.ui.lgArm === armKey && now() - S.ui.lgArmAt >= 5000) { S.ui.lgArm = null; renderLeague(); } }, 5100); }
+    }
     else if (act === 'gh-disconnect') { try { localStorage.removeItem('roster.ghToken'); } catch (e) {} renderOrgConnect(); orgMsg('Disconnected. This device can’t publish the schedule until you connect again.'); }
     else if (act === 'stats-range') { S.stats = S.stats || { range: '1', state: 'idle' }; S.stats.range = t.getAttribute('data-range'); renderStats(); }
     else if (act === 'org-freset') { delete S.org.fast[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
@@ -4440,12 +5065,18 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var k = ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-org-topic') : null;
     if (k) orgSetTopic(k, ev.target.value);
     if (ev.target && ev.target.id === 'stats-nome') { store('roster.nostats', ev.target.checked ? '1' : '0'); renderStats(); return; }
+    if (ev.target && ev.target.id === 'league-search') { clearTimeout(S.lgSearchT); var qv = ev.target.value; S.lgSearchT = setTimeout(function () { leagueSearch(qv); }, 300); }
     var fk = ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-org-ftopic') : null;
     if (fk) orgSetFastTopic(fk, ev.target.value);
   });
   document.addEventListener('submit', function (ev) {
     if (ev.target.id === 'acct-form') { ev.preventDefault(); createAccount($('acct-name').value); }
     if (ev.target.id === 'gh-form') { ev.preventDefault(); ghConnect($('gh-token').value); }
+    if (ev.target.id === 'email-form') { ev.preventDefault(); fbSendLink($('acct-fname').value, $('acct-email').value); }
+    if (ev.target.id === 'email-confirm-form') { ev.preventDefault(); fbFinishEmailLink($('acct-confirm-email').value); }
+    if (ev.target.id === 'name-form') { ev.preventDefault(); fbSaveName($('acct-newname').value); }
+    if (ev.target.id === 'league-new-form') { ev.preventDefault(); leagueCreate($('league-new').value); }
+    if (ev.target.id === 'league-search-form') { ev.preventDefault(); leagueSearch($('league-search').value, true); }
   });
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape' && !$('intro').hidden) { if (S.game) S.introClosed = gameId(S.game); hideIntro(); return; }
@@ -4501,7 +5132,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-07';
+  var BUILD_ID = '2026-10-17-09';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -5086,6 +5717,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var saved = store('roster.name'); if (saved) $('player-name').value = clean(saved);
     var m = /^#r-([A-Z]{5})$/i.exec(location.hash || '');
     if (m) { $('room-code').value = m[1].toUpperCase(); S.view = 'play'; S.mode = 'room'; }
+    var lm = /^#league-([A-Z]{6})$/i.exec(location.hash || '');
+    if (lm) { S.view = 'play'; S.mode = 'league'; S.leagueOpenCode = lm[1].toUpperCase(); }
     var restored = null, roomCode = null, orgSaved = null;
     try {
       restored = JSON.parse(sessionStorage.getItem('roster.local') || 'null');
@@ -5093,8 +5726,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       orgSaved = sessionStorage.getItem('roster.orgSaved');
       sessionStorage.removeItem('roster.orgSaved');
     } catch (e) {}
-    var fr = loadFastToday(); if (!m && fr && !fr.done) { S.fast = fr; S.view = 'play'; S.mode = 'fast'; if (now() >= fr.endsAt) finishFast(); }
-    if (!m && restored && restored.game && restored.game.mode === 'local' && TOPICS[restored.game.topicId] && Array.isArray(restored.game.picks)) {
+    var fr = loadFastToday(); if (!m && !lm && fr && !fr.done) { S.fast = fr; S.view = 'play'; S.mode = 'fast'; if (now() >= fr.endsAt) finishFast(); }
+    if (!m && !lm && restored && restored.game && restored.game.mode === 'local' && TOPICS[restored.game.topicId] && Array.isArray(restored.game.picks)) {
       S.game = restored.game; S.me = 'you'; S.view = 'play';
       S.lastSettings = restored.settings || { mode: 'local', count: 3 };
     }
@@ -5136,7 +5769,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (m && S.env.db && S.env.uid) {
       if (myName()) joinRoom(m[1]);
       else setMsg('Enter your name, then tap Join to enter room ' + m[1].toUpperCase() + '.');
-    } else if (!S.game && roomCode && S.env.db && S.env.uid) {
+    } else if (!S.game && !lm && roomCode && S.env.db && S.env.uid) {
       enterRoom(roomCode);
     }
     if (S.env.web && S.env.orgHash && !S.game) openOrganizer();
