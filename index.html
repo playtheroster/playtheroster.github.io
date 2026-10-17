@@ -592,9 +592,9 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .bsub.done .mono { color: var(--hi); }
 .nav-actions { gap: 8px; flex: 0 0 auto; }
 .nav-actions .btn { white-space: nowrap; }
-#league-btn { gap: 6px; }
+#league-btn, #me-btn { gap: 6px; }
 .nav .brand { min-width: 0; }
-@media (max-width: 480px) { .nav .wordmark { font-size: 1.45rem; gap: 8px; } .nav-actions .btn.small { padding: 0 10px; font-size: 0.8rem; } #league-btn .lb-text { display: none; } }
+@media (max-width: 480px) { .nav .wordmark { font-size: 1.45rem; gap: 8px; } .nav-actions .btn.small { padding: 0 10px; font-size: 0.8rem; } #league-btn .lb-text, #me-btn .lb-text { display: none; } }
 @media (max-width: 400px) { .nav .wordmark { font-size: 1.2rem; gap: 6px; } .nav { gap: 8px; } }
 
 /* ---------- Game Day Red: red band up top, white topic card, black subtopic chips with gold numbers ---------- */
@@ -607,8 +607,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .band .wordmark { color: #ffffff; }
 .band .wordmark i, .band .wordmark .dot { color: var(--hi); }
 .band .brand .mono { color: rgba(255, 255, 255, 0.85); }
-.band #account-btn, .band #org-btn, .band #league-btn { background: #ffffff; color: #000000; border-color: #000000; box-shadow: 0 4px 0 #000000; border-radius: 999px; }
-@media (hover: hover) and (pointer: fine) { .band #account-btn:hover, .band #org-btn:hover, .band #league-btn:hover { background: #000000; color: var(--hi); box-shadow: 0 6px 0 #000000; } }
+.band #account-btn, .band #org-btn, .band #league-btn, .band #me-btn { background: #ffffff; color: #000000; border-color: #000000; box-shadow: 0 4px 0 #000000; border-radius: 999px; }
+@media (hover: hover) and (pointer: fine) { .band #account-btn:hover, .band #org-btn:hover, .band #league-btn:hover, .band #me-btn:hover { background: #000000; color: var(--hi); box-shadow: 0 6px 0 #000000; } }
 .band-hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; padding-block: 18px 150px; }
 .band-hero > div:first-child { flex: 1 1 520px; min-width: 0; }
 .band-clock { flex: 0 0 auto; }
@@ -728,6 +728,39 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .lg-block .row > .btn { min-height: 46px; flex: 0 0 auto; }
 .lg-block > .mono, .lg-block > label.mono { display: block; }
 .lg-block .note { margin: 0; }
+#mode-me { gap: 16px; }
+#mode-me > *, #me-body > * { min-width: 0; }
+#me-body { display: grid; gap: 18px; min-width: 0; }
+.me-gate { display: grid; gap: 12px; justify-items: start; padding: 18px; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--tint); }
+.me-gate p { margin: 0; }
+.me-sub { margin: 0; color: var(--muted); }
+.me-tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.me-tiles .stat-tile b { font-size: clamp(1.7rem, 4.4vw, 2.4rem); }
+@media (max-width: 900px) { .me-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .me-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.me-sec { display: grid; gap: 10px; }
+.me-sec > .mono { display: block; }
+.me-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.me-mode { display: grid; gap: 10px; align-content: start; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--surface); }
+.me-mode.empty { border-style: dashed; border-color: var(--line); }
+.me-mode-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.me-mode-head strong { font-size: 1.05rem; }
+.me-mode-head .mono { white-space: nowrap; }
+.me-avg { display: grid; gap: 4px; }
+.me-avg-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.me-avg-top b { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.me-avg-top b small { font-family: var(--font-body, inherit); font-size: 0.85rem; color: var(--muted); }
+.me-bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.me-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.me-kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; margin: 0; }
+.me-kv div { display: grid; gap: 0; }
+.me-kv dt { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.me-kv dd { margin: 0; font-weight: 800; font-variant-numeric: tabular-nums; }
+.me-levels { list-style: none; margin: 0; padding: 8px 0 0; border-top: 2px dashed var(--line); display: grid; gap: 4px; font-size: 0.9rem; }
+.me-levels li { display: flex; justify-content: space-between; gap: 8px; }
+.me-levels span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.me-recent li span { min-width: 0; }
+.me-recent li strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .lg-owner { display: grid; gap: 10px; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; }
 /* ---------- Hover colors: every clickable thing turns black under a mouse (not on touch screens, so taps don't stick).
    White things go black with gold text; things that are already black stay black and their text turns white. ---------- */
@@ -762,6 +795,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   <div class="nav-actions">
     <button class="btn small ghost" id="org-btn" type="button" data-act="organizer" hidden="">Organizer</button>
     <button class="btn small" id="league-btn" type="button" data-act="goto-mode" data-mode="league" aria-label="Leagues" hidden=""><span aria-hidden="true">🏆</span><span class="lb-text">Leagues</span></button>
+    <button class="btn small" id="me-btn" type="button" data-act="goto-mode" data-mode="me" aria-label="My stats" hidden=""><span aria-hidden="true">📊</span><span class="lb-text">My Stats</span></button>
     <button class="btn small" id="account-btn" type="button" data-act="account">Sign in / Join</button>
   </div>
 </header>
@@ -940,6 +974,11 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <h3 id="league-heading">Leagues</h3>
                 <div id="league-body"></div>
                 <p class="msg" id="league-msg" role="status" aria-live="polite"></p>
+              </div>
+
+              <div class="mode" id="mode-me" hidden="">
+                <h3 id="me-heading">My Stats</h3>
+                <div id="me-body"></div>
               </div>
 
               <div class="mode" id="mode-fast">
@@ -3053,12 +3092,13 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     $('hero').hidden = inPlay || inOrg; $('band-hero').hidden = inPlay || inOrg; $('how').hidden = inPlay || inOrg; $('play').hidden = !inPlay; $('organizer').hidden = !inOrg;
     $('org-btn').hidden = !orgAllowed() || inOrg;
     persistSession();
-    ['room', 'offline', 'practice', 'fast', 'league'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
-    $('league-btn').hidden = !fbOn();
+    ['room', 'offline', 'practice', 'fast', 'league', 'me'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    $('league-btn').hidden = !fbOn(); $('me-btn').hidden = !fbOn();
     var rln = $('room-league-note');
     if (rln) { rln.hidden = !fbOn(); rln.innerHTML = lgSignedIn() ? 'Playing with your league? Your games together count toward its leaderboard automatically. <a href="#" data-act="goto-mode" data-mode="league">See your leagues</a>' : 'Playing with your league? <a href="#" data-act="account">Sign in</a> and your games together count toward its leaderboard automatically.'; }
-    document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league';
-    document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league');
+    document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league' || S.mode === 'me';
+    document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league' || S.mode === 'me');
+    if (!S.game && inPlay && S.mode === 'me') renderMe();
     if (!S.game && !S.fast && inPlay && S.mode === 'league') renderLeague(); else leagueUnwatch();
     if (scr !== 'results' && $('league-note')) $('league-note').hidden = true;
     var atResults = !!S.game && scr === 'results';
@@ -3332,10 +3372,11 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var saved = S.saved[gameId(g)];
     $('save-btn').hidden = !inGame;
     $('save-btn').disabled = !res || saved;
-    $('save-btn').textContent = saved ? 'Saved to your account' : 'Save my result';
+    $('save-btn').textContent = saved ? (fbOn() ? 'Saved to your stats' : 'Saved to your account') : 'Save my result';
+    if (res && inGame && !saved) autoSaveResult(g);
     $('share-btn').hidden = !(res && inGame);
     if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; }
-    $('save-note').textContent = (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (fbOn() ? 'Sign in to save this result to your account.' : S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
+    $('save-note').textContent = (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (fbOn() ? 'Sign in to save this result to your stats.' : S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
     var againTxt = g.practice ? 'New random topic' : g.mode === 'local' ? 'Play again' : 'New game';
     document.querySelectorAll('#scr-results [data-act="again"]').forEach(function (b) { b.textContent = againTxt; });
   }
@@ -3909,7 +3950,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var f = $('account').querySelector('input, button.primary');
     if (f) f.focus();
   }
-  function closeAccount() { $('account').hidden = true; S.pendingSave = false; S.pendingLeague = null; $('account-btn').focus(); if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague(); }
+  function closeAccount() { $('account').hidden = true; S.pendingSave = false; S.pendingLeague = null; $('account-btn').focus(); if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague(); if (S.mode === 'me' && S.view === 'play' && !S.game) renderMe(); }
   function renderAccount(reason) {
     if (fbOn()) { renderAccountFB(reason); return; }
     var body = $('acct-body'), p = S.account.profile;
@@ -3948,7 +3989,19 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       renderAccount(); acctMsg('Account created.');
     } catch (e) { acctMsg('Couldn’t create the account. Try again.', true); }
   }
-  async function saveResult() {
+  /* Signed in on the website: every finished game saves to your stats by itself. */
+  var AUTO_SAVE_TRIED = {};
+  function autoSaveResult(g) {
+    if (!fbOn() || !FB.user || !S.account.profile || !g || !g.results || !g.players[S.me]) return;
+    var id = gameId(g); if (S.saved[id] || AUTO_SAVE_TRIED[id]) return;
+    AUTO_SAVE_TRIED[id] = 1; setTimeout(function () { if (S.game === g) saveResult(true); }, 0);
+  }
+  function addMyGame(rec) {
+    var other = function (x) { return !(rec.id && x.id === rec.id); }, byAt = function (a, b) { return (b.at || 0) - (a.at || 0); };
+    S.account.games = [rec].concat((S.account.games || []).filter(other)).sort(byAt);
+    if (S.myStats && S.myStats.games && FB.user && S.myStats.uid === FB.user.uid) S.myStats.games = [rec].concat(S.myStats.games.filter(other)).sort(byAt);
+  }
+  async function saveResult(quiet) {
     var g = S.game; if (!g || !g.results) return;
     if (!S.env.db || !S.env.uid) { openAccount(); return; }
     if (fbOn()) { if (!FB.user || !S.account.profile) { S.pendingSave = true; openAccount('Sign in to save this result to your account.'); return; } }
@@ -3957,16 +4010,16 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var rows = standings(g, g.results.scores), mine = rows.filter(function (r) { return r.pid === S.me; })[0];
     if (!mine) return;
     var rec = {
-      at: now(), dateKey: g.dateKey, topic: TOPICS[g.topicId].name, mode: g.practice ? 'practice' : g.mode === 'local' ? 'offline' : (g.isPublic ? 'random' : 'room'), level: g.mode === 'local' ? (g.botLevel || 'medium') : undefined,
+      id: 'g-' + id.replace(/[^A-Za-z0-9]/g, '-'), at: now(), dateKey: g.dateKey, topic: TOPICS[g.topicId].name, mode: g.practice ? 'practice' : g.mode === 'local' ? 'offline' : (g.isPublic ? 'random' : 'room'), level: g.mode === 'local' ? (g.botLevel || 'medium') : undefined,
       score: mine.total, max: g.subs.length * 10, rank: mine.rank, players: rows.length, won: mine.rank === 1,
       picks: g.picks.filter(function (p) { return p.pid === S.me; }).map(function (p) { var s = g.results.scores['p' + p.n]; return { sub: p.sub, name: p.name, score: s ? s.score : 0 }; })
     };
     try {
-      if (fbOn()) await FB.db.collection('users').doc(FB.user.uid).collection('games').doc('g' + rec.at).set(JSON.parse(JSON.stringify(rec)));
-      else await S.env.db.doc('data/users/' + S.env.uid + '/profile').collection('games').doc('g' + rec.at).set(rec);
-      S.saved[id] = true; S.account.games.unshift(rec);
-      setMsg(S.env.web && !fbOn() ? 'Result saved on this device.' : 'Result saved to your account.');
-    } catch (e) { setMsg('Couldn’t save your result. Try again.', true); }
+      if (fbOn()) await FB.db.collection('users').doc(FB.user.uid).collection('games').doc(rec.id).set(JSON.parse(JSON.stringify(rec)));
+      else await S.env.db.doc('data/users/' + S.env.uid + '/profile').collection('games').doc(rec.id).set(rec);
+      S.saved[id] = true; addMyGame(rec);
+      if (!quiet) setMsg(S.env.web && !fbOn() ? 'Result saved on this device.' : 'Result saved to your account.');
+    } catch (e) { if (!quiet) setMsg('Couldn’t save your result. Try again.', true); }
     render();
   }
 
@@ -4031,6 +4084,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       renderAccountBtn(); if (!$('account').hidden) renderAccount();
       if (S.view === 'play' && !S.game) render();
       if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague();
+      if (S.mode === 'me' && S.view === 'play' && !S.game) renderMe();
       return;
     }
     var prof = null, ref = FB.db.collection('users').doc(u.uid);
@@ -4051,12 +4105,14 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     } catch (e) { S.account.games = []; }
     await loadMyLeagues();
     S.account.loaded = true;
+    if (S.account.profile) fastSyncAccount();
     renderAccountBtn();
     if (S.view === 'play' && !S.game) render();
     if (S.account.profile && S.pendingSave) { S.pendingSave = false; closeAccount(); saveResult(); }
     else if (S.account.profile && S.pendingLeague) { var next = S.pendingLeague; S.pendingLeague = null; closeAccount(); next(); }
     else if (!$('account').hidden) renderAccount();
     if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague();
+    if (S.mode === 'me' && S.view === 'play' && !S.game) renderMe();
   }
   var GOOGLE_G = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.9 6.1C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.6 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.2-8.5 2.2-6.3 0-11.6-4.2-13.5-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
   function renderAccountFB(reason) {
@@ -4096,8 +4152,9 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       '<div class="acct-meta"><span class="note">' + esc(p.email || 'Signed in') + '</span><button class="btn small ghost" type="button" data-act="sign-out">Sign out</button></div>' +
       '<div class="stats"><div class="stat"><b>' + gs.length + '</b><span class="mono">Games</span></div><div class="stat"><b>' + wins + '</b><span class="mono">Wins</span></div><div class="stat"><b>' + (gs.length ? fmt1(best) : '—') + '</b><span class="mono">Best</span></div><div class="stat"><b>' + avg + '</b><span class="mono">Average</span></div></div>' +
       '<div><p class="mono" style="margin-bottom:6px">Saved results</p><ul class="history">' + (gs.length ? gs.slice(0, 12).map(function (x) {
-        return '<li><span>' + esc(x.topic || '') + ' · ' + esc(x.dateKey || '') + ' · ' + (x.won ? 'Won' : ('#' + x.rank + ' of ' + x.players)) + '</span><strong>' + fmt1(x.score) + '/' + (x.max || 50) + '</strong></li>';
-      }).join('') : '<li><span class="note">No saved results yet. Finish a draft and tap “Save my result”.</span></li>') + '</ul></div>' +
+        return '<li><span>' + esc(x.topic || '') + ' · ' + esc(x.dateKey || '') + ' · ' + meResult(x) + '</span><strong>' + fmt1(x.score) + '/' + (x.max || 50) + '</strong></li>';
+      }).join('') : '<li><span class="note">No results yet. Finish a game while signed in and it’s saved here automatically.</span></li>') + '</ul></div>' +
+      '<button class="btn block" type="button" data-act="open-me">📊 See all my stats</button>' +
       '<form id="name-form" style="display:grid;gap:8px"><label class="mono label" for="acct-newname">Your name</label><div class="row"><input class="field" id="acct-newname" type="text" maxlength="20" value="' + esc(p.username) + '"><button class="btn small" type="submit">Change name</button></div></form>';
   }
   async function fbGoogle() {
@@ -4468,6 +4525,95 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
           (m.status === 'denied' ? '<button class="btn small ghost" type="button" data-act="league-dismiss" data-code="' + c + '">Remove from my list</button>' : '') + '</li>';
       }).join('') + '</ul></div>' : '') +
       (signed ? '<div class="lg-split">' + find + create + '</div>' : find);
+  }
+  /* ---------- My Stats: your own results, overall and by game mode (signed-in players only) ---------- */
+  var ME_MODES = [
+    { k: 'online', name: 'Play Online', play: 'room' },
+    { k: 'offline', name: 'Offline vs AI', play: 'offline' },
+    { k: 'practice', name: 'Practice Mode', play: 'practice' },
+    { k: 'fast', name: 'Daily Fast Money ⚡', play: 'fast' }
+  ];
+  function meModeOf(x) { return x.mode === 'fast' ? 'fast' : x.mode === 'offline' ? 'offline' : x.mode === 'practice' ? 'practice' : 'online'; }
+  function meResult(x) {
+    if (x.mode === 'fast') return x.won ? 'Beat ' + fmt1(x.target || 40) : 'Missed ' + fmt1(x.target || 40);
+    return x.won ? 'Won' : (x.rank && x.players ? '#' + x.rank + ' of ' + x.players : 'Played');
+  }
+  function meDate(k) { var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(k || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''; }
+  function meSum(list) {
+    var o = { n: list.length, wins: 0, total: 0, best: 0, fin: 0, finN: 0, days: {} };
+    list.forEach(function (x) {
+      var sc = Number(x.score) || 0;
+      if (x.won) o.wins++;
+      o.total += sc; if (sc > o.best) o.best = sc;
+      if (x.dateKey) o.days[x.dateKey] = 1;
+      /* Finish, weighted by how many played: 100 = first, 0 = last, so 2nd of 5 (75) beats 2nd of 3 (50). */
+      if (x.mode !== 'fast' && x.players > 1 && x.rank >= 1) { o.fin += (x.players - x.rank) / (x.players - 1) * 100; o.finN++; }
+    });
+    o.avg = o.n ? o.total / o.n : 0; o.winPct = o.n ? Math.round(o.wins / o.n * 100) : 0; o.avgFin = o.finN ? Math.round(o.fin / o.finN) : null;
+    return o;
+  }
+  async function loadMyStats() {
+    var st = S.myStats;
+    try {
+      var gs = await FB.db.collection('users').doc(st.uid).collection('games').orderBy('at', 'desc').limit(1000).get();
+      st.games = gs.docs.map(function (d) { var v = d.data(); if (!v.id) v.id = d.id; return v; });
+    } catch (e) { st.games = (S.account.games || []).slice(); st.partial = true; }
+    if (S.myStats === st && S.mode === 'me' && S.view === 'play' && !S.game) renderMe();
+  }
+  function renderMe() {
+    var body = $('me-body'); if (!body) return;
+    $('me-heading').textContent = 'My Stats';
+    if (!fbOn()) { body.innerHTML = '<p>Personal stats are only available on the website.</p>'; return; }
+    if (S.fbError) { body.innerHTML = '<p>Your stats can’t load right now. Check your internet connection, then reload the page.</p>'; return; }
+    if (!FB.db || !S.account.loaded) { body.innerHTML = '<p class="note">Loading…</p>'; if (!FB.started) fbStart(); return; }
+    var p = S.account.profile;
+    if (!p) {
+      body.innerHTML = '<div class="me-gate"><p><strong>Sign in to see your stats.</strong></p><p>Every game you finish while signed in is saved to your account: your wins, average score, best score and how you do in each game mode, on any device.</p>' +
+        '<button class="btn primary" type="button" data-act="me-signin">Sign in or create an account</button><p class="note">You can always play without an account.</p></div>';
+      return;
+    }
+    if (!S.myStats || S.myStats.uid !== p.uid) { S.myStats = { uid: p.uid, games: null }; loadMyStats(); }
+    var gs = S.myStats.games;
+    if (!gs) { body.innerHTML = '<p class="note">Loading your games…</p>'; return; }
+    var all = meSum(gs);
+    var tile = function (v, lbl, sub) { return '<div class="stat-tile"><b>' + v + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; };
+    var html = '<p class="me-sub">' + esc(p.username) + ' · ' + all.n + ' game' + (all.n === 1 ? '' : 's') + ' over ' + Object.keys(all.days).length + ' day' + (Object.keys(all.days).length === 1 ? '' : 's') + '</p>';
+    if (!all.n) {
+      html += '<div class="me-gate"><p><strong>No games yet.</strong></p><p>Finish any game while you’re signed in and it shows up here automatically, broken down by game mode.</p><button class="btn primary" type="button" data-act="home">Play a game</button></div>';
+      body.innerHTML = html; return;
+    }
+    html += '<div class="stat-tiles me-tiles">' +
+      tile(all.n, 'Games', 'all modes') +
+      tile(all.wins, 'Wins', 'first place or beat the target') +
+      tile(all.winPct + '%', 'Win %', 'of games played') +
+      tile(fmt1(all.avg), 'Avg score', 'out of 50') +
+      tile(fmt1(all.best), 'Best score', 'out of 50') +
+      tile(all.avgFin == null ? '—' : all.avgFin, 'Avg finish', '100 = always first') + '</div>';
+    html += '<div class="me-sec"><span class="mono">By game mode</span><div class="me-modes">' + ME_MODES.map(function (m) {
+      var list = gs.filter(function (x) { return meModeOf(x) === m.k; });
+      if (!list.length) return '<div class="me-mode empty"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">0 games</span></div><p class="note" style="margin:0">Not played yet.</p><div><button class="btn small ghost" type="button" data-act="goto-mode" data-mode="' + m.play + '">Play ' + (m.k === 'fast' ? 'Fast Money' : m.k === 'online' ? 'online' : m.k === 'offline' ? 'vs AI' : 'practice') + '</button></div></div>';
+      var o = meSum(list), fast = m.k === 'fast';
+      var kv = function (lbl, v) { return '<div><dt>' + lbl + '</dt><dd>' + v + '</dd></div>'; };
+      var levels = '';
+      if (m.k === 'offline') {
+        levels = ['easy', 'medium', 'hard'].map(function (lv) {
+          var l = list.filter(function (x) { return (x.level || 'medium') === lv; }); if (!l.length) return '';
+          var q = meSum(l);
+          return '<li><span>' + lv.charAt(0).toUpperCase() + lv.slice(1) + '</span><span>' + q.n + ' game' + (q.n === 1 ? '' : 's') + ' · ' + q.wins + ' win' + (q.wins === 1 ? '' : 's') + ' · ' + fmt1(q.avg) + ' avg</span></li>';
+        }).join('');
+        if (levels) levels = '<ul class="me-levels" aria-label="By difficulty">' + levels + '</ul>';
+      }
+      return '<div class="me-mode"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">' + o.n + ' game' + (o.n === 1 ? '' : 's') + '</span></div>' +
+        '<div class="me-avg"><div class="me-avg-top"><span class="note">Average score</span><b>' + fmt1(o.avg) + ' <small>/ 50</small></b></div><div class="me-bar" aria-hidden="true"><i style="width:' + Math.max(0, Math.min(100, o.avg / 50 * 100)).toFixed(1) + '%"></i></div></div>' +
+        '<dl class="me-kv">' + kv(fast ? 'Beat ' + fmt1(FAST_TARGET) : 'Wins', o.wins) + kv('Win %', o.winPct + '%') + kv('Best score', fmt1(o.best)) +
+        (fast ? kv('Days played', Object.keys(o.days).length) : kv('Avg finish', o.avgFin == null ? '—' : o.avgFin)) + '</dl>' + levels + '</div>';
+    }).join('') + '</div></div>';
+    html += '<div class="me-sec"><span class="mono">Recent games</span><ul class="history me-recent">' + gs.slice(0, 10).map(function (x) {
+      var m = ME_MODES.filter(function (q) { return q.k === meModeOf(x); })[0];
+      return '<li><span>' + esc(meDate(x.dateKey)) + ' · ' + esc(m ? m.name.replace(' ⚡', '') : '') + ' · ' + esc(x.topic || '') + ' · ' + meResult(x) + '</span><strong>' + fmt1(x.score) + '/' + (x.max || 50) + '</strong></li>';
+    }).join('') + '</ul></div>';
+    html += '<p class="note">Every game you finish while signed in saves here automatically. Win % for Fast Money counts the days you beat ' + fmt1(FAST_TARGET) + '. Avg finish counts games against other players or the AI: 100 means first every time, 0 means last, weighted by how many played.' + (S.myStats.partial ? ' Showing your most recent games only.' : '') + '</p>';
+    body.innerHTML = html;
   }
   function renderLeagueView(body) {
     var L = S.league, me = lgUid();
@@ -5018,7 +5164,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (S.game) { render(); window.scrollTo(0, 0); return; }
     showView('play', mode);
     if (mode === 'room' && S.env.web && S.env.db && S.env.db.net) S.env.db.net.warm();
-    var f = (mode === 'league' || myName()) ? $('mode-' + mode).querySelector('input, select, button:not(:disabled)') : $('player-name');
+    var f = (mode === 'league' || mode === 'me' || myName()) ? $('mode-' + mode).querySelector('input, select, button:not(:disabled)') : $('player-name');
     if (f) setTimeout(function () { f.focus({ preventScroll: true }); }, 60);
   }
   document.addEventListener('click', function (ev) {
@@ -5086,6 +5232,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       else leaveGame(false);
     }
     else if (act === 'account') openAccount();
+    else if (act === 'me-signin') { S.pendingLeague = function () { renderMe(); }; openAccount('Sign in to see your stats.'); }
+    else if (act === 'open-me') { closeAccount(); gotoMode('me'); }
     else if (act === 'organizer') openOrganizer();
     else if (act === 'org-sub') orgToggleSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-reset') { delete S.org.draft[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
@@ -5192,7 +5340,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-17';
+  var BUILD_ID = '2026-10-17-18';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -5656,7 +5804,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     leaveGame(true);
     var spec = fastSpec(dateKey(new Date()));
     var t0 = now();
-    S.fast = { topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, idx: 0, answers: [], startedAt: t0, endsAt: t0 + FAST_SECONDS * 1000, done: false, finishedAt: 0 };
+    S.fast = { topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, idx: 0, answers: [], startedAt: t0, endsAt: t0 + FAST_SECONDS * 1000, done: false, finishedAt: 0, uid: fbOn() && FB.user ? FB.user.uid : '' };
     S.ui.fastQ = ''; S.ui.fastSel = 0;
     S.view = 'play'; S.mode = 'fast';
     saveFast(); setMsg(''); render(); window.scrollTo(0, 0);
@@ -5696,6 +5844,40 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     });
     f.total = round1(f.results.reduce(function (m, r) { return m + r.score; }, 0));
     saveFast(); render();
+    fastSyncAccount();
+  }
+  function fastRecord(f) {
+    return { id: 'f-' + f.dateKey, at: f.finishedAt || f.startedAt || now(), dateKey: f.dateKey, topic: TOPICS[f.topicId] ? TOPICS[f.topicId].name : '', mode: 'fast',
+      score: Number(f.total) || 0, max: 50, won: (Number(f.total) || 0) > FAST_TARGET, target: FAST_TARGET,
+      picks: (f.results || []).map(function (r) { return { sub: r.sub, name: r.name || '', score: Number(r.score) || 0 }; }) };
+  }
+  async function fastSyncAccount() {
+    if (!fbOn() || !FB.user || !FB.db || !S.account.profile) return;
+    var uid = FB.user.uid, doneKey = 'roster.fastSaved.' + uid, done = {};
+    try { done = JSON.parse(store(doneKey) || '{}') || {}; } catch (e) { done = {}; }
+    var todo = [];
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i); if (!k || k.indexOf('roster.fast.') !== 0) continue;
+        var f = null; try { f = JSON.parse(localStorage.getItem(k)); } catch (e) {}
+        /* Only your own games: played while signed in as you, or played signed out on this device and not yet claimed by another account. */
+        var owner = f && (f.uid || f.claimedBy);
+        if (f && f.done && Array.isArray(f.results) && f.dateKey && !done[f.dateKey] && (!owner || owner === uid)) todo.push({ k: k, f: f });
+      }
+    } catch (e) {}
+    for (var j = 0; j < todo.length; j++) {
+      var t = todo[j], rec = fastRecord(t.f);
+      try {
+        await FB.db.collection('users').doc(uid).collection('games').doc(rec.id).set(JSON.parse(JSON.stringify(rec)));
+        done[rec.dateKey] = 1; store(doneKey, JSON.stringify(done));
+        if (!t.f.uid && !t.f.claimedBy) {
+          t.f.claimedBy = uid; store(t.k, JSON.stringify(t.f));
+          if (S.fast && S.fast.dateKey === t.f.dateKey) S.fast.claimedBy = uid;
+        }
+        if (FB.user && FB.user.uid === uid) addMyGame(rec);
+      } catch (e) {}
+    }
+    if (todo.length && S.mode === 'me' && S.view === 'play' && !S.game) renderMe();
   }
   function fastTick() {
     var f = S.fast; if (!f || f.done || S.view !== 'play') return;
