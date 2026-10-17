@@ -589,7 +589,12 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .wordmark > span { white-space: nowrap; }
 .bsub.done { background: var(--deep); color: #ffffff; }
 .bsub.done .mono { color: var(--hi); }
-@media (max-width: 480px) { .nav .wordmark { font-size: 1.45rem; gap: 8px; } }
+.nav-actions { gap: 8px; flex: 0 0 auto; }
+.nav-actions .btn { white-space: nowrap; }
+#league-btn { gap: 6px; }
+.nav .brand { min-width: 0; }
+@media (max-width: 480px) { .nav .wordmark { font-size: 1.45rem; gap: 8px; } .nav-actions .btn.small { padding: 0 10px; font-size: 0.8rem; } #league-btn .lb-text { display: none; } }
+@media (max-width: 400px) { .nav .wordmark { font-size: 1.2rem; gap: 6px; } .nav { gap: 8px; } }
 
 /* ---------- Game Day Red: red band up top, white topic card, black subtopic chips with gold numbers ---------- */
 .band { position: relative; overflow: hidden; background-color: var(--pop); background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 2px, transparent 2px); background-size: 128px 100%; background-position: calc(50% + 63px) 0; color: #ffffff; }
@@ -601,8 +606,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .band .wordmark { color: #ffffff; }
 .band .wordmark i, .band .wordmark .dot { color: var(--hi); }
 .band .brand .mono { color: rgba(255, 255, 255, 0.85); }
-.band #account-btn, .band #org-btn { background: #ffffff; color: #000000; border-color: #000000; box-shadow: 0 4px 0 #000000; border-radius: 999px; }
-@media (hover: hover) and (pointer: fine) { .band #account-btn:hover, .band #org-btn:hover { background: #000000; color: var(--hi); box-shadow: 0 6px 0 #000000; } }
+.band #account-btn, .band #org-btn, .band #league-btn { background: #ffffff; color: #000000; border-color: #000000; box-shadow: 0 4px 0 #000000; border-radius: 999px; }
+@media (hover: hover) and (pointer: fine) { .band #account-btn:hover, .band #org-btn:hover, .band #league-btn:hover { background: #000000; color: var(--hi); box-shadow: 0 6px 0 #000000; } }
 .band-hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; padding-block: 18px 150px; }
 .band-hero > div:first-child { flex: 1 1 520px; min-width: 0; }
 .band-clock { flex: 0 0 auto; }
@@ -746,6 +751,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   </div>
   <div class="nav-actions">
     <button class="btn small ghost" id="org-btn" type="button" data-act="organizer" hidden="">Organizer</button>
+    <button class="btn small" id="league-btn" type="button" data-act="goto-mode" data-mode="league" aria-label="Leagues" hidden=""><span aria-hidden="true">🏆</span><span class="lb-text">Leagues</span></button>
     <button class="btn small" id="account-btn" type="button" data-act="account">Sign in / Join</button>
   </div>
 </header>
@@ -783,7 +789,6 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
         <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="practice">Practice Mode</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
-        <button class="btn" type="button" data-act="goto-mode" data-mode="league" id="league-cta" hidden="">Leagues 🏆</button>
       </div>
     </div>
   </section>
@@ -826,6 +831,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <div class="mode" id="mode-room">
                 <h3>Online game</h3>
                 <p>Play live against people on their own devices, 2–8 players.</p>
+                <p class="note" id="room-league-note" hidden=""></p>
                 <div class="online-opt">
                   <span class="mono">1 · Create a room</span>
                   <span class="mono label" id="privacy-label">Who can join?</span>
@@ -3037,7 +3043,9 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     $('org-btn').hidden = !orgAllowed() || inOrg;
     persistSession();
     ['room', 'offline', 'practice', 'fast', 'league'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
-    $('league-cta').hidden = !fbOn();
+    $('league-btn').hidden = !fbOn();
+    var rln = $('room-league-note');
+    if (rln) { rln.hidden = !fbOn(); rln.innerHTML = lgSignedIn() ? 'Playing with your league? Your games together count toward its leaderboard automatically. <a href="#" data-act="goto-mode" data-mode="league">See your leagues</a>' : 'Playing with your league? <a href="#" data-act="account">Sign in</a> and your games together count toward its leaderboard automatically.'; }
     document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league';
     document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league');
     if (!S.game && !S.fast && inPlay && S.mode === 'league') renderLeague(); else leagueUnwatch();
@@ -4006,6 +4014,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (!u) {
       S.account.profile = null; S.account.games = []; S.myLeagues = {}; S.account.loaded = true;
       renderAccountBtn(); if (!$('account').hidden) renderAccount();
+      if (S.view === 'play' && !S.game) render();
       if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague();
       return;
     }
@@ -4025,6 +4034,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     await loadMyLeagues();
     S.account.loaded = true;
     renderAccountBtn();
+    if (S.view === 'play' && !S.game) render();
     if (S.account.profile && S.pendingSave) { S.pendingSave = false; closeAccount(); saveResult(); }
     else if (S.account.profile && S.pendingLeague) { var next = S.pendingLeague; S.pendingLeague = null; closeAccount(); next(); }
     else if (!$('account').hidden) renderAccount();
@@ -5139,7 +5149,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-10';
+  var BUILD_ID = '2026-10-17-11';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
