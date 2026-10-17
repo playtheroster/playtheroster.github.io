@@ -1142,7 +1142,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 
   /* ENGINE START */
   var PICK_SECONDS = TEST.pickSeconds || 60;
-  /* 5-second countdown before online drafts and Offline vs AI (not Practice). Tests turn it off unless they ask for it. */
+  /* 5-second countdown (with the full-screen intro) before every draft: online, Offline vs AI and Practice. Tests turn it off unless they ask for it. */
   var COUNTDOWN_MS = TEST.countdownMs != null ? TEST.countdownMs : (window.__ROSTER_TEST__ ? 0 : 5000);
   var SUBS_PER_DAY = 5, MAX_PLAYERS = 8, MIN_PLAYERS = 2, GRACE_MS = 5000;
   var ARTIFACT_URL = 'https://claude.ai/artifact/DzXuXVgiVSX84zfRUggkkp';
@@ -3512,7 +3512,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var players = { you: { name: name, joinedAt: 0 } };
     var bots = shuffled(BOT_NAMES, Math.random).slice(0, count);
     bots.forEach(function (b, i) { players['bot' + i] = { name: b + ' (AI)', bot: true, joinedAt: i + 1 }; });
-    var t0 = now() + (practice ? 0 : COUNTDOWN_MS);
+    var t0 = now() + COUNTDOWN_MS;
     var level = currentLevel();
     S.game = { mode: 'local', practice: !!practice, botLevel: level, showList: currentListPref() === 'show', code: 'LOCAL', isPublic: false, hostId: 'you', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, status: 'drafting', order: shuffled(Object.keys(players), Math.random), startedAt: t0, players: players, picks: [], results: null };
     S.me = 'you';
@@ -4166,7 +4166,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-16-01';
+  var BUILD_ID = '2026-10-16-02';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
