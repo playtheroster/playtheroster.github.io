@@ -1,0 +1,149 @@
+{
+ "version": 1,
+ "from": "2026-10-17",
+ "updatedAt": 1792249328993,
+ "days": {
+  "2026-10-17": {
+   "topicId": "history",
+   "subs": [
+    "Leadership",
+    "Fame today",
+    "Influence",
+    "Legacy",
+    "Military genius"
+   ]
+  },
+  "2026-10-18": {
+   "topicId": "nba-players",
+   "subs": [
+    "Playmaking",
+    "Clutch",
+    "Scoring",
+    "Defense",
+    "Championships"
+   ]
+  },
+  "2026-10-19": {
+   "topicId": "disney-characters",
+   "subs": [
+    "Merch appeal",
+    "Humor",
+    "Heart",
+    "Songs",
+    "Iconic status"
+   ]
+  },
+  "2026-10-20": {
+   "topicId": "pizza-toppings",
+   "subs": [
+    "Classic",
+    "Popularity",
+    "Crowd-pleaser",
+    "Taste",
+    "Versatility"
+   ]
+  },
+  "2026-10-21": {
+   "topicId": "cars",
+   "subs": [
+    "Reliability",
+    "Speed",
+    "Luxury",
+    "Style",
+    "Iconic status"
+   ]
+  },
+  "2026-10-22": {
+   "topicId": "sandwiches",
+   "subs": [
+    "Fillingness",
+    "Taste",
+    "Portability",
+    "Healthiness",
+    "Classic status"
+   ]
+  },
+  "2026-10-23": {
+   "topicId": "nfl-players",
+   "subs": [
+    "Clutch",
+    "Rushing",
+    "Passing",
+    "Receiving",
+    "Defense"
+   ]
+  },
+  "2026-10-26": {
+   "topicId": "superheroes",
+   "subs": [
+    "Popularity",
+    "Gadgets",
+    "Speed",
+    "Intelligence",
+    "Strength"
+   ]
+  },
+  "2026-10-28": {
+   "topicId": "vegetables",
+   "subs": [
+    "Roasted",
+    "Taste",
+    "Nutrition",
+    "Raw crunch",
+    "Versatility"
+   ]
+  },
+  "2026-10-29": {
+   "topicId": "animated-movies",
+   "subs": [
+    "Story",
+    "Animation",
+    "Villain",
+    "Songs",
+    "Heart"
+   ]
+  },
+  "2026-10-30": {
+   "topicId": "jobs",
+   "subs": [
+    "Impact",
+    "Salary",
+    "Job security",
+    "Prestige",
+    "Fun"
+   ]
+  },
+  "2026-11-03": {
+   "topicId": "fashion-brands",
+   "subs": [
+    "Quality",
+    "Celebrity appeal",
+    "Luxury",
+    "Streetwear cred",
+    "Iconic logo"
+   ]
+  },
+  "2026-11-11": {
+   "topicId": "countries",
+   "subs": [
+    "Culture",
+    "Sports",
+    "Innovation",
+    "Natural beauty",
+    "Quality of life"
+   ]
+  }
+ },
+ "fast": {
+  "2026-10-17": {
+   "topicId": "beers",
+   "subs": [
+    "Strength",
+    "Party appeal",
+    "Popularity",
+    "Taste",
+    "Value"
+   ]
+  }
+ }
+}
