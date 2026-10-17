@@ -314,6 +314,7 @@ button.bsub[aria-pressed="true"] .mono { color: var(--hi-ink); }
 .stats-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
 .stats-bar .seg { flex: 1 1 340px; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 520px; }
 .stat-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.stat-tiles.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .stat-tile { display: grid; gap: 2px; align-content: start; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--surface); min-width: 0; }
 .stat-tile b { font-family: var(--font-display); font-weight: 400; font-size: clamp(2rem, 6vw, 2.8rem); line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink); }
 .stat-tile .lbl { font-weight: 700; }
@@ -1169,6 +1170,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
             <span class="pill soft mono" id="stats-live">Loading…</span>
           </div>
           <div class="stat-tiles" id="stats-tiles"></div>
+          <div class="stat-tiles two" id="stats-fb"></div>
           <span class="mono">By mode</span>
           <div class="org-glance-wrap"><table class="org-glance-table stats-table" id="stats-modes"></table></div>
           <p class="note" id="stats-rooms"></p>
@@ -4025,6 +4027,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       if (nm.length >= 2) { prof = { name: nm, createdAt: now() }; try { await ref.set(prof); } catch (e) { prof = null; } }
     }
     try { localStorage.removeItem('roster.nameForSignIn'); } catch (e) {}
+    /* An anonymous marker (just the date) so the organizer can count accounts. No name or email. */
+    if (prof) { var mk = FB.db.collection('accountMarkers').doc(u.uid); mk.get().then(function (x) { if (!x.exists) return mk.set({ at: Number(prof.createdAt) || now() }); }).catch(function () {}); }
     S.account.profile = prof ? { username: clean(prof.name, 20) || 'Player', uid: u.uid, email: u.email || '', createdAt: Number(prof.createdAt) || now() } : null;
     if (S.account.profile && !myName()) { $('player-name').value = S.account.profile.username; store('roster.name', S.account.profile.username); }
     try {
@@ -4712,6 +4716,11 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var allDrafts = function (list) { return games(list, 'room') + games(list, 'offline') + games(list, 'practice'); };
     var label = { '1': 'today', '7': 'last 7 days', '30': 'last 30 days', all: 'since Oct 16' }[st.range];
     function tile(n, lbl, sub) { return '<div class="stat-tile"><b>' + n.toLocaleString() + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; }
+    var fbc = st.fb, cutAt = st.range === 'all' ? 0 : new Date(days[Math.min(Number(st.range), 30) - 1] + 'T00:00:00').getTime();
+    $('stats-fb').innerHTML = !S.env.web ? '' : !fbc ? '<div class="stat-tile"><b>…</b><span class="lbl">Accounts</span><span class="sub">loading</span></div><div class="stat-tile"><b>…</b><span class="lbl">Leagues</span><span class="sub">loading</span></div>'
+      : fbc.error ? '<div class="stat-tile" style="grid-column:1/-1"><span class="lbl">Accounts and leagues</span><span class="sub">Couldn’t load from Firebase right now.</span></div>'
+      : tile(fbc.accounts.length, 'Accounts', 'total · ' + fbc.accounts.filter(function (t) { return t >= cutAt; }).length + ' new ' + label) +
+        tile(fbc.leagues.length, 'Leagues', fbc.leagues.filter(function (l) { return l.vis === 'public'; }).length + ' public · ' + fbc.leagues.filter(function (l) { return l.vis !== 'public'; }).length + ' private · ' + fbc.leagues.filter(function (l) { return l.at >= cutAt; }).length + ' new ' + label);
     $('stats-tiles').innerHTML = tile(uniq(sel), 'Visitors', 'devices, ' + label) + tile(sum(sel, function (r) { return r.visits; }), 'Visits', 'page opens, ' + label) +
       tile(allDrafts(sel), 'Drafts played', 'an online draft counts once, ' + label) + tile(sum(sel, function (r) { return r.start.fast; }), 'Fast Money plays', label);
     $('stats-modes').innerHTML = '<thead><tr><th>Mode</th><th class="num">Games</th><th class="num">Finished</th><th class="num">Players</th><th class="num">Avg. players per game</th></tr></thead><tbody>' +
@@ -4733,7 +4742,19 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     $('stats-sites').textContent = names.length ? 'Visitors by site (' + label + '): ' + names.map(function (n) { return n + ' ' + Object.keys(sites[n]).length; }).join(' · ') : '';
   }
   var statsRenderQueued = false;
+  function loadFbCounts() {
+    if (!fbOn()) return;
+    var st = S.stats;
+    fbStart().then(function () {
+      if (!FB.db) throw new Error('no db');
+      return Promise.all([FB.db.collection('accountMarkers').get(), FB.db.collection('leagues').get()]);
+    }).then(function (r) {
+      st.fb = { accounts: r[0].docs.map(function (d) { return Number((d.data() || {}).at) || 0; }),
+                leagues: r[1].docs.map(function (d) { var v = d.data() || {}; return { at: Number(v.createdAt) || 0, vis: v.visibility === 'public' ? 'public' : 'private' }; }) };
+    }).catch(function () { st.fb = { error: true }; }).then(function () { if (S.view === 'organizer' && S.org.tab === 'stats') renderStats(); });
+  }
   function loadStats() {
+    loadFbCounts();
     var st = S.stats;
     if (!S.env.web || !S.env.db || !S.env.db.net || !S.env.db.net.statsWatch) { st.state = 'ready'; return; }
     st.state = 'loading';
@@ -5155,7 +5176,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-14';
+  var BUILD_ID = '2026-10-17-15';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
