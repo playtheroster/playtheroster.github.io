@@ -645,6 +645,45 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   .band-clock { justify-items: start; }
   .cats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* rules layout */
+.how-lede { max-width: 46rem; font-size: 1.12rem; color: var(--muted); }
+.how .card.wide { grid-column: 1 / -1; }
+.card .steps li { grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding-block: 14px; }
+.card .steps li:first-child { border-top: 0; padding-top: 0; }
+.card .steps li:last-child { border-bottom: 0; }
+.card .steps .n { font-size: 2.2rem; color: var(--pop); }
+.card .steps strong { font-size: 1.05rem; }
+.card .steps span:not(.n) { display: block; }
+.card.wide h3 { color: var(--ink); }
+.ways { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.way { display: grid; gap: 6px; align-content: start; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--surface); min-width: 0; }
+.way h4 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.45rem; line-height: 1.05; text-transform: uppercase; color: var(--pop); }
+.way p { margin: 0; font-size: 0.95rem; }
+@media (max-width: 920px) { .ways { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .ways { grid-template-columns: minmax(0, 1fr); } }
+/* ---------- Hover colors: every clickable thing turns black under a mouse (not on touch screens, so taps don't stick).
+   White things go black with gold text; things that are already black stay black and their text turns white. ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .btn, .chip, .seg-btn, .org-tab, button.bsub, .opt, .bopt.pick, .intro-x, select.field, .wordmark, .stats-me { transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease, box-shadow 0.1s ease, transform 0.1s ease; }
+  .btn:not(:disabled):hover, .btn.ghost:not(:disabled):hover, .intro-x:hover { background: #000000; color: #ffb612; border-color: #000000; }
+  .btn.primary:not(:disabled):hover { background: #000000; color: #ffffff; border-color: #000000; }
+  .players .kick:not(:disabled):hover, .players .kick.armed:hover { background: #ca2430; color: #ffffff; border-color: #000000; }
+  .chip:not(:disabled):hover { background: #000000; color: #ffb612; border-color: #000000; }
+  .chip[aria-pressed="true"]:not(:disabled):hover { background: #000000; color: #ffffff; }
+  .seg-btn:not(:disabled):hover { background: #000000; color: #ffb612; }
+  .seg-btn[aria-checked="true"]:not(:disabled):hover, .seg-btn[data-level="easy"][aria-checked="true"]:not(:disabled):hover, .seg-btn[data-level="hard"][aria-checked="true"]:not(:disabled):hover { background: #000000; color: #ffffff; }
+  .org-tab:hover, .org-tab[aria-selected="true"]:hover, #org-tab-fast[aria-selected="true"]:hover, #org-tab-stats[aria-selected="true"]:hover { background: #000000; color: #ffffff; }
+  button.bsub:hover, button.bsub[aria-pressed="true"]:hover { background: #000000; color: #ffffff; }
+  button.bsub:hover .mono { color: #ffb612; }
+  .opt:not([aria-disabled="true"]):not(.none):hover, .bopt.pick:hover { background: #000000; color: #ffffff; }
+  .opt:not([aria-disabled="true"]):not(.none):hover .via, .opt:not([aria-disabled="true"]):not(.none):hover .why, .bopt.pick:hover .via, .bopt.pick:hover .why { color: rgba(255, 255, 255, 0.8); }
+  select.field:not(:disabled):hover { background-color: color-mix(in srgb, #000000 7%, #ffffff); border-color: #000000; }
+  .band .wordmark:hover { color: #000000; }
+  .footer .wordmark:hover, .footer .wordmark:hover i { color: #ca2430; }
+  .stats-me:hover { color: #ca2430; text-decoration: underline; cursor: pointer; }
+  .stats-me input:hover { outline: 2px solid #000000; outline-offset: 2px; }
+}
 </style>
 <template id="shell">
 <div class="band">
@@ -1088,18 +1127,20 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   <section class="section" id="how">
     <div class="wrap">
       <div class="section-head">
-        <h2 class="display">Rules</h2>
+        <h2 class="display">How to play</h2>
+        <p class="how-lede">Build the best team of five for today’s topic, one pick at a time, while your friends try to steal your answers first. Highest score wins.</p>
       </div>
       <div class="how">
         <div class="card">
           <h3>The draft</h3>
-          <ul class="rules">
-            <li><span><strong>Snake order.</strong> The order is shuffled at the start and reverses every round.</span></li>
-            <li><span><strong>1 minute a pick.</strong> If time runs out, you get a random available answer for your first open subtopic.</span></li>
-            <li><span><strong>One answer per subtopic.</strong> Once you fill a subtopic, it's locked for you.</span></li>
-            <li><span><strong>No repeats.</strong> Once anyone drafts an answer, nobody can draft it again, under any name. USA and United States count as the same pick.</span></li>
-          </ul>
-          <div class="snake" aria-label="Example snake order for three players over five rounds">
+          <ol class="steps">
+            <li><span class="n">1</span><div><strong>Everyone gets the same topic.</strong><span>Each day has one topic and 5 subtopics. For example: Rappers, with Lyrics, Flow, Hits, Albums and Influence.</span></div></li>
+            <li><span class="n">2</span><div><strong>Take turns picking.</strong><span>On your turn, choose a subtopic you haven’t filled yet and pick the answer you think is best for it. You have 1 minute.</span></div></li>
+            <li><span class="n">3</span><div><strong>One pick per subtopic.</strong><span>After 5 rounds, everyone has a full team: one answer for each subtopic.</span></div></li>
+            <li><span class="n">4</span><div><strong>Once it’s taken, it’s gone.</strong><span>Nobody can pick an answer someone already drafted, even under a nickname or a different spelling. Grab the great ones early.</span></div></li>
+            <li><span class="n">5</span><div><strong>The order snakes.</strong><span>The order is shuffled at the start and flips every round, so whoever picks last in one round picks first in the next.</span></div></li>
+          </ol>
+          <div class="snake" aria-label="Example pick order for three players over five rounds">
             <span></span><span class="hd mono">P1</span><span class="hd mono">P2</span><span class="hd mono">P3</span>
             <span class="rd mono">R1</span><span class="cell on">1</span><span class="cell on">2</span><span class="cell on">3</span>
             <span class="rd mono">R2</span><span class="cell">6</span><span class="cell">5</span><span class="cell">4</span>
@@ -1107,19 +1148,31 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
             <span class="rd mono">R4</span><span class="cell">12</span><span class="cell">11</span><span class="cell">10</span>
             <span class="rd mono">R5</span><span class="cell">13</span><span class="cell">14</span><span class="cell">15</span>
           </div>
+          <p class="note">Ran out of time? You get a random answer that’s still available, for your first empty subtopic.</p>
         </div>
         <div class="card">
           <h3>Scoring</h3>
-          <p id="score-intro">Claude scores each pick from 1.0 to 10.0 against its subtopic, compared with every other answer that could have been drafted.</p>
+          <p id="score-intro">Claude scores every pick from 1.0 to 10.0 based on how good it is for its subtopic.</p>
           <div class="scale">
-            <div><b class="sc tier t5">9.0–10.0</b><span><strong>Elite.</strong> One of the very best answers for the subtopic. 10.0 is the single best.</span></div>
-            <div><b class="sc tier t4">7.5–8.9</b><span><strong>Strong.</strong> A clearly good pick, a step below the elite.</span></div>
-            <div><b class="sc tier t3">6.0–7.4</b><span><strong>Solid.</strong> A fair answer that fits, but better ones were there.</span></div>
-            <div><b class="sc tier t2">4.0–5.9</b><span><strong>Reach.</strong> Fits loosely, or is known for something else.</span></div>
-            <div><b class="sc tier t1">1.0–3.9</b><span><strong>Miss.</strong> A weak fit for the subtopic.</span></div>
+            <div><b class="sc tier t5">9.0–10.0</b><span><strong>Elite.</strong> One of the very best answers. 10.0 is the single best.</span></div>
+            <div><b class="sc tier t4">7.5–8.9</b><span><strong>Strong.</strong> A clearly good pick.</span></div>
+            <div><b class="sc tier t3">6.0–7.4</b><span><strong>Solid.</strong> It fits, but better answers were out there.</span></div>
+            <div><b class="sc tier t2">4.0–5.9</b><span><strong>Reach.</strong> A loose fit, or better for a different subtopic.</span></div>
+            <div><b class="sc tier t1">1.0–3.9</b><span><strong>Miss.</strong> A poor fit for the subtopic.</span></div>
           </div>
-          <p>Highest total out of 50.0 wins. Ties go to the higher single best pick, then the win is shared.</p>
-          <p class="note" id="quick-note">If Claude isn't available, a quick score is used instead: 10.0 for #1 on a subtopic's ranked list, sliding to 7.0 at the bottom of the list, 4.5–6.5 for answers ranked under a different subtopic, and 4.0 for anything else. On topics where every answer is ranked, it slides from 10.0 for #1 down to 2.5 for the last answer.</p>
+          <p><strong>Add up your 5 picks. The highest total (out of 50) wins.</strong> If there’s a tie, the player with the best single pick wins. Still tied? You share the win.</p>
+          <p><strong>Tip:</strong> match each answer to the right subtopic. A great answer in the wrong subtopic scores lower.</p>
+          <p class="note" id="quick-note">If Claude can’t score a game, each subtopic’s ranked list is used instead: #1 scores 10.0, sliding to 7.0 at the bottom of the list. An answer ranked only under a different subtopic scores 4.5–6.5, and an answer on no list scores 4.0.</p>
+        </div>
+        <div class="card wide">
+          <h3>Ways to play</h3>
+          <div class="ways">
+            <div class="way"><h4>Online room</h4><p>Create a room and send friends the 5-letter code or link. 2 to 8 players. The host starts the draft when everyone’s in. Or tap <strong>Join a random room</strong> to play people you don’t know.</p></div>
+            <div class="way"><h4>Offline vs AI</h4><p>Draft today’s topic on your own device against 1 to 7 AI players. Pick Easy, Medium or Hard.</p></div>
+            <div class="way"><h4>Practice</h4><p>Just like Offline vs AI, but with a random topic each time, never today’s. Warm up without spoiling the daily draft.</p></div>
+            <div class="way"><h4>Fast Money ⚡</h4><p>A solo bonus round, once a day. You get 60 seconds to name one answer for each of 5 subtopics. Score 40 or more to beat it. A skip scores 0.</p></div>
+          </div>
+          <p class="note">Want it harder? Before a game, answer <strong>No</strong> to “Show draft options?” to hide the answer list, so you have to type answers from memory.</p>
         </div>
       </div>
     </div>
@@ -4341,7 +4394,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-16-03';
+  var BUILD_ID = '2026-10-16-08';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -4753,8 +4806,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   }
   function applyWebCopy() {
     var intro = document.getElementById('score-intro'), qn = document.getElementById('quick-note');
-    if (intro) intro.textContent = 'Each pick is scored from 1.0 to 10.0 against its subtopic’s ranked list. The higher an answer ranks, the higher it scores.';
-    if (qn) qn.textContent = 'On the list: 10.0 for #1, sliding to 7.0 at the bottom. Ranked under a different subtopic: 4.5–6.5. Not on any list: 4.0. On topics where every answer is ranked: 10.0 for #1 down to 2.5 for the last.';
+    if (intro) intro.textContent = 'Every pick is scored from 1.0 to 10.0 based on where it ranks on that subtopic’s list. The better the answer, the higher the score.';
+    if (qn) qn.textContent = 'The exact math: #1 on a subtopic’s list scores 10.0, sliding down to 7.0 at the bottom of the list. An answer ranked only under a different subtopic scores 4.5–6.5, and an answer on no list scores 4.0. (On topics where every answer is ranked, scores slide from 10.0 for #1 down to 2.5 for the last.)';
     var on = document.querySelector('.org-save .note');
     if (on) on.textContent = 'Saving downloads an updated index.html. Upload it to your website host, replacing the old file, and everyone sees the new schedule.';
   }
