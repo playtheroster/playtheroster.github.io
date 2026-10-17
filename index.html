@@ -673,7 +673,14 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 /* sign-in */
 .google-btn { gap: 10px; background: #ffffff; color: #000000; }
 .google-btn svg { width: 20px; height: 20px; flex: 0 0 auto; }
-.or-line { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.or-line { display: flex; align-items: center; gap: 10px; color: var(--muted); margin-top: 4px; }
+/* sign-in sheet: even spacing between every block, labels close to their fields */
+#acct-body { display: grid; gap: 16px; }
+#acct-body form { gap: 6px !important; }
+#acct-body form .label { margin-bottom: 0; }
+#acct-body form .label:not(:first-child) { margin-top: 10px; }
+#acct-body form > .btn, #acct-body form > button { margin-top: 12px; }
+#acct-body .google-btn { min-height: 52px; }
 .or-line::before, .or-line::after { content: ""; flex: 1; height: 2px; background: var(--line); }
 .acct-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
 /* leagues */
@@ -5132,7 +5139,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-09';
+  var BUILD_ID = '2026-10-17-10';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
