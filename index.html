@@ -662,6 +662,14 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .way p { margin: 0; font-size: 0.95rem; }
 @media (max-width: 920px) { .ways { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .ways { grid-template-columns: minmax(0, 1fr); } }
+/* organizer: connect to GitHub */
+.org-connect { display: grid; gap: 10px; padding: 16px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); }
+.org-connect.off { border-color: var(--pop); box-shadow: inset 6px 0 0 var(--pop); }
+.org-connect.on { border-style: dashed; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.org-connect h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1; text-transform: uppercase; }
+.org-connect ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+.org-connect code { font-size: 0.85em; padding: 1px 6px; border-radius: 6px; background: var(--tint); overflow-wrap: anywhere; }
+.org-connect .row .field { font-family: var(--font-mono); }
 /* ---------- Hover colors: every clickable thing turns black under a mouse (not on touch screens, so taps don't stick).
    White things go black with gold text; things that are already black stay black and their text turns white. ---------- */
 @media (hover: hover) and (pointer: fine) {
@@ -1082,6 +1090,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
           <span class="mono">Coming up · next 7 days</span>
           <div class="org-glance-wrap"><table class="org-glance-table" id="org-glance"></table></div>
         </div>
+        <div class="org-connect" id="org-connect" hidden=""></div>
         <div class="org-tabs" role="tablist" aria-label="Which schedule">
           <button type="button" class="org-tab" role="tab" id="org-tab-daily" data-act="org-tab" data-tab="daily" aria-selected="true">🗓️ Daily draft</button>
           <button type="button" class="org-tab" role="tab" id="org-tab-fast" data-act="org-tab" data-tab="fast" aria-selected="false">⚡ Fast Money</button>
@@ -1109,7 +1118,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
           <div class="org-glance-wrap"><table class="org-glance-table stats-table" id="stats-days"></table></div>
           <p class="note" id="stats-sites"></p>
           <label class="stats-me"><input type="checkbox" id="stats-nome"> Don’t count my visits and games from this device</label>
-          <p class="note">How it’s counted: each phone or computer counts as one visitor, so one person on two devices counts twice, and clearing browser data makes a device count as new. Nothing personal is recorded (no names or emails), only anonymous counts. Games count when the draft starts (“Games”) and when results appear (“Finished”). Counting started on Oct 16, 2026, and only covers the two websites, not the Claude version.</p>
+          <p class="note">How it’s counted: each phone or computer counts as one visitor, so one person on two devices counts twice, and clearing browser data makes a device count as new. Nothing personal is recorded (no names or emails), only anonymous counts. A game counts when the draft starts and again under “Finished” when results appear. An online draft counts as one game no matter how many people are in the room; “Players” is how many different people played that mode, and “Avg. players per game” is how full the rooms were (AI players aren’t counted). Counting started on Oct 16, 2026, and only covers the two websites, not the Claude version.</p>
         </div>
         <ol class="org-list" id="org-list"></ol>
         <div><button class="btn small" type="button" id="org-more" data-act="org-more">Show 30 more days</button></div>
@@ -4022,6 +4031,9 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     Object.keys(all).forEach(function (d) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
       var r = all[d], out = { v: 1, site: r.site, visits: r.visits || 0, start: r.start || {}, done: r.done || {}, rooms: r.rooms || 0, joins: r.joins || 0, first: r.first || 0, last: r.last || 0 };
+      /* Online drafts: every player in a room shares the same game id, so the organizer can count each draft once. */
+      function roomIds(kind) { return (r.g || []).filter(function (id) { return id.indexOf(kind + ':') === 0 && id.indexOf(kind + ':LOCAL:') !== 0 && /^[a-z]+:[A-Z]{5}:\d{6,16}$/.test(id); }).map(function (id) { return id.slice(kind.length + 1); }).slice(-40); }
+      out.rg = roomIds('start'); out.rgd = roomIds('done');
       S.env.db.net.statsPut('stats/v1/' + d.slice(0, 7) + '/' + d + '/' + sid, out).catch(function () {});
     });
   }
@@ -4038,6 +4050,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       var m = /stats\/v1\/\d{4}-\d{2}\/(\d{4}-\d{2}-\d{2})\/([A-Za-z0-9_-]{4,40})$/.exec(topic), v = map[topic];
       if (!m || !v || typeof v !== 'object') return;
       var row = { day: m[1], sid: m[2], site: String(v.site || ''), visits: statNum(v.visits), rooms: statNum(v.rooms), joins: statNum(v.joins), start: {}, done: {} };
+      function ids(a) { return Array.isArray(a) ? a.filter(function (x) { return typeof x === 'string' && /^[A-Z]{5}:\d{6,16}$/.test(x); }).slice(0, 40) : null; }
+      row.rg = ids(v.rg); row.rgd = ids(v.rgd);
       STATS_MODES.forEach(function (x) { row.start[x[0]] = statNum(v.start && v.start[x[0]]); row.done[x[0]] = statNum(v.done && v.done[x[0]]); });
       rows.push(row);
     });
@@ -4062,22 +4076,30 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var sel = rows.filter(inRange);
     function sum(list, f) { return list.reduce(function (m, r) { return m + f(r); }, 0); }
     function uniq(list, f) { var u = {}; list.forEach(function (r) { if (!f || f(r)) u[r.sid] = 1; }); return Object.keys(u).length; }
-    var drafts = function (r) { return r.start.room + r.start.offline + r.start.practice; };
+    /* Online drafts count once per room game, however many people played in it. Records from before Oct 17 have no ids, so their games are counted as they are. */
+    function roomDrafts(list, done) {
+      var u = {}, extra = 0;
+      list.forEach(function (r) { var a = done ? r.rgd : r.rg; if (a) a.forEach(function (id) { u[id] = 1; }); else extra += done ? r.done.room : r.start.room; });
+      return Object.keys(u).length + extra;
+    }
+    function games(list, k, done) { return k === 'room' ? roomDrafts(list, done) : sum(list, function (r) { return (done ? r.done : r.start)[k]; }); }
+    var allDrafts = function (list) { return games(list, 'room') + games(list, 'offline') + games(list, 'practice'); };
     var label = { '1': 'today', '7': 'last 7 days', '30': 'last 30 days', all: 'since Oct 16' }[st.range];
     function tile(n, lbl, sub) { return '<div class="stat-tile"><b>' + n.toLocaleString() + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; }
     $('stats-tiles').innerHTML = tile(uniq(sel), 'Visitors', 'devices, ' + label) + tile(sum(sel, function (r) { return r.visits; }), 'Visits', 'page opens, ' + label) +
-      tile(sum(sel, drafts), 'Drafts played', 'all draft modes, ' + label) + tile(sum(sel, function (r) { return r.start.fast; }), 'Fast Money plays', label);
-    $('stats-modes').innerHTML = '<thead><tr><th>Mode</th><th class="num">Players</th><th class="num">Games</th><th class="num">Finished</th></tr></thead><tbody>' +
+      tile(allDrafts(sel), 'Drafts played', 'an online draft counts once, ' + label) + tile(sum(sel, function (r) { return r.start.fast; }), 'Fast Money plays', label);
+    $('stats-modes').innerHTML = '<thead><tr><th>Mode</th><th class="num">Games</th><th class="num">Finished</th><th class="num">Players</th><th class="num">Avg. players per game</th></tr></thead><tbody>' +
       STATS_MODES.map(function (x) {
-        var k = x[0];
-        return '<tr><th scope="row">' + x[1] + '</th><td>' + uniq(sel, function (r) { return r.start[k] > 0; }) + '</td><td>' + sum(sel, function (r) { return r.start[k]; }) + '</td><td>' + sum(sel, function (r) { return r.done[k]; }) + '</td></tr>';
+        var k = x[0], gms = games(sel, k), seats = sum(sel, function (r) { return r.start[k]; });
+        var avg = k === 'room' ? (gms ? (seats / gms).toFixed(1) : '–') : (gms ? '1' : '–');
+        return '<tr><th scope="row">' + x[1] + '</th><td>' + gms + '</td><td>' + games(sel, k, true) + '</td><td>' + uniq(sel, function (r) { return r.start[k] > 0; }) + '</td><td>' + avg + '</td></tr>';
       }).join('') + '</tbody>';
     $('stats-rooms').textContent = 'Rooms created: ' + sum(sel, function (r) { return r.rooms; }) + ' · Times someone joined a room with a code or match: ' + sum(sel, function (r) { return r.joins; }) + ' (' + label + ')';
     $('stats-days').innerHTML = '<thead><tr><th>Day</th><th class="num">Visitors</th><th class="num">Visits</th><th class="num">Online</th><th class="num">Offline vs AI</th><th class="num">Practice</th><th class="num">Fast Money</th></tr></thead><tbody>' +
       days.slice(0, 14).filter(function (k) { return k >= '2026-10-16'; }).map(function (k, i) {
         var dr = rows.filter(function (r) { return r.day === k; });
         return '<tr' + (k === today ? ' class="today"' : '') + '><th scope="row">' + (i === 0 ? 'Today' : i === 1 ? 'Yesterday' : esc(keyLabel(k))) + '</th><td>' + uniq(dr) + '</td><td>' + sum(dr, function (r) { return r.visits; }) + '</td>' +
-          ['room', 'offline', 'practice', 'fast'].map(function (m) { return '<td>' + sum(dr, function (r) { return r.start[m]; }) + '</td>'; }).join('') + '</tr>';
+          ['room', 'offline', 'practice', 'fast'].map(function (m) { return '<td>' + games(dr, m) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody>';
     var sites = {};
     sel.forEach(function (r) { var n = statsSiteName(r.site); sites[n] = sites[n] || {}; sites[n][r.sid] = 1; });
@@ -4098,8 +4120,78 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       setTimeout(function () { st.state = 'ready'; st.at = now(); if (S.view === 'organizer' && S.org.tab === 'stats') renderStats(); }, 1500);
     }, function () { st.state = 'error'; if (S.view === 'organizer' && S.org.tab === 'stats') renderStats(); });
   }
+  /* ---------- organizer: publish the schedule straight to the website (websites only) ----------
+     Save writes schedule.json in the main site's GitHub repository using an access key that the organizer pastes in
+     once. The key stays in this browser only. Both sites read that file when they load. */
+  var GH_REPO = 'playtheroster/playtheroster.github.io', GH_FILE = 'schedule.json';
+  function ghToken() { return store('roster.ghToken') || ''; }
+  function ghApi(method, path, body) {
+    return fetch('https://api.github.com/repos/' + GH_REPO + path, {
+      method: method, cache: 'no-store',
+      headers: { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + ghToken(), 'X-GitHub-Api-Version': '2022-11-28' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+  }
+  function renderOrgConnect() {
+    var box = $('org-connect');
+    if (!S.env.web) { box.hidden = true; return; }
+    box.hidden = false;
+    if (ghToken()) {
+      box.className = 'org-connect on';
+      box.innerHTML = '<span><strong>Connected.</strong> Save publishes the schedule to both websites. They update within about a minute.</span>' +
+        '<button type="button" class="btn small ghost" data-act="gh-disconnect">Disconnect this device</button>';
+      return;
+    }
+    box.className = 'org-connect off';
+    box.innerHTML = '<h3>Connect the organizer to your website</h3>' +
+      '<p>Do this once on each device you organize from. After that, Save updates both websites for everyone.</p>' +
+      '<ol>' +
+      '<li>On GitHub, open <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong> and tap <strong>Generate new token</strong>.</li>' +
+      '<li>Name it “Roster organizer”. Set <strong>Resource owner</strong> to <code>playtheroster</code> and pick an expiration (1 year is fine).</li>' +
+      '<li>Under <strong>Repository access</strong>, choose <strong>Only select repositories</strong> → <code>playtheroster.github.io</code>.</li>' +
+      '<li>Under <strong>Permissions → Repository permissions</strong>, set <strong>Contents</strong> to <strong>Read and write</strong>.</li>' +
+      '<li>Tap <strong>Generate token</strong> (approve it on the next screen if GitHub asks), copy it, and paste it here.</li>' +
+      '</ol>' +
+      '<form id="gh-form" class="row"><input class="field" id="gh-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" aria-label="GitHub access key"><button class="btn primary small" type="submit">Connect</button></form>' +
+      '<p class="note">The key is saved only in this browser on this device and can only change files in that one repository. You can delete it on GitHub any time.</p>';
+  }
+  async function ghConnect(tok) {
+    tok = String(tok || '').trim();
+    if (tok.length < 20) { orgMsg('Paste the whole access key. It starts with github_pat_.', true); return; }
+    store('roster.ghToken', tok);
+    orgMsg('Checking the key…');
+    try {
+      var r = await ghApi('GET', '');
+      if (r.status === 401) throw new Error('That key didn’t work. Copy it again from GitHub and paste the whole thing.');
+      if (r.status === 404 || r.status === 403) throw new Error('That key can’t see the website repository. Make sure Resource owner is playtheroster and the repository playtheroster.github.io is selected.');
+      if (!r.ok) throw new Error('GitHub didn’t answer (' + r.status + '). Try again in a minute.');
+      orgMsg('Connected. Save now publishes to both websites.');
+    } catch (e) {
+      try { localStorage.removeItem('roster.ghToken'); } catch (x) {}
+      orgMsg(e && e.message && !/fetch|network/i.test(e.message) ? e.message : 'Couldn’t reach GitHub. Check your connection and try again.', true);
+    }
+    renderOrgConnect(); renderOrganizer();
+  }
+  function b64utf8(str) { return btoa(unescape(encodeURIComponent(str))); }
+  async function ghSaveSchedule(schedule) {
+    var body = { version: 1, from: dateKey(new Date()), updatedAt: now(), days: schedule.days, fast: schedule.fast };
+    var text = JSON.stringify(body, null, 1) + '\n';
+    var sha = null;
+    var g = await ghApi('GET', '/contents/' + GH_FILE + '?ref=main');
+    if (g.status === 401) throw new Error('auth');
+    if (g.ok) { var cur = await g.json(); sha = cur && cur.sha || null; }
+    else if (g.status !== 404) throw new Error('http ' + g.status);
+    var put = await ghApi('PUT', '/contents/' + GH_FILE, { message: 'Schedule update from the organizer', content: b64utf8(text), sha: sha || undefined, branch: 'main' });
+    if (put.status === 401) throw new Error('auth');
+    if (put.status === 403 || put.status === 404) throw new Error('write');
+    if (put.status === 409 || put.status === 422) throw new Error('conflict');
+    if (!put.ok) throw new Error('http ' + put.status);
+    applyLiveSchedule(body);
+    return body;
+  }
   function renderOrganizer() {
     if (!S.org.draft) orgStart();
+    renderOrgConnect();
     var tab = S.org.tab === 'fast' ? 'fast' : S.org.tab === 'stats' ? 'stats' : 'daily';
     var saved = futureOnly(SCHEDULE.days), savedF = futureOnly(SCHEDULE.fast || {});
     ['daily', 'fast', 'stats'].forEach(function (x) { var b = $('org-tab-' + x); b.setAttribute('aria-selected', String(x === tab)); });
@@ -4215,8 +4307,21 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var schedule = { version: 1, days: futureOnly(S.org.draft), fast: futureOnly(S.org.fast) };
     var html = pageSource(schedule);
     if (S.env.web) {
-      downloadFile('index.html', html);
-      orgMsg('Downloaded index.html with the new schedule. Upload it to your website host, replacing the old file, to publish it.');
+      if (!ghToken()) { orgMsg('Connect the organizer to your website first (the box at the top), then Save.', true); $('org-connect').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      $('org-save').disabled = true;
+      orgMsg('Publishing…');
+      try {
+        await ghSaveSchedule(schedule);
+        S.org.draft = null; orgStart(); renderOrganizer();
+        orgMsg('Saved. Both websites show the new schedule within about a minute (refresh the page to see it).');
+      } catch (e) {
+        var m = String(e && e.message || '');
+        if (m === 'auth') { try { localStorage.removeItem('roster.ghToken'); } catch (x) {} renderOrgConnect(); orgMsg('GitHub didn’t accept the access key (it may have expired). Connect again with a new key, then Save.', true); }
+        else if (m === 'write') orgMsg('That access key can’t change the website. On GitHub, set the key’s Contents permission to Read and write, then Save again.', true);
+        else if (m === 'conflict') orgMsg('The schedule changed somewhere else at the same moment. Save again.', true);
+        else orgMsg('The schedule didn’t publish. Check your connection and Save again.', true);
+        $('org-save').disabled = false;
+      }
       return;
     }
     $('org-save').disabled = true;
@@ -4322,6 +4427,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     else if (act === 'org-sub') orgToggleSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-reset') { delete S.org.draft[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
     else if (act === 'org-tab') { S.org.tab = t.getAttribute('data-tab'); renderOrganizer(); window.scrollTo(0, 0); }
+    else if (act === 'gh-disconnect') { try { localStorage.removeItem('roster.ghToken'); } catch (e) {} renderOrgConnect(); orgMsg('Disconnected. This device can’t publish the schedule until you connect again.'); }
     else if (act === 'stats-range') { S.stats = S.stats || { range: '1', state: 'idle' }; S.stats.range = t.getAttribute('data-range'); renderStats(); }
     else if (act === 'org-freset') { delete S.org.fast[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
     else if (act === 'org-fsub') orgToggleFastSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
@@ -4339,6 +4445,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   });
   document.addEventListener('submit', function (ev) {
     if (ev.target.id === 'acct-form') { ev.preventDefault(); createAccount($('acct-name').value); }
+    if (ev.target.id === 'gh-form') { ev.preventDefault(); ghConnect($('gh-token').value); }
   });
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape' && !$('intro').hidden) { if (S.game) S.introClosed = gameId(S.game); hideIntro(); return; }
@@ -4394,7 +4501,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-04';
+  var BUILD_ID = '2026-10-17-07';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -4809,7 +4916,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (intro) intro.textContent = 'Every pick is scored from 1.0 to 10.0 based on where it ranks on that subtopic’s list. The better the answer, the higher the score.';
     if (qn) qn.textContent = 'The exact math: #1 on a subtopic’s list scores 10.0, sliding down to 7.0 at the bottom of the list. An answer ranked only under a different subtopic scores 4.5–6.5, and an answer on no list scores 4.0. (On topics where every answer is ranked, scores slide from 10.0 for #1 down to 2.5 for the last.)';
     var on = document.querySelector('.org-save .note');
-    if (on) on.textContent = 'Saving downloads an updated index.html. Upload it to your website host, replacing the old file, and everyone sees the new schedule.';
+    if (on) on.textContent = 'Save publishes the schedule to both websites. They update within about a minute.';
   }
   /* ---------- Fast Money: 60 seconds, five subtopics in a row, beat the target ---------- */
   var FAST_SECONDS = TEST.fastSeconds || 60, FAST_TARGET = 40;
@@ -5040,7 +5147,35 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       orgMsg(ok ? 'Schedule saved.' : 'Your changes didn’t save. Make them again, then save.', !ok);
     }
   }
-  boot();
+  /* Live schedule: both websites read the organizer's schedule from one file on the main site, so a Save in the
+     organizer reaches everyone without a new version of the page. It wins for every day from its "from" date on;
+     the schedule built into the page is the fallback if the file can't be reached. */
+  var SCHEDULE_URL = TEST.scheduleUrl || 'https://playtheroster.github.io/schedule.json';
+  function applyLiveSchedule(j) {
+    if (!j || typeof j !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(String(j.from || ''))) return false;
+    ['days', 'fast'].forEach(function (part) {
+      var src = j[part] && typeof j[part] === 'object' ? j[part] : {};
+      var dst = SCHEDULE[part] = SCHEDULE[part] || {};
+      Object.keys(dst).forEach(function (k) { if (k >= j.from) delete dst[k]; });
+      Object.keys(src).forEach(function (k) { if (/^\d{4}-\d{2}-\d{2}$/.test(k) && k >= j.from && validOverride(src[k])) dst[k] = { topicId: src[k].topicId, subs: src[k].subs.slice() }; });
+    });
+    S.liveSchedule = { from: j.from, at: Number(j.updatedAt) || 0 };
+    TODAY = dailySpec(dateKey(new Date()));
+    return true;
+  }
+  function loadLiveSchedule() {
+    if (window.__ROSTER_TEST__ && !TEST.scheduleUrl) return Promise.resolve();
+    if (typeof fetch !== 'function' || !/^https?:$/.test(location.protocol)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var done = false, ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var t = setTimeout(function () { if (!done) { done = true; try { ctl && ctl.abort(); } catch (e) {} resolve(); } }, 2500);
+      fetch(SCHEDULE_URL + '?t=' + Date.now(), { cache: 'no-store', signal: ctl ? ctl.signal : undefined })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { if (!done) { done = true; clearTimeout(t); try { applyLiveSchedule(j); } catch (e) {} resolve(); } },
+              function () { if (!done) { done = true; clearTimeout(t); resolve(); } });
+    });
+  }
+  loadLiveSchedule().then(boot, boot);
 })();
 </script>
 
