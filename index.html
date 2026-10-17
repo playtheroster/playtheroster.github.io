@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="The Roster: a daily draft game. One topic, five subtopics, draft the best roster against friends or AI."><meta property="og:title" content="The Roster"><meta property="og:description" content="Today's topic is live. Draft the best roster and prove your friends wrong."><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website"><meta property="og:url" content="https://playtheroster.github.io/"><meta property="og:site_name" content="The Roster"><meta property="og:image" content="https://playtheroster.github.io/og-image-3.png"><meta property="og:image:secure_url" content="https://playtheroster.github.io/og-image-3.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="The Roster logo: a gold number 01 jersey on black"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="The Roster"><meta name="twitter:description" content="Today's topic is live. Draft the best roster and prove your friends wrong."><meta name="twitter:image" content="https://playtheroster.github.io/og-image-3.png"><link rel="icon" type="image/png" sizes="32x32" href="https://playtheroster.github.io/jersey3-32.png"><link rel="icon" type="image/png" sizes="64x64" href="https://playtheroster.github.io/jersey3-64.png"><link rel="icon" type="image/png" sizes="192x192" href="https://playtheroster.github.io/jersey3-192.png"><link rel="icon" type="image/png" sizes="512x512" href="https://playtheroster.github.io/jersey3-512.png"><link rel="apple-touch-icon" sizes="180x180" href="https://playtheroster.github.io/jersey3-apple-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="The Roster: a daily draft game. One topic, five subtopics, draft the best roster against friends or AI."><meta property="og:title" content="The Roster"><meta property="og:description" content="Today's topic is live. Draft the best roster and prove your friends wrong."><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website"><meta property="og:url" content="https://playtheroster.com/"><meta property="og:site_name" content="The Roster"><meta property="og:image" content="https://playtheroster.com/og-image-3.png"><meta property="og:image:secure_url" content="https://playtheroster.com/og-image-3.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="The Roster logo: a gold number 01 jersey on black"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="The Roster"><meta name="twitter:description" content="Today's topic is live. Draft the best roster and prove your friends wrong."><meta name="twitter:image" content="https://playtheroster.com/og-image-3.png"><link rel="icon" type="image/png" sizes="32x32" href="https://playtheroster.com/jersey3-32.png"><link rel="icon" type="image/png" sizes="64x64" href="https://playtheroster.com/jersey3-64.png"><link rel="icon" type="image/png" sizes="192x192" href="https://playtheroster.com/jersey3-192.png"><link rel="icon" type="image/png" sizes="512x512" href="https://playtheroster.com/jersey3-512.png"><link rel="apple-touch-icon" sizes="180x180" href="https://playtheroster.com/jersey3-apple-180.png"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 
 <title>The Roster</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3476,7 +3476,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   }
   function afterChange() { render(); if (S.ui.open) renderList(); }
 
-  var SHARE_URL = 'https://playtheroster.github.io';
+  var SHARE_URL = 'https://playtheroster.com';
   var TIER_SQUARES = { 5: '🟩', 4: '🟩', 3: '🟨', 2: '🟧', 1: '🟥' };
   function medal(rank) { return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank + '.'; }
   function shareText(g) {
@@ -4683,7 +4683,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     });
     return rows;
   }
-  function statsSiteName(h) { return /^playtheroster\.github\.io$/i.test(h) ? 'Main site' : /^danielsbauer8-svg\.github\.io$/i.test(h) ? 'Second site' : h || 'Other'; }
+  function statsSiteName(h) { return /^(www\.)?playtheroster\.(com|github\.io)$/i.test(h) ? 'Main site' : /^danielsbauer8-svg\.github\.io$/i.test(h) ? 'Second site' : h || 'Other'; }
   function renderStats() {
     if (!S.stats) S.stats = { range: '1', state: 'idle' };
     var st = S.stats;
@@ -5155,7 +5155,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-12';
+  var BUILD_ID = '2026-10-17-14';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -5806,7 +5806,10 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   /* Live schedule: both websites read the organizer's schedule from one file on the main site, so a Save in the
      organizer reaches everyone without a new version of the page. It wins for every day from its "from" date on;
      the schedule built into the page is the fallback if the file can't be reached. */
-  var SCHEDULE_URL = TEST.scheduleUrl || 'https://playtheroster.github.io/schedule.json';
+  /* The main site reads its own copy; the second site reads the main site's (new domain first, old address as backup). */
+  var SCHEDULE_URLS = TEST.scheduleUrl ? [TEST.scheduleUrl]
+    : /^(www\.)?playtheroster\.(com|github\.io)$/i.test(location.hostname) ? ['/schedule.json']
+    : ['https://playtheroster.com/schedule.json', 'https://playtheroster.github.io/schedule.json'];
   function applyLiveSchedule(j) {
     if (!j || typeof j !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(String(j.from || ''))) return false;
     ['days', 'fast'].forEach(function (part) {
@@ -5824,11 +5827,16 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if (typeof fetch !== 'function' || !/^https?:$/.test(location.protocol)) return Promise.resolve();
     return new Promise(function (resolve) {
       var done = false, ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      var t = setTimeout(function () { if (!done) { done = true; try { ctl && ctl.abort(); } catch (e) {} resolve(); } }, 2500);
-      fetch(SCHEDULE_URL + '?t=' + Date.now(), { cache: 'no-store', signal: ctl ? ctl.signal : undefined })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (j) { if (!done) { done = true; clearTimeout(t); try { applyLiveSchedule(j); } catch (e) {} resolve(); } },
-              function () { if (!done) { done = true; clearTimeout(t); resolve(); } });
+      function finish() { if (!done) { done = true; clearTimeout(t); resolve(); } }
+      var t = setTimeout(function () { try { ctl && ctl.abort(); } catch (e) {} finish(); }, 2500);
+      (function tryUrl(i) {
+        if (done) return;
+        if (i >= SCHEDULE_URLS.length) { finish(); return; }
+        fetch(SCHEDULE_URLS[i] + '?t=' + Date.now(), { cache: 'no-store', signal: ctl ? ctl.signal : undefined })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) { if (done) return; var ok = false; try { ok = applyLiveSchedule(j); } catch (e) {} if (ok) finish(); else tryUrl(i + 1); },
+                function () { tryUrl(i + 1); });
+      })(0);
     });
   }
   loadLiveSchedule().then(boot, boot);
