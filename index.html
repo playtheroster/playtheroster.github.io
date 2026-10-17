@@ -304,10 +304,26 @@ button.bsub[aria-pressed="true"] .mono { color: var(--hi-ink); }
 .org-glance-table thead th { border-top: 0; background: var(--deep); color: var(--deep-ink); font-weight: 700; }
 .org-glance-table tbody th { font-weight: 700; white-space: nowrap; }
 .org-glance-table .mono { font-size: 0.62rem; color: var(--accent); }
-.org-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 6px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); }
+.org-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 6px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); }
 .org-tab { min-height: 52px; border: 0; border-radius: 13px; background: transparent; font-weight: 800; font-size: 1.02rem; color: var(--muted); }
 .org-tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--drop); }
 #org-tab-fast[aria-selected="true"] { background: linear-gradient(100deg, var(--grad-a), var(--grad-b)); color: var(--grad-ink); }
+#org-tab-stats[aria-selected="true"] { background: var(--pop); color: #ffffff; }
+/* organizer stats */
+.org-stats { display: grid; gap: 14px; }
+.stats-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.stats-bar .seg { flex: 1 1 340px; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 520px; }
+.stat-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.stat-tile { display: grid; gap: 2px; align-content: start; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--surface); min-width: 0; }
+.stat-tile b { font-family: var(--font-display); font-weight: 400; font-size: clamp(2rem, 6vw, 2.8rem); line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink); }
+.stat-tile .lbl { font-weight: 700; }
+.stat-tile .sub { color: var(--muted); font-size: 0.82rem; }
+.stats-table td, .stats-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.stats-table thead th.num { text-align: right; }
+.stats-table tbody tr.today th, .stats-table tbody tr.today td { background: var(--tint); }
+.stats-me { display: flex; gap: 10px; align-items: center; font-weight: 600; }
+.stats-me input { width: 20px; height: 20px; accent-color: #000000; }
+@media (max-width: 640px) { .stat-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stats-bar .seg-btn { white-space: nowrap; font-size: 0.88rem; padding: 0 2px; } .org-tab { font-size: 0.9rem; padding: 0 4px; } }
 .org-day.is-fast { background: color-mix(in srgb, var(--pop) 6%, var(--surface)); }
 .org-other { color: var(--muted); }
 .org-fast { display: grid; gap: 8px; margin-top: 4px; padding: 12px; border-radius: 14px; background: var(--tint); border: 2px dashed var(--accent); }
@@ -1030,10 +1046,31 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
         <div class="org-tabs" role="tablist" aria-label="Which schedule">
           <button type="button" class="org-tab" role="tab" id="org-tab-daily" data-act="org-tab" data-tab="daily" aria-selected="true">🗓️ Daily draft</button>
           <button type="button" class="org-tab" role="tab" id="org-tab-fast" data-act="org-tab" data-tab="fast" aria-selected="false">⚡ Fast Money</button>
+          <button type="button" class="org-tab" role="tab" id="org-tab-stats" data-act="org-tab" data-tab="stats" aria-selected="false">📊 Stats</button>
         </div>
         <div style="display:grid;gap:8px">
           <h2 class="display org-title" id="org-heading">Daily draft schedule</h2>
           <p class="note" id="org-intro"></p>
+        </div>
+        <div class="org-stats" id="org-stats" hidden="">
+          <div class="stats-bar">
+            <div class="seg" role="radiogroup" aria-label="Time period" id="stats-range">
+              <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="stats-range" data-range="1">Today</button>
+              <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="stats-range" data-range="7">7 days</button>
+              <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="stats-range" data-range="30">30 days</button>
+              <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="stats-range" data-range="all">All time</button>
+            </div>
+            <span class="pill soft mono" id="stats-live">Loading…</span>
+          </div>
+          <div class="stat-tiles" id="stats-tiles"></div>
+          <span class="mono">By mode</span>
+          <div class="org-glance-wrap"><table class="org-glance-table stats-table" id="stats-modes"></table></div>
+          <p class="note" id="stats-rooms"></p>
+          <span class="mono">Day by day · last 14 days (counting started Oct 16)</span>
+          <div class="org-glance-wrap"><table class="org-glance-table stats-table" id="stats-days"></table></div>
+          <p class="note" id="stats-sites"></p>
+          <label class="stats-me"><input type="checkbox" id="stats-nome"> Don’t count my visits and games from this device</label>
+          <p class="note">How it’s counted: each phone or computer counts as one visitor, so one person on two devices counts twice, and clearing browser data makes a device count as new. Nothing personal is recorded (no names or emails), only anonymous counts. Games count when the draft starts (“Games”) and when results appear (“Finished”). Counting started on Oct 16, 2026, and only covers the two websites, not the Claude version.</p>
         </div>
         <ol class="org-list" id="org-list"></ol>
         <div><button class="btn small" type="button" id="org-more" data-act="org-more">Show 30 more days</button></div>
@@ -2892,6 +2929,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     renderBanner();
     var fastOn = !!S.fast && !S.game;
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
+    if (S.game && !fastOn && (scr === 'draft' || scr === 'results')) { statGame(S.game, 'start'); if (scr === 'results') statGame(S.game, 'done'); }
     if (fastOn || scr !== 'draft') hideIntro();
     $('scr-fast').hidden = !fastOn;
     if (fastOn) { $('back-btn').hidden = !S.fast.done; $('back-btn').innerHTML = '&larr; Homepage'; }
@@ -3564,6 +3602,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       await db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' });
       await db.doc('rooms/' + code + '/players/' + S.env.uid).set({ name: name, joinedAt: now() });
       enterRoom(code);
+      if (!fixedCode) statBump(function (r) { r.rooms = (r.rooms || 0) + 1; });
       return code;
     } catch (e) { S.lastCreateErr = e; return null; }
   }
@@ -3583,6 +3622,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
         var ps = await db.collection('rooms/' + code + '/players').get();
         if (ps.size >= MAX_PLAYERS) { setMsg('That room is full (8 players).', true); return; }
         await db.doc('rooms/' + code + '/players/' + S.env.uid).set({ name: name, joinedAt: now() });
+        statBump(function (r) { r.joins = (r.joins || 0) + 1; });
       }
       setMsg('');
       enterRoom(code);
@@ -3882,11 +3922,144 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     }).join('');
   }
   function orgOpts(sel) { return TOPIC_SORTED.map(function (x) { return '<option value="' + x.id + '"' + (x.id === sel ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join(''); }
+  /* ---------- usage stats (the two websites only) ----------
+     Each device keeps its own anonymous tally for the day (visits, games started and finished per mode, rooms)
+     and sends it to the relay as one retained message per device per day. The organizer page reads them all
+     and adds them up. No names or emails are sent. */
+  var STATS_MODES = [['room', 'Online rooms'], ['offline', 'Offline vs AI'], ['practice', 'Practice'], ['fast', 'Fast Money']];
+  function statsOn() { return !!S.env.web && (!window.__ROSTER_TEST__ || !!TEST.stats) && store('roster.nostats') !== '1'; }
+  function statsKey() { return 'roster.stats' + (TEST.sid ? '.' + TEST.sid : ''); }
+  function statsSid() {
+    if (TEST.sid) return TEST.sid;
+    var id = store('roster.sid');
+    if (!id) { id = 's' + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 6); store('roster.sid', id); }
+    return id;
+  }
+  function statsLoadLocal() { try { var o = JSON.parse(store(statsKey()) || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } }
+  function statBump(change) {
+    if (!statsOn()) return;
+    var all = statsLoadLocal(), d = dateKey(new Date());
+    var r = all[d] || { v: 1, day: d, site: String(location.hostname || 'local').slice(0, 60), visits: 0, start: {}, done: {}, rooms: 0, joins: 0, g: [], first: now() };
+    if (change(r) === false) return;
+    r.last = now(); all[d] = r;
+    Object.keys(all).sort().slice(0, -3).forEach(function (k) { delete all[k]; });
+    store(statsKey(), JSON.stringify(all));
+    statsQueue();
+  }
+  function statGame(g, kind) {
+    if (!g || !g.players || !g.players[S.me] || g.players[S.me].bot) return;
+    var mode = g.mode === 'local' ? (g.practice ? 'practice' : 'offline') : 'room';
+    var id = kind + ':' + gameId(g);
+    statBump(function (r) {
+      r.g = r.g || [];
+      if (r.g.indexOf(id) >= 0) return false;
+      r.g.push(id); if (r.g.length > 80) r.g = r.g.slice(-80);
+      r[kind] = r[kind] || {}; r[kind][mode] = (r[kind][mode] || 0) + 1;
+    });
+  }
+  function statFast(kind) { statBump(function (r) { r[kind] = r[kind] || {}; r[kind].fast = (r[kind].fast || 0) + 1; }); }
+  var statsTimer = null;
+  function statsQueue() {
+    clearTimeout(statsTimer);
+    statsTimer = setTimeout(statsSend, TEST.statsDelay || 3000);
+  }
+  function statsSend() {
+    if (!statsOn() || !S.env.db || !S.env.db.net || !S.env.db.net.statsPut) return;
+    var all = statsLoadLocal(), sid = statsSid();
+    Object.keys(all).forEach(function (d) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+      var r = all[d], out = { v: 1, site: r.site, visits: r.visits || 0, start: r.start || {}, done: r.done || {}, rooms: r.rooms || 0, joins: r.joins || 0, first: r.first || 0, last: r.last || 0 };
+      S.env.db.net.statsPut('stats/v1/' + d.slice(0, 7) + '/' + d + '/' + sid, out).catch(function () {});
+    });
+  }
+  function statsVisit() {
+    if (!statsOn() || S.env.orgHash) return;
+    statBump(function (r) { r.visits = (r.visits || 0) + 1; });
+  }
+  /* Organizer side */
+  function statNum(x) { var n = Math.floor(Number(x)); return isFinite(n) && n > 0 ? Math.min(n, 200) : 0; }
+  function statsRows() {
+    var map = (S.env.db && S.env.db.net && S.env.db.net.statsMap) ? S.env.db.net.statsMap() : {};
+    var rows = [];
+    Object.keys(map).forEach(function (topic) {
+      var m = /stats\/v1\/\d{4}-\d{2}\/(\d{4}-\d{2}-\d{2})\/([A-Za-z0-9_-]{4,40})$/.exec(topic), v = map[topic];
+      if (!m || !v || typeof v !== 'object') return;
+      var row = { day: m[1], sid: m[2], site: String(v.site || ''), visits: statNum(v.visits), rooms: statNum(v.rooms), joins: statNum(v.joins), start: {}, done: {} };
+      STATS_MODES.forEach(function (x) { row.start[x[0]] = statNum(v.start && v.start[x[0]]); row.done[x[0]] = statNum(v.done && v.done[x[0]]); });
+      rows.push(row);
+    });
+    return rows;
+  }
+  function statsSiteName(h) { return /^playtheroster\.github\.io$/i.test(h) ? 'Main site' : /^danielsbauer8-svg\.github\.io$/i.test(h) ? 'Second site' : h || 'Other'; }
+  function renderStats() {
+    if (!S.stats) S.stats = { range: '1', state: 'idle' };
+    var st = S.stats;
+    if (st.state === 'idle') loadStats();
+    document.querySelectorAll('#stats-range .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-range') === st.range)); });
+    $('stats-nome').checked = store('roster.nostats') === '1';
+    var live = $('stats-live');
+    if (!S.env.web) { live.textContent = 'Websites only'; live.className = 'pill soft mono'; }
+    else if (st.state === 'loading') { live.textContent = 'Loading…'; live.className = 'pill soft mono'; }
+    else if (st.state === 'error') { live.textContent = 'Can’t reach the stats right now'; live.className = 'pill warn mono'; }
+    else { live.textContent = 'Live · updated ' + new Date(st.at || now()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); live.className = 'pill mono'; }
+    var rows = statsRows(), today = dateKey(new Date());
+    var days = [];
+    for (var i = 0; i < 30; i++) days.push(dateKey(new Date(Date.now() - i * 864e5)));
+    var inRange = st.range === 'all' ? function () { return true; } : (function (n) { var keep = {}; days.slice(0, n).forEach(function (k) { keep[k] = 1; }); return function (r) { return !!keep[r.day]; }; })(Number(st.range));
+    var sel = rows.filter(inRange);
+    function sum(list, f) { return list.reduce(function (m, r) { return m + f(r); }, 0); }
+    function uniq(list, f) { var u = {}; list.forEach(function (r) { if (!f || f(r)) u[r.sid] = 1; }); return Object.keys(u).length; }
+    var drafts = function (r) { return r.start.room + r.start.offline + r.start.practice; };
+    var label = { '1': 'today', '7': 'last 7 days', '30': 'last 30 days', all: 'since Oct 16' }[st.range];
+    function tile(n, lbl, sub) { return '<div class="stat-tile"><b>' + n.toLocaleString() + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; }
+    $('stats-tiles').innerHTML = tile(uniq(sel), 'Visitors', 'devices, ' + label) + tile(sum(sel, function (r) { return r.visits; }), 'Visits', 'page opens, ' + label) +
+      tile(sum(sel, drafts), 'Drafts played', 'all draft modes, ' + label) + tile(sum(sel, function (r) { return r.start.fast; }), 'Fast Money plays', label);
+    $('stats-modes').innerHTML = '<thead><tr><th>Mode</th><th class="num">Players</th><th class="num">Games</th><th class="num">Finished</th></tr></thead><tbody>' +
+      STATS_MODES.map(function (x) {
+        var k = x[0];
+        return '<tr><th scope="row">' + x[1] + '</th><td>' + uniq(sel, function (r) { return r.start[k] > 0; }) + '</td><td>' + sum(sel, function (r) { return r.start[k]; }) + '</td><td>' + sum(sel, function (r) { return r.done[k]; }) + '</td></tr>';
+      }).join('') + '</tbody>';
+    $('stats-rooms').textContent = 'Rooms created: ' + sum(sel, function (r) { return r.rooms; }) + ' · Times someone joined a room with a code or match: ' + sum(sel, function (r) { return r.joins; }) + ' (' + label + ')';
+    $('stats-days').innerHTML = '<thead><tr><th>Day</th><th class="num">Visitors</th><th class="num">Visits</th><th class="num">Online</th><th class="num">Offline vs AI</th><th class="num">Practice</th><th class="num">Fast Money</th></tr></thead><tbody>' +
+      days.slice(0, 14).filter(function (k) { return k >= '2026-10-16'; }).map(function (k, i) {
+        var dr = rows.filter(function (r) { return r.day === k; });
+        return '<tr' + (k === today ? ' class="today"' : '') + '><th scope="row">' + (i === 0 ? 'Today' : i === 1 ? 'Yesterday' : esc(keyLabel(k))) + '</th><td>' + uniq(dr) + '</td><td>' + sum(dr, function (r) { return r.visits; }) + '</td>' +
+          ['room', 'offline', 'practice', 'fast'].map(function (m) { return '<td>' + sum(dr, function (r) { return r.start[m]; }) + '</td>'; }).join('') + '</tr>';
+      }).join('') + '</tbody>';
+    var sites = {};
+    sel.forEach(function (r) { var n = statsSiteName(r.site); sites[n] = sites[n] || {}; sites[n][r.sid] = 1; });
+    var names = Object.keys(sites).sort();
+    $('stats-sites').textContent = names.length ? 'Visitors by site (' + label + '): ' + names.map(function (n) { return n + ' ' + Object.keys(sites[n]).length; }).join(' · ') : '';
+  }
+  var statsRenderQueued = false;
+  function loadStats() {
+    var st = S.stats;
+    if (!S.env.web || !S.env.db || !S.env.db.net || !S.env.db.net.statsWatch) { st.state = 'ready'; return; }
+    st.state = 'loading';
+    S.env.db.net.statsWatch(function () {
+      st.at = now();
+      if (statsRenderQueued) return;
+      statsRenderQueued = true;
+      setTimeout(function () { statsRenderQueued = false; if (S.view === 'organizer' && S.org.tab === 'stats') renderStats(); }, 400);
+    }).then(function () {
+      setTimeout(function () { st.state = 'ready'; st.at = now(); if (S.view === 'organizer' && S.org.tab === 'stats') renderStats(); }, 1500);
+    }, function () { st.state = 'error'; if (S.view === 'organizer' && S.org.tab === 'stats') renderStats(); });
+  }
   function renderOrganizer() {
     if (!S.org.draft) orgStart();
-    var tab = S.org.tab === 'fast' ? 'fast' : 'daily';
+    var tab = S.org.tab === 'fast' ? 'fast' : S.org.tab === 'stats' ? 'stats' : 'daily';
     var saved = futureOnly(SCHEDULE.days), savedF = futureOnly(SCHEDULE.fast || {});
-    ['daily', 'fast'].forEach(function (x) { var b = $('org-tab-' + x); b.setAttribute('aria-selected', String(x === tab)); });
+    ['daily', 'fast', 'stats'].forEach(function (x) { var b = $('org-tab-' + x); b.setAttribute('aria-selected', String(x === tab)); });
+    var isStats = tab === 'stats';
+    $('org-stats').hidden = !isStats;
+    ['org-list', 'org-more'].forEach(function (id) { $(id).hidden = isStats; });
+    document.querySelector('#organizer .org-save').hidden = isStats;
+    if (isStats) {
+      $('org-heading').textContent = 'Players & visits';
+      $('org-intro').textContent = 'How many people visited the websites and played each mode. It updates live while this page is open.';
+      renderStats();
+      return;
+    }
     $('org-heading').textContent = tab === 'fast' ? 'Fast Money schedule' : 'Daily draft schedule';
     $('org-intro').textContent = tab === 'fast'
       ? 'The solo 60-second round, one try per day. Pick each day’s Fast Money topic and its 5 subtopics. It always has to be a different topic from that day’s draft.'
@@ -4096,6 +4269,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     else if (act === 'org-sub') orgToggleSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-reset') { delete S.org.draft[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
     else if (act === 'org-tab') { S.org.tab = t.getAttribute('data-tab'); renderOrganizer(); window.scrollTo(0, 0); }
+    else if (act === 'stats-range') { S.stats = S.stats || { range: '1', state: 'idle' }; S.stats.range = t.getAttribute('data-range'); renderStats(); }
     else if (act === 'org-freset') { delete S.org.fast[t.getAttribute('data-day')]; orgMsg(''); renderOrganizer(); }
     else if (act === 'org-fsub') orgToggleFastSub(t.getAttribute('data-day'), t.getAttribute('data-sub'));
     else if (act === 'org-more') { S.org.days = Math.min(365, S.org.days + 30); renderOrganizer(); }
@@ -4106,6 +4280,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   document.addEventListener('change', function (ev) {
     var k = ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-org-topic') : null;
     if (k) orgSetTopic(k, ev.target.value);
+    if (ev.target && ev.target.id === 'stats-nome') { store('roster.nostats', ev.target.checked ? '1' : '0'); renderStats(); return; }
     var fk = ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-org-ftopic') : null;
     if (fk) orgSetFastTopic(fk, ev.target.value);
   });
@@ -4166,7 +4341,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-16-02';
+  var BUILD_ID = '2026-10-16-03';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -4254,7 +4429,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
        the connection when they switch apps or sleep, and it takes a few seconds to come back. */
     var all = [], started = false, waiters = [], downTimer = null;
     var CONNECT_WAIT_MS = 20000, ACK_NUDGE_MS = 5000, ACK_GIVEUP_MS = 20000;
-    function flushWaiters(err) { var w = waiters; waiters = []; w.forEach(function (x) { clearTimeout(x.t); if (err) x.reject(err); else x.resolve(true); }); }
+    function flushWaiters(err) { var w = waiters; waiters = []; if (err && w.some(function (x) { return !x.quiet; })) netFail(); w.forEach(function (x) { clearTimeout(x.t); if (err) x.reject(err); else x.resolve(true); }); }
     function nudge() { all.forEach(function (c) { if (!c.connected && !c.reconnecting && !c.disconnecting && !c._rsBusy && c.reconnect) { try { c.reconnect(); } catch (e) {} } }); }
     /* A connection that looks connected but stopped answering (common after a phone sleeps): drop it so it reconnects.
        Unanswered messages are sent again once it is back. */
@@ -4288,18 +4463,28 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
           c.on('offline', function () { down('offline'); });
           c.on('error', function (e) { diag.relays[url] = 'error'; diag.errs.push(String((e && e.message) || e).slice(0, 80)); showDiag(); });
         });
-      }, function (e) { started = false; netFail(); flushWaiters(e); });
+      }, function (e) { started = false; flushWaiters(e); });
     }
-    function whenLive(ms) {
+    function whenLive(ms, quiet) {
       start();
       if (live().length) return Promise.resolve(true);
       nudge();
       return new Promise(function (resolve, reject) {
-        var w = { resolve: resolve, reject: reject };
-        w.t = setTimeout(function () { waiters = waiters.filter(function (x) { return x !== w; }); netFail(); reject(new Error('no-broker')); }, ms || CONNECT_WAIT_MS);
+        var w = { resolve: resolve, reject: reject, quiet: !!quiet };
+        w.t = setTimeout(function () { waiters = waiters.filter(function (x) { return x !== w; }); if (!quiet) netFail(); reject(new Error('no-broker')); }, ms || CONNECT_WAIT_MS);
         waiters.push(w);
       });
     }
+    /* Usage stats: sent quietly (never shows a connection warning), read by the organizer page. */
+    var statsStore = {}, statsCb = null;
+    function statsPut(path, data) {
+      var body = JSON.stringify(data);
+      return whenLive(30000, true).then(function () {
+        live().forEach(function (c) { try { c.publish(topicFor(path), body, { qos: 1, retain: true }); diag.sent++; } catch (e) {} });
+        showDiag();
+      });
+    }
+    function statsWatch(cb) { statsCb = cb; return subscribe(topicFor('stats/v1/#')); }
     function client() { return whenLive(); }
     /* Send something that the relay acknowledges (publish or subscribe) on every live connection; done when any
        one answers. Connections that don't answer in a few seconds are restarted, and the request is retried. */
@@ -4355,6 +4540,13 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     function onMessage(topic, payload) {
       if (topic.indexOf(MQTT_ROOT) !== 0) return;
       var path = topic.slice(MQTT_ROOT.length);
+      if (path.indexOf('stats/v1/') === 0) {
+        var sv = decode(payload);
+        if (sv === undefined) delete statsStore[path];
+        else if (sv && typeof sv === 'object' && !Array.isArray(sv)) { var prev = statsStore[path]; if (!prev || (Number(sv.last) || 0) >= (Number(prev.last) || 0)) statsStore[path] = sv; }
+        if (statsCb) statsCb();
+        return;
+      }
       var ix = /^pub\/([^/]+)\/([^/]+)$/.exec(path);
       if (ix) {
         if (ix[2] === '_req') { answerIndex(ix[1]); return; }
@@ -4508,7 +4700,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
         return new Promise(function (resolve) { setTimeout(function () { resolve(jclone(S.env.pubIndex) || {}); }, 2000); });
       });
     }
-    return { doc: doc, collection: collection, publicRooms: publicRooms, warm: start };
+    return { doc: doc, collection: collection, publicRooms: publicRooms, warm: start, statsPut: statsPut, statsWatch: statsWatch, statsMap: function () { return statsStore; } };
   }
   function makeWebDb(uid) {
     var local = makeLocalStore(), net = makeNetStore(uid);
@@ -4617,6 +4809,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     S.ui.fastQ = ''; S.ui.fastSel = 0;
     S.view = 'play'; S.mode = 'fast';
     saveFast(); setMsg(''); render(); window.scrollTo(0, 0);
+    statFast('start');
     setTimeout(function () { var i = $('fast-in'); if (i) i.focus(); }, 50);
   }
   function saveFast() { if (S.fast) store(fastStoreKey(S.fast.dateKey), JSON.stringify(S.fast)); }
@@ -4643,6 +4836,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   function finishFast() {
     var f = S.fast; if (!f || f.done) return;
     f.done = true; f.finishedAt = Math.min(now(), f.endsAt);
+    statFast('done');
     f.results = f.subs.map(function (sub, i) {
       var a = f.answers[i];
       if (!a || a.skipped) return { sub: sub, score: 0, rank: -1, skipped: !!(a && a.skipped) };
@@ -4777,6 +4971,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     S.env.ready = true;
     render();
     loadAccount().then(render);
+    statsVisit();
+    if (statsOn()) setTimeout(statsSend, TEST.statsDelay || 4000);
     if (m && S.env.db && S.env.uid) {
       if (myName()) joinRoom(m[1]);
       else setMsg('Enter your name, then tap Join to enter room ' + m[1].toUpperCase() + '.');
