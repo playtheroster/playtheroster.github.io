@@ -3874,7 +3874,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
   /* ---------- account ---------- */
   function renderAccountBtn() {
     var p = S.account.profile;
-    $('account-btn').textContent = p ? p.username : 'Sign in / Join';
+    var cached = !p && !S.account.loaded && fbOn() ? store('roster.acctName') : null;
+    $('account-btn').textContent = p ? p.username : cached || 'Sign in / Join';
   }
   function acctMsg(t, bad) { var m = $('acct-msg'); m.textContent = t || ''; m.className = 'msg' + (bad ? ' bad' : ''); }
   async function loadAccount() {
@@ -3983,6 +3984,8 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
           var fb = window.firebase;
           if (!fb.apps || !fb.apps.length) fb.initializeApp(FIREBASE_CONFIG);
           FB.auth = fb.auth(); FB.db = fb.firestore();
+          /* Stay signed in on this device after the tab or browser closes, until you tap Sign out. */
+          try { if (fb.auth.Auth && fb.auth.Auth.Persistence) FB.auth.setPersistence(fb.auth.Auth.Persistence.LOCAL).catch(function () {}); } catch (e) {}
           resolve(FB);
         } catch (e) { FB.ready = null; reject(e); }
       }
@@ -4015,6 +4018,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     if ((u ? u.uid : '') !== was && S.league) { S.leagueOpenCode = S.league.code; leagueUnwatch(); S.league = null; }
     if (!u) {
       S.account.profile = null; S.account.games = []; S.myLeagues = {}; S.account.loaded = true;
+      try { localStorage.removeItem('roster.acctName'); } catch (e) {}
       renderAccountBtn(); if (!$('account').hidden) renderAccount();
       if (S.view === 'play' && !S.game) render();
       if (S.mode === 'league' && S.view === 'play' && !S.game) renderLeague();
@@ -4030,6 +4034,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     /* An anonymous marker (just the date) so the organizer can count accounts. No name or email. */
     if (prof) { var mk = FB.db.collection('accountMarkers').doc(u.uid); mk.get().then(function (x) { if (!x.exists) return mk.set({ at: Number(prof.createdAt) || now() }); }).catch(function () {}); }
     S.account.profile = prof ? { username: clean(prof.name, 20) || 'Player', uid: u.uid, email: u.email || '', createdAt: Number(prof.createdAt) || now() } : null;
+    if (S.account.profile) store('roster.acctName', S.account.profile.username);
     if (S.account.profile && !myName()) { $('player-name').value = S.account.profile.username; store('roster.name', S.account.profile.username); }
     try {
       var gs = await ref.collection('games').orderBy('at', 'desc').limit(50).get();
@@ -4148,7 +4153,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
       var created = S.account.profile ? S.account.profile.createdAt : now();
       await FB.db.collection('users').doc(FB.user.uid).set({ name: name, createdAt: created });
       S.account.profile = { username: name, uid: FB.user.uid, email: FB.user.email || '', createdAt: created };
-      store('roster.name', name); $('player-name').value = name;
+      store('roster.name', name); $('player-name').value = name; store('roster.acctName', name);
       renderAccountBtn(); acctMsg('Saved.');
       if (S.pendingSave) { S.pendingSave = false; closeAccount(); saveResult(); return; }
       if (S.pendingLeague) { var next = S.pendingLeague; S.pendingLeague = null; closeAccount(); next(); return; }
@@ -5176,7 +5181,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-15';
+  var BUILD_ID = '2026-10-17-16';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
