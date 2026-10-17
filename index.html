@@ -719,6 +719,15 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .lg-people li { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 14px; background: var(--tint); }
 .lg-people .acts { display: flex; gap: 8px; }
 .lg-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.lg-intro { display: grid; gap: 4px; }
+.lg-intro p { margin: 0; }
+.lg-intro .note { margin: 0; }
+.lg-split { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px 32px; }
+.lg-split > .lg-block, .lg-split > .lg-block:first-child { align-content: start; padding-top: 14px; border-top: 2px dashed var(--line); }
+.lg-block .row { flex-wrap: nowrap; }
+.lg-block .row > .btn { min-height: 46px; flex: 0 0 auto; }
+.lg-block > .mono, .lg-block > label.mono { display: block; }
+.lg-block .note { margin: 0; }
 .lg-owner { display: grid; gap: 10px; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; }
 /* ---------- Hover colors: every clickable thing turns black under a mouse (not on touch screens, so taps don't stick).
    White things go black with gold text; things that are already black stay black and their text turns white. ---------- */
@@ -729,7 +738,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   .players .kick:not(:disabled):hover, .players .kick.armed:hover { background: #ca2430; color: #ffffff; border-color: #000000; }
   .chip:not(:disabled):hover { background: #000000; color: #ffb612; border-color: #000000; }
   .chip[aria-pressed="true"]:not(:disabled):hover { background: #000000; color: #ffffff; }
-  .seg-btn:not(:disabled):hover { background: #000000; color: #ffb612; }
+  .seg-btn:not(:disabled):not([aria-checked="true"]):hover { background: color-mix(in srgb, #000000 8%, #ffffff); color: #000000; box-shadow: inset 0 0 0 2px #000000; }
   .seg-btn[aria-checked="true"]:not(:disabled):hover, .seg-btn[data-level="easy"][aria-checked="true"]:not(:disabled):hover, .seg-btn[data-level="hard"][aria-checked="true"]:not(:disabled):hover { background: #000000; color: #ffffff; }
   .org-tab:hover, .org-tab[aria-selected="true"]:hover, #org-tab-fast[aria-selected="true"]:hover, #org-tab-stats[aria-selected="true"]:hover { background: #000000; color: #ffffff; }
   button.bsub:hover, button.bsub[aria-pressed="true"]:hover { background: #000000; color: #ffffff; }
@@ -4441,22 +4450,24 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
     var signed = lgSignedIn(), mine = S.myLeagues || {};
     var codes = Object.keys(mine).sort(function (a, b) { return (mine[b].at || 0) - (mine[a].at || 0); });
     var res = S.ui.lgResults;
-    body.innerHTML = '<p>Play with the same friends a lot? A league keeps a running leaderboard of your online games together: wins, win %, average score and average finish.</p>' +
+    var find = '<div class="lg-block"><label class="mono" for="league-search">Find a league</label><form id="league-search-form" class="row"><input class="field" id="league-search" type="search" maxlength="30" autocomplete="off" placeholder="Search by name" value="' + esc(S.ui.lgQuery || '') + '"><button class="btn primary" type="submit">Search</button></form>' +
+      (res ? (res.length ? '<ul class="lg-list">' + res.map(function (r) {
+        return '<li><button class="btn" type="button" data-act="league-open" data-code="' + r.code + '"><span>' + esc(r.name) + '</span><span class="mono">' + (r.visibility === 'public' ? 'Public' : 'Private') + ' · by ' + esc(r.ownerName) + '</span></button></li>';
+      }).join('') + '</ul>' : '<p class="note">No leagues start with “' + esc(S.ui.lgQuery) + '”.</p>') : '') + '</div>';
+    var create = signed ? '<div class="lg-block"><label class="mono" for="league-new">Create a league</label>' +
+        '<div class="seg two" role="radiogroup" aria-label="Who can join"><button type="button" class="seg-btn" role="radio" aria-checked="' + (S.ui.lgVis !== 'public') + '" data-act="league-vis" data-vis="private">Private</button><button type="button" class="seg-btn" role="radio" aria-checked="' + (S.ui.lgVis === 'public') + '" data-act="league-vis" data-vis="public">Public</button></div>' +
+        '<p class="note">' + (S.ui.lgVis === 'public' ? 'Anyone signed in can join right away.' : 'You approve who joins.') + '</p>' +
+        '<form id="league-new-form" class="row"><input class="field" id="league-new" type="text" maxlength="30" autocomplete="off" placeholder="League name"><button class="btn primary" type="submit">Create</button></form>' +
+        '<p class="note">Names are unique and can’t be changed later.</p></div>' : '';
+    body.innerHTML = '<div class="lg-intro"><p>Play with the same friends a lot? A league keeps a running leaderboard of your online games together.</p>' +
+      (signed ? '<p class="note">Signed in as <strong>' + esc(S.account.profile.username) + '</strong></p>' : '') + '</div>' +
       (!signed ? '<div class="lg-block"><p>You need an account to create or join a league, so your stats follow you on any device.</p><button class="btn primary block" type="button" data-act="league-signin">Sign in or create an account</button></div>' : '') +
       (signed && codes.length ? '<div class="lg-block"><span class="mono">Your leagues</span><ul class="lg-list">' + codes.map(function (c) {
         var m = mine[c], tag = m.status === 'pending' ? 'Waiting for approval' : m.status === 'denied' ? 'Declined' : (m.role === 'owner' ? 'Creator' : 'Member');
         return '<li><button class="btn" type="button" data-act="league-open" data-code="' + c + '"><span>' + esc(m.name) + '</span><span class="mono">' + tag + '</span></button>' +
           (m.status === 'denied' ? '<button class="btn small ghost" type="button" data-act="league-dismiss" data-code="' + c + '">Remove from my list</button>' : '') + '</li>';
       }).join('') + '</ul></div>' : '') +
-      '<div class="lg-block"><label class="mono" for="league-search">Find a league</label><form id="league-search-form" class="row"><input class="field" id="league-search" type="search" maxlength="30" autocomplete="off" placeholder="Search by name" value="' + esc(S.ui.lgQuery || '') + '"><button class="btn small primary" type="submit">Search</button></form>' +
-      (res ? (res.length ? '<ul class="lg-list">' + res.map(function (r) {
-        return '<li><button class="btn" type="button" data-act="league-open" data-code="' + r.code + '"><span>' + esc(r.name) + '</span><span class="mono">' + (r.visibility === 'public' ? 'Public' : 'Private') + ' · by ' + esc(r.ownerName) + '</span></button></li>';
-      }).join('') + '</ul>' : '<p class="note">No leagues start with “' + esc(S.ui.lgQuery) + '”.</p>') : '') + '</div>' +
-      (signed ? '<div class="lg-block"><label class="mono" for="league-new">Create a league</label>' +
-        '<div class="seg two" role="radiogroup" aria-label="Who can join"><button type="button" class="seg-btn" role="radio" aria-checked="' + (S.ui.lgVis !== 'public') + '" data-act="league-vis" data-vis="private">Private</button><button type="button" class="seg-btn" role="radio" aria-checked="' + (S.ui.lgVis === 'public') + '" data-act="league-vis" data-vis="public">Public</button></div>' +
-        '<p class="note">' + (S.ui.lgVis === 'public' ? 'Public: anyone signed in can find it and join right away.' : 'Private: people can find it by name, but you approve who joins.') + ' League names are unique and can’t be changed later.</p>' +
-        '<form id="league-new-form" class="row"><input class="field" id="league-new" type="text" maxlength="30" autocomplete="off" placeholder="League name"><button class="btn small primary" type="submit">Create</button></form></div>' +
-        '<p class="note">Signed in as <strong>' + esc(S.account.profile.username) + '</strong>.</p>' : '');
+      (signed ? '<div class="lg-split">' + find + create + '</div>' : find);
   }
   function renderLeagueView(body) {
     var L = S.league, me = lgUid();
@@ -5181,7 +5192,7 @@ F("christmas-movies","Christmas Movies","Christmas movie","Which movies make the
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-16';
+  var BUILD_ID = '2026-10-17-17';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
