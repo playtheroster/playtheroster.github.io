@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-19",
- "updatedAt": 1792448867203,
+ "updatedAt": 1792448878568,
  "days": {
   "2026-10-19": {
    "topicId": "cartoon-characters",
@@ -213,6 +213,16 @@
     "Navigation",
     "Bravery",
     "Fame"
+   ]
+  },
+  "2026-11-14": {
+   "topicId": "sidekicks",
+   "subs": [
+    "Humor",
+    "Usefulness",
+    "Iconic",
+    "Could lead their own story",
+    "Loyalty"
    ]
   }
  }
