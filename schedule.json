@@ -1,36 +1,16 @@
 {
  "version": 1,
- "from": "2026-10-17",
- "updatedAt": 1792249328993,
+ "from": "2026-10-19",
+ "updatedAt": 1792440936889,
  "days": {
-  "2026-10-17": {
-   "topicId": "history",
-   "subs": [
-    "Leadership",
-    "Fame today",
-    "Influence",
-    "Legacy",
-    "Military genius"
-   ]
-  },
-  "2026-10-18": {
-   "topicId": "nba-players",
-   "subs": [
-    "Playmaking",
-    "Clutch",
-    "Scoring",
-    "Defense",
-    "Championships"
-   ]
-  },
   "2026-10-19": {
-   "topicId": "disney-characters",
+   "topicId": "cartoon-characters",
    "subs": [
-    "Merch appeal",
     "Humor",
-    "Heart",
-    "Songs",
-    "Iconic status"
+    "Popularity",
+    "Personality",
+    "Catchphrases",
+    "Merch appeal"
    ]
   },
   "2026-10-20": {
@@ -134,16 +114,5 @@
    ]
   }
  },
- "fast": {
-  "2026-10-17": {
-   "topicId": "beers",
-   "subs": [
-    "Strength",
-    "Party appeal",
-    "Popularity",
-    "Taste",
-    "Value"
-   ]
-  }
- }
+ "fast": {}
 }
