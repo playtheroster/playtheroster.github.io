@@ -683,6 +683,9 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 /* sign-in */
 .google-btn { gap: 10px; background: #ffffff; color: #000000; }
 .google-btn svg { width: 20px; height: 20px; flex: 0 0 auto; }
+.acct-form { display: grid; gap: 10px; }
+.acct-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; }
+.linkish { padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--ink); text-decoration: underline; cursor: pointer; }
 .or-line { display: flex; align-items: center; gap: 10px; color: var(--muted); margin-top: 4px; }
 /* sign-in sheet: even spacing between every block, labels close to their fields */
 #acct-body { display: grid; gap: 16px; }
@@ -786,6 +789,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   .band .wordmark:hover { color: #000000; }
   .footer .wordmark:hover, .footer .wordmark:hover i { color: #ca2430; }
   .stats-me:hover { color: #ca2430; text-decoration: underline; cursor: pointer; }
+  .linkish:hover { color: #ca2430; }
   .stats-me input:hover { outline: 2px solid #000000; outline-offset: 2px; }
 }
 </style>
@@ -4118,6 +4122,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
   async function fbUserChanged(u) {
     var was = FB.user ? FB.user.uid : '';
     FB.user = u || null;
+    if (u) { S.ui.linkMode = false; S.ui.acctTab = null; S.ui.prefillEmail = null; }
     if ((u ? u.uid : '') !== was && S.league) { S.leagueOpenCode = S.league.code; leagueUnwatch(); S.league = null; }
     if (!u) {
       S.account.profile = null; S.account.games = []; S.myLeagues = {}; S.account.loaded = true;
@@ -4138,7 +4143,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     /* An anonymous marker (just the date) so the organizer can count accounts. No name or email. */
     if (prof) { var mk = FB.db.collection('accountMarkers').doc(u.uid); mk.get().then(function (x) { if (!x.exists) return mk.set({ at: Number(prof.createdAt) || now() }); }).catch(function () {}); }
     S.account.profile = prof ? { username: clean(prof.name, 20) || 'Player', uid: u.uid, email: u.email || '', createdAt: Number(prof.createdAt) || now() } : null;
-    if (S.account.profile) store('roster.acctName', S.account.profile.username);
+    if (S.account.profile) { store('roster.acctName', S.account.profile.username); store('roster.hadAccount', '1'); }
     if (S.account.profile && !myName()) { $('player-name').value = S.account.profile.username; store('roster.name', S.account.profile.username); }
     try {
       var gs = await ref.collection('games').orderBy('at', 'desc').limit(50).get();
@@ -4168,16 +4173,31 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       return;
     }
     if (!u) {
-      $('acct-title').textContent = 'Sign in / Join';
-      body.innerHTML = lead + '<p>Sign in to save your results on every device and to create or join leagues. You can always play without an account.</p>' +
-        '<button class="btn block google-btn" type="button" data-act="google-signin">' + GOOGLE_G + 'Continue with Google</button>' +
-        '<div class="or-line mono">or use your email</div>' +
-        (S.ui.linkSent
-          ? '<p><strong>Check your email.</strong> We sent a sign-in link to <strong>' + esc(S.ui.linkSent) + '</strong>. Open it on this device to finish. It can take a minute, so check your spam folder too.</p><button class="btn small ghost" type="button" data-act="email-again">Use a different email</button>'
-          : '<form id="email-form" style="display:grid;gap:10px"><label class="mono label" for="acct-fname">Your name</label><input class="field" id="acct-fname" type="text" maxlength="20" autocomplete="name" value="' + esc(myName()) + '">' +
-            '<label class="mono label" for="acct-email">Email</label><input class="field" id="acct-email" type="email" autocomplete="email" placeholder="you@example.com">' +
-            '<button class="btn primary" type="submit">Email me a sign-in link</button></form>' +
-            '<p class="note">No password: we email you a link and you tap it to sign in. Your email is never shown to other players.</p>');
+      var tab = S.ui.acctTab || (store('roster.hadAccount') ? 'signin' : 'join'), join = tab === 'join', pre = esc(S.ui.prefillEmail || '');
+      $('acct-title').textContent = join ? 'Join The Roster' : 'Sign in';
+      var tabs = '<div class="seg two acct-tabs" role="radiogroup" aria-label="Sign in or join"><button type="button" class="seg-btn" role="radio" aria-checked="' + !join + '" data-act="acct-tab" data-tab="signin">Sign in</button><button type="button" class="seg-btn" role="radio" aria-checked="' + join + '" data-act="acct-tab" data-tab="join">Join</button></div>';
+      var intro = join ? '<p>Create a free account to save your results on every device and to create or join leagues. You can always play without one.</p>'
+        : '<p>Welcome back. Sign in to see your stats and leagues on any device.</p>';
+      var google = '<button class="btn block google-btn" type="button" data-act="google-signin">' + GOOGLE_G + (join ? 'Join with Google' : 'Sign in with Google') + '</button>';
+      var form;
+      if (S.ui.linkSent) form = '<p><strong>Check your email.</strong> We sent a sign-in link to <strong>' + esc(S.ui.linkSent) + '</strong>. Open it on this device to finish. It can take a minute, so check your spam folder too.</p><button class="btn small ghost" type="button" data-act="email-again">Use a different email</button>';
+      else if (S.ui.linkMode) form = '<form id="email-form" class="acct-form">' +
+          (join ? '<label class="mono label" for="acct-fname">Your name</label><input class="field" id="acct-fname" type="text" maxlength="20" autocomplete="name" value="' + esc(myName()) + '">' : '') +
+          '<label class="mono label" for="acct-email">Email</label><input class="field" id="acct-email" type="email" autocomplete="email" placeholder="you@example.com" value="' + pre + '">' +
+          '<button class="btn primary" type="submit">Email me a sign-in link</button></form>' +
+          '<p class="note">No password: we email you a link and you tap it to sign in. <button class="linkish" type="button" data-act="link-mode" data-on="0">Use a password instead</button></p>';
+      else if (join) form = '<form id="join-form" class="acct-form"><label class="mono label" for="acct-fname">Your name</label><input class="field" id="acct-fname" type="text" maxlength="20" autocomplete="name" value="' + esc(myName()) + '">' +
+          '<label class="mono label" for="acct-email">Email</label><input class="field" id="acct-email" type="email" autocomplete="email" placeholder="you@example.com" value="' + pre + '">' +
+          '<label class="mono label" for="acct-pw">Password</label><input class="field" id="acct-pw" type="password" autocomplete="new-password" placeholder="At least 6 characters">' +
+          '<button class="btn primary" type="submit">Create account</button></form>' +
+          '<p class="note">Your name is what other players see. Your email is never shown to anyone. Rather not use a password? <button class="linkish" type="button" data-act="link-mode" data-on="1">Email me a link instead</button></p>' +
+          '<p class="note">Already have an account? <button class="linkish" type="button" data-act="acct-tab" data-tab="signin">Sign in</button></p>';
+      else form = '<form id="pw-signin-form" class="acct-form"><label class="mono label" for="acct-email">Email</label><input class="field" id="acct-email" type="email" autocomplete="username" placeholder="you@example.com" value="' + pre + '">' +
+          '<label class="mono label" for="acct-pw">Password</label><input class="field" id="acct-pw" type="password" autocomplete="current-password">' +
+          '<button class="btn primary" type="submit">Sign in</button></form>' +
+          '<div class="acct-links"><button class="linkish" type="button" data-act="pw-reset">Forgot password?</button><button class="linkish" type="button" data-act="link-mode" data-on="1">Email me a sign-in link instead</button></div>' +
+          '<p class="note">New here? <button class="linkish" type="button" data-act="acct-tab" data-tab="join">Join</button> to create an account.</p>';
+      body.innerHTML = lead + tabs + intro + google + '<div class="or-line mono">or use your email</div>' + form;
       return;
     }
     if (!p) {
@@ -4218,14 +4238,14 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     }
   }
   async function fbSendLink(name, email) {
-    name = clean(name, 20); email = String(email || '').trim();
-    if (name.length < 2) { acctMsg('Enter your name (at least 2 characters).', true); return; }
+    var asking = name != null; name = clean(name || '', 20); email = String(email || '').trim();
+    if (asking && name.length < 2) { acctMsg('Enter your name (at least 2 characters).', true); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { acctMsg('Enter a valid email address.', true); return; }
     acctMsg('Sending…');
     try {
       await fbLoad();
       await FB.auth.sendSignInLinkToEmail(email, { url: location.origin + location.pathname + '?signin=1', handleCodeInApp: true });
-      store('roster.emailForSignIn', email); store('roster.nameForSignIn', name); store('roster.name', name); $('player-name').value = name;
+      store('roster.emailForSignIn', email); if (name) { store('roster.nameForSignIn', name); store('roster.name', name); $('player-name').value = name; }
       S.ui.linkSent = email; acctMsg(''); renderAccount();
     } catch (e) {
       var c = (e && e.code) || '';
@@ -4237,6 +4257,51 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
         : c === 'auth/network-request-failed' ? 'Couldn’t reach the sign-in service. Check your internet connection and try again.'
         : 'The sign-in email didn’t send. Try again, or use “Continue with Google”.' + (c ? ' (' + c.replace('auth/', '') + ')' : ''), true);
     }
+  }
+  function pwErr(c, joining) {
+    return c === 'auth/email-already-in-use' ? 'There’s already an account with that email. Sign in instead.'
+      : c === 'auth/weak-password' ? 'Passwords need at least 6 characters.'
+      : c === 'auth/invalid-email' || c === 'auth/missing-email' ? 'That email address doesn’t look right. Check it and try again.'
+      : c === 'auth/invalid-credential' || c === 'auth/invalid-login-credentials' || c === 'auth/wrong-password' || c === 'auth/user-not-found' ? 'That email and password don’t match an account. Check them, or tap “Forgot password?”. (If you used to sign in with an emailed link, “Forgot password?” lets you set a password.)'
+      : c === 'auth/user-disabled' ? 'This account has been switched off.'
+      : c === 'auth/operation-not-allowed' || c === 'auth/admin-restricted-operation' ? 'Passwords aren’t switched on for this website yet. Use Google or an emailed link for now.'
+      : c === 'auth/too-many-requests' ? 'Too many tries in a row. Wait a few minutes, or tap “Forgot password?”.'
+      : c === 'auth/network-request-failed' ? 'Couldn’t reach the sign-in service. Check your internet connection and try again.'
+      : (joining ? 'Couldn’t create the account. Try again.' : 'Couldn’t sign in. Try again.') + (c ? ' (' + c.replace('auth/', '') + ')' : '');
+  }
+  function okEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+  async function fbJoin(name, email, pw) {
+    name = clean(name, 20); email = String(email || '').trim(); pw = String(pw || '');
+    if (name.length < 2) { acctMsg('Enter your name (at least 2 characters).', true); return; }
+    if (!okEmail(email)) { acctMsg('Enter a valid email address.', true); return; }
+    if (pw.length < 6) { acctMsg('Passwords need at least 6 characters.', true); return; }
+    acctMsg('Creating your account…');
+    try {
+      await fbLoad();
+      store('roster.nameForSignIn', name); store('roster.name', name); $('player-name').value = name;
+      await FB.auth.createUserWithEmailAndPassword(email, pw);
+      S.ui.acctTab = null; S.ui.prefillEmail = null;
+    } catch (e) {
+      try { localStorage.removeItem('roster.nameForSignIn'); } catch (x) {}
+      var c = (e && e.code) || '';
+      if (c === 'auth/email-already-in-use') { S.ui.acctTab = 'signin'; S.ui.prefillEmail = email; renderAccount(); }
+      acctMsg(pwErr(c, true), true);
+    }
+  }
+  async function fbPwSignIn(email, pw) {
+    email = String(email || '').trim(); pw = String(pw || '');
+    if (!okEmail(email)) { acctMsg('Enter the email address you joined with.', true); return; }
+    if (!pw) { acctMsg('Enter your password.', true); return; }
+    acctMsg('Signing in…');
+    try { await fbLoad(); await FB.auth.signInWithEmailAndPassword(email, pw); S.ui.acctTab = null; S.ui.prefillEmail = null; }
+    catch (e) { acctMsg(pwErr((e && e.code) || '', false), true); }
+  }
+  async function fbPwReset(email) {
+    email = String(email || '').trim();
+    if (!okEmail(email)) { acctMsg('Type your email above first, then tap “Forgot password?”.', true); return; }
+    acctMsg('Sending…');
+    try { await fbLoad(); await FB.auth.sendPasswordResetEmail(email, { url: location.origin + location.pathname }); acctMsg('If there’s an account for ' + email + ', we sent it a link to set a new password. Check your spam folder too.'); }
+    catch (e) { var c = (e && e.code) || ''; acctMsg(c === 'auth/invalid-email' ? 'That email address doesn’t look right.' : c === 'auth/too-many-requests' ? 'Too many tries in a row. Wait a few minutes.' : 'The email didn’t send. Try again.', true); }
   }
   function cleanSignInUrl() { try { history.replaceState(null, '', location.pathname + (location.hash || '')); } catch (e) {} }
   async function fbFinishEmailLink(typed) {
@@ -5339,6 +5404,9 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     else if (act === 'org-tab') { S.org.tab = t.getAttribute('data-tab'); renderOrganizer(); window.scrollTo(0, 0); }
     else if (act === 'google-signin') fbGoogle();
     else if (act === 'email-again') { S.ui.linkSent = null; renderAccount(); }
+    else if (act === 'acct-tab') { var em = $('acct-email'); if (em && em.value) S.ui.prefillEmail = em.value; S.ui.acctTab = t.getAttribute('data-tab'); S.ui.linkSent = null; acctMsg(''); renderAccount(); var f0 = $('acct-body').querySelector('input'); if (f0) f0.focus(); }
+    else if (act === 'link-mode') { var em2 = $('acct-email'); if (em2 && em2.value) S.ui.prefillEmail = em2.value; S.ui.linkMode = t.getAttribute('data-on') === '1'; acctMsg(''); renderAccount(); }
+    else if (act === 'pw-reset') fbPwReset(($('acct-email') || {}).value);
     else if (act === 'sign-out') fbSignOut();
     else if (act === 'league-signin') { S.pendingLeague = function () { renderLeague(); }; openAccount('Sign in to create or join a league. Your league stats follow your account on any device.'); }
     else if (act === 'league-vis') { S.ui.lgVis = t.getAttribute('data-vis'); renderLeague(); }
@@ -5379,7 +5447,9 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
   document.addEventListener('submit', function (ev) {
     if (ev.target.id === 'acct-form') { ev.preventDefault(); createAccount($('acct-name').value); }
     if (ev.target.id === 'gh-form') { ev.preventDefault(); ghConnect($('gh-token').value); }
-    if (ev.target.id === 'email-form') { ev.preventDefault(); fbSendLink($('acct-fname').value, $('acct-email').value); }
+    if (ev.target.id === 'email-form') { ev.preventDefault(); fbSendLink($('acct-fname') ? $('acct-fname').value : null, $('acct-email').value); }
+    if (ev.target.id === 'join-form') { ev.preventDefault(); fbJoin($('acct-fname').value, $('acct-email').value, $('acct-pw').value); }
+    if (ev.target.id === 'pw-signin-form') { ev.preventDefault(); fbPwSignIn($('acct-email').value, $('acct-pw').value); }
     if (ev.target.id === 'email-confirm-form') { ev.preventDefault(); fbFinishEmailLink($('acct-confirm-email').value); }
     if (ev.target.id === 'name-form') { ev.preventDefault(); fbSaveName($('acct-newname').value); }
     if (ev.target.id === 'league-new-form') { ev.preventDefault(); leagueCreate($('league-new').value); }
@@ -5439,7 +5509,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-19-01';
+  var BUILD_ID = '2026-10-19-03';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
