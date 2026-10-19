@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-19",
- "updatedAt": 1792448772535,
+ "updatedAt": 1792448867203,
  "days": {
   "2026-10-19": {
    "topicId": "cartoon-characters",
@@ -123,6 +123,96 @@
     "Taste",
     "Meltability",
     "Snacking"
+   ]
+  },
+  "2026-10-21": {
+   "topicId": "tailgate",
+   "subs": [
+    "Fun",
+    "Popularity",
+    "Tradition",
+    "Effort-free",
+    "Taste"
+   ]
+  },
+  "2026-10-23": {
+   "topicId": "seafood",
+   "subs": [
+    "Texture",
+    "Versatility",
+    "Healthiness",
+    "Luxury",
+    "Taste"
+   ]
+  },
+  "2026-10-24": {
+   "topicId": "game-franchises",
+   "subs": [
+    "Longevity",
+    "Sales",
+    "Gameplay",
+    "Cultural impact",
+    "Story"
+   ]
+  },
+  "2026-10-25": {
+   "topicId": "excuses",
+   "subs": [
+    "Believability",
+    "Commonness",
+    "Creativity",
+    "Reusability",
+    "Sympathy"
+   ]
+  },
+  "2026-10-26": {
+   "topicId": "got-characters",
+   "subs": [
+    "Fame",
+    "Cunning",
+    "Power",
+    "Honor",
+    "Survival skills"
+   ]
+  },
+  "2026-10-28": {
+   "topicId": "fall-favorites",
+   "subs": [
+    "Coziness",
+    "Affordability",
+    "Fun",
+    "Popularity",
+    "Nostalgia"
+   ]
+  },
+  "2026-10-29": {
+   "topicId": "dorm-essentials",
+   "subs": [
+    "Space-saving",
+    "Comfort",
+    "Affordability",
+    "Popularity",
+    "Usefulness"
+   ]
+  },
+  "2026-10-30": {
+   "topicId": "phobias",
+   "subs": [
+    "Commonness",
+    "Fame",
+    "Intensity",
+    "Relatability",
+    "Weirdness"
+   ]
+  },
+  "2026-11-02": {
+   "topicId": "explorers",
+   "subs": [
+    "Distance traveled",
+    "Discoveries",
+    "Navigation",
+    "Bravery",
+    "Fame"
    ]
   }
  }
