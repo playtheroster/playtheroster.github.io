@@ -43,6 +43,7 @@
 body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 .wrap { width: min(1160px, 100%); margin-inline: auto; padding-inline: 16px; }
 h1, h2, h3, p { margin: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 h1, h2, h3 { text-wrap: balance; }
 button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
@@ -470,6 +471,10 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .intro-in { position: relative; width: 100%; max-width: 900px; display: grid; justify-items: center; gap: clamp(12px, 2.4vh, 22px); text-align: center; }
 .intro .mono { color: var(--hi); letter-spacing: 0.14em; }
 .intro-topic { margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 13vw, 8.5rem); line-height: 0.88; text-transform: uppercase; text-wrap: balance; color: #ffffff; text-shadow: 5px 5px 0 #000000; overflow-wrap: anywhere; }
+.intro-league, .cd-league { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 3px solid #000000; border-radius: 999px; background: #000000; color: #ffb612; font-weight: 800; font-size: clamp(0.95rem, 2.4vw, 1.15rem); box-shadow: 0 4px 0 #ca2430; text-align: center; }
+.cd-league { margin-top: 6px; font-size: 0.95rem; }
+.lobby-league { margin: 0; padding: 10px 14px; border: 2.5px solid #000000; border-radius: 14px; background: #000000; color: #ffffff; font-weight: 600; }
+.lobby-league strong { color: #ffb612; }
 .intro-q { margin: 0; font-size: clamp(1rem, 2.6vw, 1.3rem); font-weight: 600; max-width: 34ch; }
 .intro-subs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; margin: 0; list-style: none; }
 .intro-subs li { display: inline-flex; align-items: baseline; gap: 6px; padding: 8px 14px; border: 3px solid #000000; border-radius: 12px; background: #ffffff; color: #000000; font-weight: 800; font-size: clamp(0.95rem, 2.4vw, 1.15rem); box-shadow: 0 4px 0 #000000; }
@@ -815,7 +820,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
         <span class="mono" id="today-date"></span>
       </div>
       <div class="topic-body">
-        <h1 class="display topic-title" id="today-name">Countries</h1>
+        <h1 class="sr-only">The Roster: the daily draft game. Draft the best roster against friends or AI.</h1>
+        <h2 class="display topic-title" id="today-name">Countries</h2>
         <p class="q" id="today-q"></p>
         <p class="mono subs-label">Today's <span class="subs-count">5</span> subtopics</p>
         <div class="cats" id="today-subs"></div>
@@ -1009,6 +1015,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
             <div style="display:grid;gap:14px">
               <span class="mono" id="lobby-count">Players</span>
               <ul class="players" id="lobby-players"></ul>
+              <p class="lobby-league" id="lobby-league" hidden=""></p>
               <div class="lobby-list">
                 <span class="mono label" id="list-room-label">Show draft options?</span>
                 <div class="seg two" role="radiogroup" aria-labelledby="list-room-label" id="lobby-list-seg">
@@ -1041,6 +1048,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <span class="mono">The draft starts in</span>
               <div class="cd-n" id="cd-n">5</div>
               <span class="cd-first" id="cd-first"></span>
+              <span class="cd-league" id="cd-league" hidden=""></span>
             </div>
             <div class="order" id="order" aria-label="Draft order this round"></div>
             <p class="lastpick" id="lastpick"></p>
@@ -1225,7 +1233,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
           <div class="org-glance-wrap"><table class="org-glance-table stats-table" id="stats-days"></table></div>
           <p class="note" id="stats-sites"></p>
           <label class="stats-me"><input type="checkbox" id="stats-nome"> Don’t count my visits and games from this device</label>
-          <p class="note">How it’s counted: each phone or computer counts as one visitor, so one person on two devices counts twice, and clearing browser data makes a device count as new. Nothing personal is recorded (no names or emails), only anonymous counts. A game counts when the draft starts and again under “Finished” when results appear. An online draft counts as one game no matter how many people are in the room; “Players” is how many different people played that mode, and “Avg. players per game” is how full the rooms were (AI players aren’t counted). Counting started on Oct 16, 2026, and only covers the two websites, not the Claude version.</p>
+          <p class="note">How it’s counted: each phone or computer counts as one visitor, so one person on two devices counts twice, and clearing browser data makes a device count as new. Nothing personal is recorded (no names or emails), only anonymous counts. A game counts when the draft starts and again under “Finished” when results appear. An online draft counts as one game no matter how many people are in the room; “Players” is how many different people played that mode, and “Avg. players per game” is how full the rooms were (AI players aren’t counted). Counting started on Oct 16, 2026, and only covers the website, not the Claude version.</p>
         </div>
         <ol class="org-list" id="org-list"></ol>
         <div><button class="btn small" type="button" id="org-more" data-act="org-more">Show 30 more days</button></div>
@@ -1299,6 +1307,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   <button type="button" class="intro-x" data-act="intro-close">Close</button>
   <div class="intro-in">
     <span class="mono" id="intro-kicker">The draft is on</span>
+    <span class="intro-league" id="intro-league" hidden=""></span>
     <h2 class="intro-topic" id="intro-topic"></h2>
     <p class="intro-q" id="intro-q"></p>
     <ul class="intro-subs" id="intro-subs" aria-label="Subtopics, one per round"></ul>
@@ -3124,7 +3133,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     ['room', 'offline', 'practice', 'fast', 'league', 'me'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
     $('league-btn').hidden = !fbOn(); $('me-btn').hidden = !fbOn();
     var rln = $('room-league-note');
-    if (rln) { rln.hidden = !fbOn(); rln.innerHTML = lgSignedIn() ? 'Playing with your league? Your games together count toward its leaderboard automatically. <a href="#" data-act="goto-mode" data-mode="league">See your leagues</a>' : 'Playing with your league? <a href="#" data-act="account">Sign in</a> and your games together count toward its leaderboard automatically.'; }
+    if (rln) { rln.hidden = !fbOn(); rln.innerHTML = (lgSignedIn() ? 'Playing with your league? ' : 'Playing with your league? <a href="#" data-act="account">Sign in</a>. ') + 'A game counts on its leaderboard when everyone in the room is in the league (2 or more players) and nobody has played today’s topic yet, online or against AI.' + (lgSignedIn() ? ' <a href="#" data-act="goto-mode" data-mode="league">See your leagues</a>' : ''); }
     document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league' || S.mode === 'me';
     document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league' || S.mode === 'me');
     if (!S.game && inPlay && S.mode === 'me') renderMe();
@@ -3136,7 +3145,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     renderBanner();
     var fastOn = !!S.fast && !S.game;
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
-    if (S.game && !fastOn && (scr === 'draft' || scr === 'results')) { statGame(S.game, 'start'); if (scr === 'results') statGame(S.game, 'done'); }
+    if (S.game && !fastOn && (scr === 'draft' || scr === 'results')) { markPlayed(S.game); statGame(S.game, 'start'); if (scr === 'results') statGame(S.game, 'done'); }
     if (fastOn || scr !== 'draft') hideIntro();
     $('scr-fast').hidden = !fastOn;
     if (fastOn) { $('back-btn').hidden = !S.fast.done; $('back-btn').innerHTML = '&larr; Homepage'; }
@@ -3214,6 +3223,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
   }
   function renderLobby() {
     var g = S.game, ps = sortedPlayers(g), t = TOPICS[g.topicId];
+    lgCheckRoom(g); renderLeagueBadge();
     $('lobby-kind').textContent = g.isPublic ? 'Public room · anyone can join' : 'Private room · code only';
     $('lobby-code').textContent = g.code;
     $('lobby-hint').textContent = (g.isPublic ? 'Players who tap “Join a random room” can be matched here. You can also share the code or the link.' : 'Only people with the code or the link can join. Share it with your friends.') + '';
@@ -3256,7 +3266,9 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     var g = S.game, d = derive(g, now()), t = TOPICS[g.topicId];
     var mine = d.current === S.me;
     var cd = d.countdownMs > 0;
+    lgCheckRoom(g);
     renderIntro(g, d, t, cd);
+    renderLeagueBadge();
     $('countdown').hidden = !cd;
     $('clock').hidden = cd; $('bar').hidden = cd;
     if (cd) {
@@ -3808,7 +3820,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       for (var i = 0; i < 6 && !code; i++) { var c = newCode(); var ex = await db.doc('rooms/' + c).get(); if (!ex.exists) code = c; }
       if (!code) throw new Error('no code');
       await db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' });
-      await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name));
+      await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name, code, spec.topicId));
       enterRoom(code);
       if (!fixedCode) statBump(function (r) { r.rooms = (r.rooms || 0) + 1; });
       return code;
@@ -3829,7 +3841,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       if (!mine.exists) {
         var ps = await db.collection('rooms/' + code + '/players').get();
         if (ps.size >= MAX_PLAYERS) { setMsg('That room is full (8 players).', true); return; }
-        await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name));
+        await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name, code, room.topicId));
         statBump(function (r) { r.joins = (r.joins || 0) + 1; });
       }
       setMsg('');
@@ -3880,7 +3892,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     S.unsub.push(db.collection('rooms/' + code + '/players').onSnapshot(function (s) {
       if (S.game !== g) return;
       var ps = {};
-      s.docs.forEach(function (d) { if ((g.kicked || []).indexOf(d.id) >= 0) return; var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; if (typeof v.acct === 'string' && /^[A-Za-z0-9_-]{6,128}$/.test(v.acct)) ps[d.id].acct = v.acct; });
+      s.docs.forEach(function (d) { if ((g.kicked || []).indexOf(d.id) >= 0) return; var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; if (typeof v.acct === 'string' && /^[A-Za-z0-9_-]{6,128}$/.test(v.acct)) { ps[d.id].acct = v.acct; if (v.fresh === true) ps[d.id].fresh = true; } });
       g.players = ps;
       afterChange();
     }, onErr));
@@ -4261,10 +4273,72 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     acctMsg('Signed out.'); renderAccount();
   }
   /* The room player record carries the account, so league games know who played. */
-  function playerDoc(name) {
+  function playerDoc(name, code, topicId) {
     var d = { name: name, joinedAt: now() };
-    if (fbOn() && FB.user && S.account.profile) d.acct = FB.user.uid;
+    if (fbOn() && FB.user && S.account.profile) { d.acct = FB.user.uid; d.fresh = !playedTopicExcept(code, topicId); }
     return d;
+  }
+  /* ---------- league games ----------
+     An online room counts as a league game when 2 or more people play, everyone in the room is a member of that
+     league, and nobody has played that topic yet (not online, not Offline vs AI). Each player's page works out
+     "haven't played this topic" when they join and puts it on their player entry. */
+  function playedKey() { return 'roster.played' + (TEST.uid ? '.' + TEST.uid : ''); }
+  function playedLog() { try { var o = JSON.parse(store(playedKey()) || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } }
+  function markPlayed(g) {
+    if (!g || !g.players || !g.players[S.me] || g.practice || (g.mode !== 'local' && g.mode !== 'shared')) return;
+    var d = dateKey(new Date()), list = playedLog()[d] || [], id = (g.mode === 'shared' ? 'r:' + g.code : 'l:' + g.startedAt) + '|' + g.topicId;
+    if (list.indexOf(id) >= 0) return;
+    list.push(id); var out = {}; out[d] = list.slice(-60); store(playedKey(), JSON.stringify(out));
+  }
+  function playedTopicExcept(code, topicId) {
+    var d = dateKey(new Date()), tname = TOPICS[topicId] ? TOPICS[topicId].name : '';
+    if ((playedLog()[d] || []).some(function (id) { var p = id.split('|'); return p[0] !== 'r:' + code && (!p[1] || !topicId || p[1] === topicId); })) return true;
+    if ((S.account.games || []).some(function (x) { return x && x.dateKey === d && x.mode !== 'practice' && x.mode !== 'fast' && (!tname || !x.topic || x.topic === tname) && String(x.id || '').indexOf('-' + code + '-') < 0; })) return true;
+    var st = statsLoadLocal()[d];
+    if (st && ((st.start && st.start.offline) || (st.g || []).some(function (x) { var m = /^start:([A-Z]{5}):/.exec(x); return m && m[1] !== code; }))) return true;
+    return false;
+  }
+  var LG_MEMBERS = {};
+  function lgMembers(code) {
+    var c = LG_MEMBERS[code];
+    if (c && now() - c.at < 60000) return c.p;
+    var p = lgRef(code).collection('members').get().then(function (ms) { var m = {}; ms.docs.forEach(function (d) { m[d.id] = clean((d.data() || {}).name, 20) || 'Player'; }); return m; });
+    LG_MEMBERS[code] = { at: now(), p: p };
+    p.catch(function () { if (LG_MEMBERS[code] && LG_MEMBERS[code].p === p) delete LG_MEMBERS[code]; });
+    return p;
+  }
+  function roomHumans(g) { return Object.keys(g.players || {}).map(function (id) { return g.players[id]; }).filter(function (q) { return q && !q.bot; }); }
+  /* The leagues (of mine) this room counts for, if any. */
+  async function leagueGameLeagues(g) {
+    if (!g || g.mode !== 'shared' || !lgSignedIn()) return [];
+    var hs = roomHumans(g), accts = {};
+    if (hs.length < 2 || hs.some(function (q) { return !q.acct || q.fresh !== true; })) return [];
+    hs.forEach(function (q) { accts[q.acct] = 1; });
+    if (Object.keys(accts).length !== hs.length) return [];
+    var codes = Object.keys(S.myLeagues || {}).filter(function (c) { return S.myLeagues[c].status === 'member'; }), out = [];
+    for (var i = 0; i < codes.length; i++) {
+      try {
+        var m = await lgMembers(codes[i]);
+        if (Object.keys(accts).every(function (a) { return m[a]; })) out.push({ code: codes[i], name: S.myLeagues[codes[i]].name, members: m });
+      } catch (e) {}
+    }
+    return out;
+  }
+  function lgRoomKey(g) { return g.code + '|' + roomHumans(g).map(function (q) { return (q.acct || '-') + ':' + (q.fresh === true ? 1 : 0); }).sort().join(','); }
+  function lgCheckRoom(g) {
+    if (!g || g.mode !== 'shared' || !fbOn()) return;
+    var key = lgRoomKey(g);
+    if (S.lgRoom && S.lgRoom.key === key) return;
+    var st = S.lgRoom = { key: key, list: null };
+    leagueGameLeagues(g).then(function (list) { if (S.lgRoom !== st) return; st.list = list; renderLeagueBadge(); });
+  }
+  function renderLeagueBadge() {
+    var g = S.game, list = g && g.mode === 'shared' && S.lgRoom && S.lgRoom.key === lgRoomKey(g) ? S.lgRoom.list : null, on = !!(list && list.length);
+    var names = on ? list.map(function (l) { return l.name; }).join(' and ') : '';
+    var a = $('intro-league'), b = $('cd-league'), c = $('lobby-league');
+    if (c) { c.hidden = !on; if (on) c.innerHTML = '<span aria-hidden="true">🏆</span> This will be a league game for <strong>' + esc(names) + '</strong>.'; }
+    if (a) { a.hidden = !on; if (on) a.innerHTML = '<span aria-hidden="true">🏆</span> League game · counts in ' + esc(names); }
+    if (b) { b.hidden = !on; if (on) b.innerHTML = '<span aria-hidden="true">🏆</span> League game · counts in ' + esc(names); }
   }
 
   /* ---------- leagues ----------
@@ -4475,26 +4549,22 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
      wins; the others find it already there. */
   async function leagueRecord(g) {
     if (!g || g.mode !== 'shared' || !g.results || !lgSignedIn()) return;
-    var codes = Object.keys(S.myLeagues || {}).filter(function (c) { return S.myLeagues[c].status === 'member'; });
-    if (!codes.length) return;
-    var rows = standings(g, g.results.scores), me = lgUid();
-    var id = (g.code + '-' + g.startedAt).replace(/[^A-Za-z0-9-]/g, '').slice(0, 40);
+    var id = (g.code + '-' + g.startedAt).replace(/[^A-Za-z0-9-]/g, '').slice(0, 40), me = lgUid();
     S.leagueDone = S.leagueDone || {};
-    for (var i = 0; i < codes.length; i++) {
-      var code = codes[i], key = code + ':' + id;
-      if (S.leagueDone[key]) continue;
-      S.leagueDone[key] = true;
+    if (S.leagueDone[id]) return;
+    S.leagueDone[id] = true;
+    var list = [];
+    try { list = await leagueGameLeagues(g); } catch (e) { S.leagueDone[id] = false; return; }
+    var rows = standings(g, g.results.scores);
+    for (var i = 0; i < list.length; i++) {
+      var L = list[i];
       try {
-        var ms = await lgRef(code).collection('members').get(), members = {};
-        ms.docs.forEach(function (d) { members[d.id] = clean((d.data() || {}).name, 20) || 'Player'; });
-        if (!members[me]) continue;
-        var seen = {}, ps = [];
-        rows.forEach(function (r) { var a = g.players[r.pid] && g.players[r.pid].acct; if (a && members[a] && !seen[a]) { seen[a] = 1; ps.push({ uid: a, name: members[a], total: r.total }); } });
-        if (ps.length < 2) continue;
-        var ref = lgRef(code).collection('games').doc(id), ex = await ref.get();
+        if (!L.members[me]) continue;
+        var ps = rows.filter(function (r) { return g.players[r.pid] && !g.players[r.pid].bot; }).map(function (r) { var a = g.players[r.pid].acct; return { uid: a, name: L.members[a], total: r.total }; });
+        var ref = lgRef(L.code).collection('games').doc(id), ex = await ref.get();
         if (!ex.exists) await ref.set({ at: now(), dateKey: g.dateKey, topicId: g.topicId, room: g.code, max: g.subs.length * 10, players: ps, by: me });
-        var n = $('league-note'); if (n) { n.textContent = 'This game counts in your league ' + S.myLeagues[code].name + '.'; n.hidden = false; }
-      } catch (e) { if (!((e && e.code) === 'permission-denied')) S.leagueDone[key] = false; }
+        var n = $('league-note'); if (n) { n.textContent = 'This game counts in your league ' + L.name + '.'; n.hidden = false; }
+      } catch (e) { if (!((e && e.code) === 'permission-denied')) S.leagueDone[id] = false; }
     }
   }
   /* Standings. Avg finish is weighted by how many league members played: in each game you score the share of
@@ -4545,10 +4615,10 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
         '<p class="note">' + (S.ui.lgVis === 'public' ? 'Anyone signed in can join right away.' : 'You approve who joins.') + '</p>' +
         '<form id="league-new-form" class="row"><input class="field" id="league-new" type="text" maxlength="30" autocomplete="off" placeholder="League name"><button class="btn primary" type="submit">Create</button></form>' +
         '<p class="note">Names are unique and can’t be changed later.</p></div>' : '';
-    body.innerHTML = '<div class="lg-intro"><p>Play with the same friends a lot? A league keeps a running leaderboard of your online games together.</p>' +
+    body.innerHTML = '<div class="lg-intro"><p>Play with the same friends a lot? A league keeps a running leaderboard of your online games together.</p><p class="note">A game counts when everyone in an online room is in the league (2 or more players) and nobody has played that day’s topic yet, online or against AI. The lobby and the countdown tell you when it’s a league game. You can be in as many leagues as you like: a game counts in every league that everyone in the room belongs to.</p>' +
       (signed ? '<p class="note">Signed in as <strong>' + esc(S.account.profile.username) + '</strong></p>' : '') + '</div>' +
       (!signed ? '<div class="lg-block"><p>You need an account to create or join a league, so your stats follow you on any device.</p><button class="btn primary block" type="button" data-act="league-signin">Sign in or create an account</button></div>' : '') +
-      (signed && codes.length ? '<div class="lg-block"><span class="mono">Your leagues</span><ul class="lg-list">' + codes.map(function (c) {
+      (signed && codes.length ? '<div class="lg-block"><span class="mono">Your leagues (' + codes.length + ')</span><ul class="lg-list">' + codes.map(function (c) {
         var m = mine[c], tag = m.status === 'pending' ? 'Waiting for approval' : m.status === 'denied' ? 'Declined' : (m.role === 'owner' ? 'Creator' : 'Member');
         return '<li><button class="btn" type="button" data-act="league-open" data-code="' + c + '"><span>' + esc(m.name) + '</span><span class="mono">' + tag + '</span></button>' +
           (m.status === 'denied' ? '<button class="btn small ghost" type="button" data-act="league-dismiss" data-code="' + c + '">Remove from my list</button>' : '') + '</li>';
@@ -4652,7 +4722,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     var I = L.info, owner = me && I.ownerUid === me, member = !!(me && L.members[me]), n = Object.keys(L.members).length;
     var readable = L.canRead && ((I.visibility === 'public' && lgSignedIn()) || member);
     var arm = function (k) { return S.ui.lgArm === k && now() - S.ui.lgArmAt < 5000; };
-    var html = '<div class="lg-head"><div><div class="lg-name">' + esc(I.name) + '</div><span class="mono">' + lgBadge(I.visibility) + ' · created by ' + esc(I.ownerName) + (readable ? ' · ' + n + ' member' + (n === 1 ? '' : 's') : '') + '</span></div>' +
+    var html = '<div><button class="btn small ghost" type="button" data-act="league-back">← All leagues</button></div><div class="lg-head"><div><div class="lg-name">' + esc(I.name) + '</div><span class="mono">' + lgBadge(I.visibility) + ' · created by ' + esc(I.ownerName) + (readable ? ' · ' + n + ' member' + (n === 1 ? '' : 's') : '') + '</span></div>' +
       '<div><span class="mono">League code</span><div class="lg-code">' + L.code + '</div></div></div>';
     if (member || owner) html += '<div class="copybox"><input class="field" id="league-link" readonly value="' + esc(leagueLink(L.code)) + '" aria-label="Invite link"><button class="btn small" type="button" data-act="league-copy">Copy invite link</button></div>';
     if (owner) {
@@ -4976,13 +5046,13 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     box.hidden = false;
     if (ghToken()) {
       box.className = 'org-connect on';
-      box.innerHTML = '<span><strong>Connected.</strong> Save publishes the schedule to both websites. They update within about a minute.</span>' +
+      box.innerHTML = '<span><strong>Connected.</strong> Save publishes the schedule to playtheroster.com. It updates within about a minute.</span>' +
         '<button type="button" class="btn small ghost" data-act="gh-disconnect">Disconnect this device</button>';
       return;
     }
     box.className = 'org-connect off';
     box.innerHTML = '<h3>Connect the organizer to your website</h3>' +
-      '<p>Do this once on each device you organize from. After that, Save updates both websites for everyone.</p>' +
+      '<p>Do this once on each device you organize from. After that, Save updates playtheroster.com for everyone.</p>' +
       '<ol>' +
       '<li>On GitHub, open <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong> and tap <strong>Generate new token</strong>.</li>' +
       '<li>Name it “Roster organizer”. Set <strong>Resource owner</strong> to <code>playtheroster</code> and pick an expiration (1 year is fine).</li>' +
@@ -5003,7 +5073,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       if (r.status === 401) throw new Error('That key didn’t work. Copy it again from GitHub and paste the whole thing.');
       if (r.status === 404 || r.status === 403) throw new Error('That key can’t see the website repository. Make sure Resource owner is playtheroster and the repository playtheroster.github.io is selected.');
       if (!r.ok) throw new Error('GitHub didn’t answer (' + r.status + '). Try again in a minute.');
-      orgMsg('Connected. Save now publishes to both websites.');
+      orgMsg('Connected. Save now publishes to playtheroster.com.');
     } catch (e) {
       try { localStorage.removeItem('roster.ghToken'); } catch (x) {}
       orgMsg(e && e.message && !/fetch|network/i.test(e.message) ? e.message : 'Couldn’t reach GitHub. Check your connection and try again.', true);
@@ -5201,7 +5271,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     if (!t) { if (S.ui.open && !(ev.target.closest && ev.target.closest('#combo'))) closeList(); return; }
     var act = t.getAttribute('data-act');
     if (act === 'goto-mode' && t.getAttribute('data-mode') === 'fast' && !S.game) openFast();
-    else if (act === 'goto-mode') gotoMode(t.getAttribute('data-mode'));
+    else if (act === 'goto-mode') { if (t.id === 'league-btn' && S.league && !S.game) { leagueUnwatch(); S.league = null; try { if (/^#league-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } gotoMode(t.getAttribute('data-mode')); }
     else if (act === 'home') { ev.preventDefault(); if (S.fast) { if (S.fast.done) leaveGame(false); else window.scrollTo(0, 0); } else if (!S.game) showView('home'); else if (screenFor() === 'results') leaveGame(false); else window.scrollTo(0, 0); }
     else if (act === 'share') { ev.preventDefault(); shareScore(); }
     else if (act === 'fast-start') startFast();
@@ -5369,7 +5439,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-17-19';
+  var BUILD_ID = '2026-10-19-01';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -5784,7 +5854,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     if (intro) intro.textContent = 'Every pick is scored from 1.0 to 10.0 based on where it ranks on that subtopic’s list. The better the answer, the higher the score.';
     if (qn) qn.textContent = 'The exact math: #1 on a subtopic’s list scores 10.0, sliding down to 7.0 at the bottom of the list. An answer ranked only under a different subtopic scores 4.5–6.5, and an answer on no list scores 4.0. (On topics where every answer is ranked, scores slide from 10.0 for #1 down to 2.5 for the last.)';
     var on = document.querySelector('.org-save .note');
-    if (on) on.textContent = 'Save publishes the schedule to both websites. They update within about a minute.';
+    if (on) on.textContent = 'Save publishes the schedule to playtheroster.com. It updates within about a minute.';
   }
   /* ---------- Fast Money: 60 seconds, five subtopics in a row, beat the target ---------- */
   var FAST_SECONDS = TEST.fastSeconds || 60, FAST_TARGET = 40;
