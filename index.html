@@ -768,6 +768,34 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .me-levels span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
 .me-recent li span { min-width: 0; }
 .me-recent li strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
+#mode-past { gap: 16px; }
+#mode-past > *, #past-body > * { min-width: 0; }
+#past-body { display: grid; gap: 18px; min-width: 0; }
+.cal { display: grid; gap: 8px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cal-head strong { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; text-transform: uppercase; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.cal-dow { text-align: center; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.cal-day { position: relative; display: grid; align-content: start; gap: 2px; min-height: 64px; padding: 6px 7px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; text-align: left; cursor: pointer; min-width: 0; }
+.cal-day .n { font-weight: 800; font-variant-numeric: tabular-nums; }
+.cal-day .t { font-size: 0.72rem; line-height: 1.15; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.cal-day .ok { position: absolute; top: 5px; right: 6px; font-size: 0.75rem; font-weight: 800; color: var(--pop); }
+.cal-day.today { border-color: var(--edge); }
+.cal-day.today .t { color: var(--ink); font-weight: 700; }
+.cal-day[aria-pressed="true"] { background: #000000; border-color: #000000; color: #ffffff; }
+.cal-day[aria-pressed="true"] .t { color: #ffb612; }
+.cal-day[aria-pressed="true"] .ok { color: #ffb612; }
+.cal-day:disabled { cursor: default; opacity: 0.45; background: transparent; }
+.cal-blank { min-height: 64px; }
+@media (max-width: 560px) { .cal-head strong { font-size: 1.25rem; white-space: nowrap; } .cal-day { min-height: 44px; padding: 5px; text-align: center; justify-items: center; } .cal-day .t { display: none; } .cal-blank { min-height: 44px; } .cal-grid { gap: 4px; } }
+.past-day { display: grid; gap: 12px; padding: 16px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); }
+.past-topic { font-family: var(--font-display); font-weight: 400; font-size: clamp(2rem, 7vw, 3rem); line-height: 0.95; text-transform: uppercase; overflow-wrap: anywhere; }
+.past-subs { display: flex; flex-wrap: wrap; gap: 6px; }
+.past-subs span { padding: 5px 10px; border: 2px solid var(--edge); border-radius: 10px; font-weight: 700; font-size: 0.9rem; }
+.past-mine { margin: 0; font-weight: 700; }
+.past-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.past-act { display: grid; gap: 8px; align-content: start; padding: 12px; border-radius: 14px; background: var(--tint); }
+.past-act p { margin: 0; }
 .lg-owner { display: grid; gap: 10px; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; }
 /* ---------- Hover colors: every clickable thing turns black under a mouse (not on touch screens, so taps don't stick).
    White things go black with gold text; things that are already black stay black and their text turns white. ---------- */
@@ -842,6 +870,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
         <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="practice">Practice Mode</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
+        <button class="btn" type="button" data-act="goto-mode" data-mode="past">Past Days 📅</button>
       </div>
     </div>
   </section>
@@ -988,6 +1017,12 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <div class="mode" id="mode-me" hidden="">
                 <h3 id="me-heading">My Stats</h3>
                 <div id="me-body"></div>
+              </div>
+
+              <div class="mode" id="mode-past" hidden="">
+                <h3>Past Days 📅</h3>
+                <p>Missed a day? Pick a day on the calendar to see its topic, then play it against AI, with friends online, or try that day’s Fast Money.</p>
+                <div id="past-body"></div>
               </div>
 
               <div class="mode" id="mode-fast">
@@ -2704,6 +2739,11 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     var seen = {};
     return o.subs.every(function (s) { if (seen[s] || t.subs.indexOf(s) < 0) return false; seen[s] = 1; return true; });
   }
+  /* ---------- Past Days ---------- */
+  var ARCHIVE_START = '2026-10-12';
+  function keyAdd(key, n) { var p = key.split('-').map(Number); return dateKey(new Date(p[0], p[1] - 1, p[2] + n)); }
+  function keyDate(key) { var p = key.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function fmtDay(key, long) { return keyDate(key).toLocaleDateString('en-US', long ? { weekday: 'long', month: 'long', day: 'numeric' } : { month: 'short', day: 'numeric' }); }
   function dailySpec(key) {
     var o = !TEST.topic && SCHEDULE.days ? SCHEDULE.days[key] : null;
     if (validOverride(o)) return { dateKey: key, topicId: o.topicId, subs: o.subs.slice(), auto: false };
@@ -3134,13 +3174,15 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     $('hero').hidden = inPlay || inOrg; $('band-hero').hidden = inPlay || inOrg; $('how').hidden = inPlay || inOrg; $('play').hidden = !inPlay; $('organizer').hidden = !inOrg;
     $('org-btn').hidden = !orgAllowed() || inOrg;
     persistSession();
-    ['room', 'offline', 'practice', 'fast', 'league', 'me'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    if ($('fast-start-btn')) $('fast-start-btn').textContent = S.fastDay ? 'Start the Fast Money from ' + fmtDay(S.fastDay) : 'Start today’s Fast Money';
+    ['room', 'offline', 'practice', 'fast', 'league', 'me', 'past'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
     $('league-btn').hidden = !fbOn(); $('me-btn').hidden = !fbOn();
     var rln = $('room-league-note');
     if (rln) { rln.hidden = !fbOn(); rln.innerHTML = (lgSignedIn() ? 'Playing with your league? ' : 'Playing with your league? <a href="#" data-act="account">Sign in</a>. ') + 'A game counts on its leaderboard when everyone in the room is in the league (2 or more players) and nobody has played today’s topic yet, online or against AI.' + (lgSignedIn() ? ' <a href="#" data-act="goto-mode" data-mode="league">See your leagues</a>' : ''); }
     document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league' || S.mode === 'me';
-    document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league' || S.mode === 'me');
+    document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league' || S.mode === 'me' || S.mode === 'past');
     if (!S.game && inPlay && S.mode === 'me') renderMe();
+    if (!S.game && inPlay && S.mode === 'past') renderPast();
     if (!S.game && !S.fast && inPlay && S.mode === 'league') renderLeague(); else leagueUnwatch();
     if (scr !== 'results' && $('league-note')) $('league-note').hidden = true;
     var atResults = !!S.game && scr === 'results';
@@ -3182,7 +3224,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     var g = S.game, topicId = g ? g.topicId : TODAY.topicId, subs = g ? g.subs : TODAY.subs, t = TOPICS[topicId];
     var mineOn = g && g.players[S.me] && g.status === 'drafting';
     $('tb-name').textContent = t.name;
-    var tbl = document.querySelector('#topic-banner .banner-main .mono'); if (tbl) tbl.textContent = g && g.practice ? 'Practice topic' : 'Topic';
+    var tbl = document.querySelector('#topic-banner .banner-main .mono'); if (tbl) tbl.textContent = g && g.practice ? 'Practice topic' : g && g.past ? 'Topic from ' + fmtDay(g.dateKey) : 'Topic';
     if (!g && S.fast) {
       var ft = TOPICS[S.fast.topicId];
       $('tb-name').textContent = ft.name; $('tb-q').textContent = ft.q;
@@ -3230,7 +3272,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     lgCheckRoom(g); renderLeagueBadge();
     $('lobby-kind').textContent = g.isPublic ? 'Public room · anyone can join' : 'Private room · code only';
     $('lobby-code').textContent = g.code;
-    $('lobby-hint').textContent = (g.isPublic ? 'Players who tap “Join a random room” can be matched here. You can also share the code or the link.' : 'Only people with the code or the link can join. Share it with your friends.') + '';
+    $('lobby-hint').textContent = (g.past ? 'This room plays the topic from ' + fmtDay(g.dateKey, true) + ' (a past day, just for fun: it doesn’t count toward stats or leagues). ' : '') + (g.isPublic ? 'Players who tap “Join a random room” can be matched here. You can also share the code or the link.' : 'Only people with the code or the link can join. Share it with your friends.') + '';
     $('share-link').value = (S.env.web ? location.origin + location.pathname : ARTIFACT_URL) + '#r-' + g.code;
     $('lobby-count').textContent = 'Players · ' + ps.length + ' of ' + MAX_PLAYERS;
     var canKick = g.mode === 'shared' && g.hostId === S.me && g.status === 'lobby';
@@ -3415,13 +3457,14 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     renderTop10(g);
     var inGame = !!g.players[S.me];
     var saved = S.saved[gameId(g)];
-    $('save-btn').hidden = !inGame;
+    $('save-btn').hidden = !inGame || !!g.past;
     $('save-btn').disabled = !res || saved;
     $('save-btn').textContent = saved ? (fbOn() ? 'Saved to your stats' : 'Saved to your account') : 'Save my result';
     if (res && inGame && !saved) autoSaveResult(g);
+    if (res && inGame) recordDay(g);
     $('share-btn').hidden = !(res && inGame);
     if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; }
-    $('save-note').textContent = (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (fbOn() ? 'Sign in to save this result to your stats.' : S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
+    $('save-note').textContent = g.past ? (res ? 'Past days don’t count toward your stats or leagues.' : '') : (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (fbOn() ? 'Sign in to save this result to your stats.' : S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
     var againTxt = g.practice ? 'New random topic' : g.mode === 'local' ? 'Play again' : 'New game';
     document.querySelectorAll('#scr-results [data-act="again"]').forEach(function (b) { b.textContent = againTxt; });
   }
@@ -3582,7 +3625,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     if (!me) return '';
     var t = TOPICS[g.topicId], max = g.subs.length * 10;
     var dateTxt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    var lines = ['The Roster · ' + t.name + ' · ' + (g.practice ? 'Practice' : dateTxt)];
+    var lines = ['The Roster · ' + t.name + ' · ' + (g.practice ? 'Practice' : g.past ? fmtDay(g.dateKey) + ' (past day)' : dateTxt)];
     if (g.mode === 'local') {
       lines.push(medal(me.rank) + ' ' + ordinal(me.rank) + ' place out of ' + rows.length + ' · vs ' + (LEVEL_NAMES[g.botLevel] || 'Medium') + ' AI');
       lines.push('Score: ' + fmt1(me.total) + '/' + max);
@@ -3597,7 +3640,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       var top = p && (t.ranks[sub] || [])[0] === p.key;
       lines.push((sc ? TIER_SQUARES[tier(sc.score)] : '⬜') + ' ' + sub + ' ' + (sc ? fmt1(sc.score) : '–') + (top ? ' ⭐' : ''));
     });
-    lines.push(g.practice ? 'Can you beat it? ' + SHARE_URL : 'Play today’s topic: ' + SHARE_URL);
+    lines.push(g.practice || g.past ? 'Can you beat it? ' + SHARE_URL : 'Play today’s topic: ' + SHARE_URL);
     return lines.join('\n');
   }
   async function shareScore() {
@@ -3766,21 +3809,22 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     S.lastPracticeTopic = id;
     return { dateKey: dateKey(new Date()), topicId: id, subs: shuffled(TOPICS[id].subs, Math.random).slice(0, SUBS_PER_DAY) };
   }
-  function playOffline(count, practice) {
-    var name = myName() || 'You';
+  function playOffline(count, practice, day) {
+    var name = myName() || 'You', today = dateKey(new Date());
     count = Math.max(1, Math.min(7, count || 3));
+    if (practice || !day || day >= today) day = null;
     leaveGame(true);
-    var spec = practice ? practiceSpec() : dailySpec(dateKey(new Date()));
+    var spec = practice ? practiceSpec() : dailySpec(day || today);
     var players = { you: { name: name, joinedAt: 0 } };
     var bots = shuffled(BOT_NAMES, Math.random).slice(0, count);
     bots.forEach(function (b, i) { players['bot' + i] = { name: b + ' (AI)', bot: true, joinedAt: i + 1 }; });
     var t0 = now() + COUNTDOWN_MS;
     var level = currentLevel();
-    S.game = { mode: 'local', practice: !!practice, botLevel: level, showList: currentListPref() === 'show', code: 'LOCAL', isPublic: false, hostId: 'you', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, status: 'drafting', order: shuffled(Object.keys(players), Math.random), startedAt: t0, players: players, picks: [], results: null };
+    S.game = { mode: 'local', practice: !!practice, past: !!day, botLevel: level, showList: currentListPref() === 'show', code: 'LOCAL', isPublic: false, hostId: 'you', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, status: 'drafting', order: shuffled(Object.keys(players), Math.random), startedAt: t0, players: players, picks: [], results: null };
     S.me = 'you';
     S.autoDone = {}; S.botForN = -1; S.scoreWaitSince = 0; S.waitShown = false;
     S.scoring = { state: 'idle', msg: '', forGame: '' };
-    S.lastSettings = { mode: 'local', count: count, practice: !!practice, level: level };
+    S.lastSettings = { mode: 'local', count: count, practice: !!practice, level: level, day: day };
     setMsg('');
     render();
   }
@@ -3793,15 +3837,15 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     return n;
   }
   function newCode() { var s = ''; for (var i = 0; i < CODE_LEN; i++) s += CODE_CHARS.charAt(Math.floor(Math.random() * CODE_CHARS.length)); return s; }
-  async function createRoom(isPublic, fixedCode) {
+  async function createRoom(isPublic, fixedCode, day) {
     if (S.creating) return null;
     var name = requireName(); if (!name) return null;
     S.creating = true; creatingUi(true);
     if (!fixedCode) setMsg('Creating your room…');
     try {
-      var code = await createRoomOnce(isPublic, fixedCode, name);
+      var code = await createRoomOnce(isPublic, fixedCode, name, day);
       /* One quiet retry for a hiccup, but not when the relay can't be reached at all (that already waited). */
-      if (!code && !fixedCode && S.lastCreateErr && !/no-broker|mqtt-lib/.test(String(S.lastCreateErr.message))) code = await createRoomOnce(isPublic, fixedCode, name);
+      if (!code && !fixedCode && S.lastCreateErr && !/no-broker|mqtt-lib/.test(String(S.lastCreateErr.message))) code = await createRoomOnce(isPublic, fixedCode, name, day);
       if (code) { if (/^Creating your room/.test($('play-msg').textContent)) setMsg(''); return code; }
       if (!fixedCode) setMsg(S.env.web ? 'Couldn’t create a room. Check your internet connection and try again.' : 'Couldn’t create a room. Check that you can edit this page and try again.', true);
       return null;
@@ -3815,15 +3859,16 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       b.setAttribute('aria-busy', on ? 'true' : 'false');
     });
   }
-  async function createRoomOnce(isPublic, fixedCode, name) {
-    var db = S.env.db, spec = dailySpec(dateKey(new Date()));
+  async function createRoomOnce(isPublic, fixedCode, name, day) {
+    var today = dateKey(new Date()); if (!day || day >= today) day = null;
+    var db = S.env.db, spec = dailySpec(day || today);
     S.lastCreateErr = null;
     try {
       var code = null;
       if (fixedCode) code = fixedCode;
       for (var i = 0; i < 6 && !code; i++) { var c = newCode(); var ex = await db.doc('rooms/' + c).get(); if (!ex.exists) code = c; }
       if (!code) throw new Error('no code');
-      await db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' });
+      await db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, past: !!day, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' });
       await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name, code, spec.topicId));
       enterRoom(code);
       if (!fixedCode) statBump(function (r) { r.rooms = (r.rooms || 0) + 1; });
@@ -3886,7 +3931,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       g.isPublic = !!r.isPublic; g.hostId = r.hostId; g.status = r.status || 'lobby';
       if (TOPICS[r.topicId]) g.topicId = r.topicId;
       if (Array.isArray(r.subs) && r.subs.length) g.subs = r.subs.map(String);
-      g.dateKey = r.dateKey; g.order = Array.isArray(r.order) ? r.order.map(String) : []; g.startedAt = Number(r.startedAt) || 0;
+      g.dateKey = r.dateKey; g.past = !!r.past; g.order = Array.isArray(r.order) ? r.order.map(String) : []; g.startedAt = Number(r.startedAt) || 0;
       g.kicked = Array.isArray(r.kicked) ? r.kicked.map(String) : [];
       g.showList = r.showList !== false;
       if (g.kicked.indexOf(S.me) >= 0) { kickedOut(code); return; }
@@ -4034,10 +4079,19 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       renderAccount(); acctMsg('Account created.');
     } catch (e) { acctMsg('Couldn’t create the account. Try again.', true); }
   }
+  function dayLog() { try { var o = JSON.parse(store('roster.days') || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } }
+  function recordDay(g) {
+    if (!g || g.practice || !g.results || !g.dateKey) return;
+    var id = gameId(g); S.dayDone = S.dayDone || {}; if (S.dayDone[id]) return; S.dayDone[id] = 1;
+    var rows = standings(g, g.results.scores), mine = rows.filter(function (r) { return r.pid === S.me; })[0]; if (!mine) return;
+    var all = dayLog(), d = all[g.dateKey] || { best: 0, n: 0 };
+    d.best = Math.max(d.best || 0, Number(mine.total) || 0); d.n = (d.n || 0) + 1; all[g.dateKey] = d;
+    store('roster.days', JSON.stringify(all));
+  }
   /* Signed in on the website: every finished game saves to your stats by itself. */
   var AUTO_SAVE_TRIED = {};
   function autoSaveResult(g) {
-    if (!fbOn() || !FB.user || !S.account.profile || !g || !g.results || !g.players[S.me]) return;
+    if (!fbOn() || !FB.user || !S.account.profile || !g || g.past || !g.results || !g.players[S.me]) return;
     var id = gameId(g); if (S.saved[id] || AUTO_SAVE_TRIED[id]) return;
     AUTO_SAVE_TRIED[id] = 1; setTimeout(function () { if (S.game === g) saveResult(true); }, 0);
   }
@@ -4047,7 +4101,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     if (S.myStats && S.myStats.games && FB.user && S.myStats.uid === FB.user.uid) S.myStats.games = [rec].concat(S.myStats.games.filter(other)).sort(byAt);
   }
   async function saveResult(quiet) {
-    var g = S.game; if (!g || !g.results) return;
+    var g = S.game; if (!g || !g.results || g.past) return;
     if (!S.env.db || !S.env.uid) { openAccount(); return; }
     if (fbOn()) { if (!FB.user || !S.account.profile) { S.pendingSave = true; openAccount('Sign in to save this result to your account.'); return; } }
     else if (!S.account.profile) { S.pendingSave = true; openAccount('Create an account to save this result.'); return; }
@@ -4056,7 +4110,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     if (!mine) return;
     var rec = {
       id: 'g-' + id.replace(/[^A-Za-z0-9]/g, '-'), at: now(), dateKey: g.dateKey, topic: TOPICS[g.topicId].name, mode: g.practice ? 'practice' : g.mode === 'local' ? 'offline' : (g.isPublic ? 'random' : 'room'), level: g.mode === 'local' ? (g.botLevel || 'medium') : undefined,
-      score: mine.total, max: g.subs.length * 10, rank: mine.rank, players: rows.length, won: mine.rank === 1,
+      score: mine.total, max: g.subs.length * 10, rank: mine.rank, players: rows.length, won: mine.rank === 1, past: g.past ? true : undefined,
       picks: g.picks.filter(function (p) { return p.pid === S.me; }).map(function (p) { var s = g.results.scores['p' + p.n]; return { sub: p.sub, name: p.name, score: s ? s.score : 0 }; })
     };
     try {
@@ -4350,7 +4404,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
   function playedKey() { return 'roster.played' + (TEST.uid ? '.' + TEST.uid : ''); }
   function playedLog() { try { var o = JSON.parse(store(playedKey()) || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } }
   function markPlayed(g) {
-    if (!g || !g.players || !g.players[S.me] || g.practice || (g.mode !== 'local' && g.mode !== 'shared')) return;
+    if (!g || !g.players || !g.players[S.me] || g.practice || g.past || (g.mode !== 'local' && g.mode !== 'shared')) return;
     var d = dateKey(new Date()), list = playedLog()[d] || [], id = (g.mode === 'shared' ? 'r:' + g.code : 'l:' + g.startedAt) + '|' + g.topicId;
     if (list.indexOf(id) >= 0) return;
     list.push(id); var out = {}; out[d] = list.slice(-60); store(playedKey(), JSON.stringify(out));
@@ -4375,7 +4429,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
   function roomHumans(g) { return Object.keys(g.players || {}).map(function (id) { return g.players[id]; }).filter(function (q) { return q && !q.bot; }); }
   /* The leagues (of mine) this room counts for, if any. */
   async function leagueGameLeagues(g) {
-    if (!g || g.mode !== 'shared' || !lgSignedIn()) return [];
+    if (!g || g.mode !== 'shared' || g.past || !lgSignedIn()) return [];
     var hs = roomHumans(g), accts = {};
     if (hs.length < 2 || hs.some(function (q) { return !q.acct || q.fresh !== true; })) return [];
     hs.forEach(function (q) { accts[q.acct] = 1; });
@@ -4690,6 +4744,52 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       }).join('') + '</ul></div>' : '') +
       (signed ? '<div class="lg-split">' + find + create + '</div>' : find);
   }
+  function pastPlayed(key) {
+    var best = -1, n = 0, d = dayLog()[key];
+    if (d) { best = Math.max(best, d.best || 0); n += d.n || 0; }
+    (S.account.games || []).concat((S.myStats && S.myStats.games) || []).forEach(function (x) { if (x && x.dateKey === key && x.mode !== 'fast' && x.mode !== 'practice') { best = Math.max(best, Number(x.score) || 0); n++; } });
+    var f = null; try { f = JSON.parse(store(fastStoreKey(key)) || 'null'); } catch (e) {}
+    return { draft: n ? best : null, fast: f && f.done ? Number(f.total) || 0 : null };
+  }
+  function renderPast() {
+    var body = $('past-body'); if (!body) return;
+    var today = dateKey(new Date()), yest = keyAdd(today, -1);
+    var sel = S.ui.pastDay && S.ui.pastDay >= ARCHIVE_START && S.ui.pastDay <= today ? S.ui.pastDay : (yest >= ARCHIVE_START ? yest : today);
+    S.ui.pastDay = sel;
+    var month = S.ui.pastMonth || sel.slice(0, 7), minM = ARCHIVE_START.slice(0, 7), maxM = today.slice(0, 7);
+    if (month < minM) month = minM; if (month > maxM) month = maxM; S.ui.pastMonth = month;
+    var y = +month.slice(0, 4), m = +month.slice(5, 7), first = new Date(y, m - 1, 1), ndays = new Date(y, m, 0).getDate();
+    var prevM = dateKey(new Date(y, m - 2, 1)).slice(0, 7), nextM = dateKey(new Date(y, m, 1)).slice(0, 7);
+    var cells = '';
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(function (w) { cells += '<span class="cal-dow" aria-hidden="true">' + w.slice(0, window.innerWidth < 560 ? 1 : 3) + '</span>'; });
+    for (var b = 0; b < first.getDay(); b++) cells += '<span class="cal-blank"></span>';
+    for (var d = 1; d <= ndays; d++) {
+      var key = dateKey(new Date(y, m - 1, d)), off = key < ARCHIVE_START, fut = key > today, isT = key === today;
+      var nm = !off && !fut ? TOPICS[dailySpec(key).topicId].name : '', pl = !off && !fut ? pastPlayed(key) : null, done = pl && (pl.draft != null || pl.fast != null);
+      cells += '<button type="button" class="cal-day' + (isT ? ' today' : '') + '" data-act="past-day" data-day="' + key + '"' + (off || fut ? ' disabled' : '') + ' aria-pressed="' + (key === sel) + '" aria-label="' + esc(fmtDay(key, true) + (nm ? ': ' + nm : fut ? ': not yet' : '') + (done ? ', played' : '')) + '">' +
+        '<span class="n">' + d + '</span>' + (isT ? '<span class="t">Today</span>' : nm ? '<span class="t">' + esc(nm) + '</span>' : fut ? '<span class="t">🔒</span>' : '') + (done ? '<span class="ok" aria-hidden="true">✓</span>' : '') + '</button>';
+    }
+    var cal = '<div class="cal"><div class="cal-head"><button class="btn small ghost" type="button" data-act="past-month" data-month="' + prevM + '"' + (month <= minM ? ' disabled' : '') + ' aria-label="Previous month">←</button><strong>' +
+      first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + '</strong><button class="btn small ghost" type="button" data-act="past-month" data-month="' + nextM + '"' + (month >= maxM ? ' disabled' : '') + ' aria-label="Next month">→</button></div>' +
+      '<div class="cal-grid">' + cells + '</div><p class="note">✓ = you played that day on this device or your account. Future days stay locked.</p></div>';
+    var spec = dailySpec(sel), t = TOPICS[spec.topicId], pl2 = pastPlayed(sel), isToday = sel === today;
+    var lv = currentLevel(), bots = $('bot-count') ? $('bot-count').value : '3';
+    var detail = '<div class="past-day" id="past-detail"><span class="mono">' + (isToday ? 'Today · ' : '') + esc(fmtDay(sel, true)) + '</span><div class="past-topic">' + esc(t.name) + '</div>' + (t.q ? '<p class="q">' + esc(t.q) + '</p>' : '') +
+      '<div class="past-subs">' + spec.subs.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>' +
+      (pl2.draft != null || pl2.fast != null ? '<p class="past-mine">' + [pl2.draft != null ? 'Your best draft: ' + fmt1(pl2.draft) + '/50' : '', pl2.fast != null ? 'Fast Money: ' + fmt1(pl2.fast) + '/50' : ''].filter(Boolean).join(' · ') + '</p>' : '');
+    if (isToday) {
+      detail += '<p>That’s today’s game. It counts for leagues and the daily leaderboard of your friends.</p><div class="lg-actions"><button class="btn primary" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button><button class="btn" type="button" data-act="goto-mode" data-mode="room">Play Online</button><button class="btn" type="button" data-act="goto-mode" data-mode="fast">Today’s Fast Money ⚡</button></div></div>';
+    } else {
+      detail += '<div class="past-acts">' +
+        '<div class="past-act"><strong>Against AI</strong><label class="mono label" for="past-bots">AI opponents</label><select class="field" id="past-bots">' + [1, 2, 3, 4, 5, 6, 7].map(function (n) { return '<option value="' + n + '"' + (String(n) === String(bots) ? ' selected' : '') + '>' + n + ' opponent' + (n === 1 ? '' : 's') + '</option>'; }).join('') + '</select>' +
+          '<div class="seg" role="radiogroup" aria-label="AI difficulty" data-seg="level-past">' + ['easy', 'medium', 'hard'].map(function (x) { return '<button type="button" class="seg-btn" role="radio" aria-checked="' + (x === lv) + '" data-act="level" data-level="' + x + '">' + x.charAt(0).toUpperCase() + x.slice(1) + '</button>'; }).join('') + '</div>' +
+          '<button class="btn primary block" type="button" data-act="past-ai">Play vs AI</button></div>' +
+        '<div class="past-act"><strong>With friends</strong><p>Create a private room for this day and share the code. Uses the name above.</p><button class="btn block" type="button" data-act="past-room">Create a room for this day</button></div>' +
+        '<div class="past-act"><strong>Fast Money ⚡</strong><p>That day’s 60-second challenge. One try per day.</p><button class="btn block" type="button" data-act="past-fast">' + (pl2.fast != null ? 'See your result' : 'Play that day’s Fast Money') + '</button></div>' +
+        '</div><p class="note">Just for fun: past days don’t count toward your stats or leagues.</p></div>';
+    }
+    body.innerHTML = cal + detail;
+  }
   /* ---------- My Stats: your own results, overall and by game mode (signed-in players only) ---------- */
   var ME_MODES = [
     { k: 'online', name: 'Play Online', play: 'room' },
@@ -4697,7 +4797,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     { k: 'practice', name: 'Practice Mode', play: 'practice' },
     { k: 'fast', name: 'Daily Fast Money ⚡', play: 'fast' }
   ];
-  function meModeOf(x) { return x.mode === 'fast' ? 'fast' : x.mode === 'offline' ? 'offline' : x.mode === 'practice' ? 'practice' : 'online'; }
+  function meModeOf(x) { return x.past ? 'past' : x.mode === 'fast' ? 'fast' : x.mode === 'offline' ? 'offline' : x.mode === 'practice' ? 'practice' : 'online'; }
   function meResult(x) {
     if (x.mode === 'fast') return x.won ? 'Beat ' + fmt1(x.target || 40) : 'Missed ' + fmt1(x.target || 40);
     return x.won ? 'Won' : (x.rank && x.players ? '#' + x.rank + ' of ' + x.players : 'Played');
@@ -4739,6 +4839,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     if (!S.myStats || S.myStats.uid !== p.uid) { S.myStats = { uid: p.uid, games: null }; loadMyStats(); }
     var gs = S.myStats.games;
     if (!gs) { body.innerHTML = '<p class="note">Loading your games…</p>'; return; }
+    gs = gs.filter(function (x) { return x && !x.past; });
     var all = meSum(gs);
     var tile = function (v, lbl, sub) { return '<div class="stat-tile"><b>' + v + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; };
     var html = '<p class="me-sub">' + esc(p.username) + ' · ' + all.n + ' game' + (all.n === 1 ? '' : 's') + ' over ' + Object.keys(all.days).length + ' day' + (Object.keys(all.days).length === 1 ? '' : 's') + '</p>';
@@ -4755,7 +4856,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       tile(all.avgFin == null ? '—' : all.avgFin, 'Avg finish', '100 = always first') + '</div>';
     html += '<div class="me-sec"><span class="mono">By game mode</span><div class="me-modes">' + ME_MODES.map(function (m) {
       var list = gs.filter(function (x) { return meModeOf(x) === m.k; });
-      if (!list.length) return '<div class="me-mode empty"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">0 games</span></div><p class="note" style="margin:0">Not played yet.</p><div><button class="btn small ghost" type="button" data-act="goto-mode" data-mode="' + m.play + '">Play ' + (m.k === 'fast' ? 'Fast Money' : m.k === 'online' ? 'online' : m.k === 'offline' ? 'vs AI' : 'practice') + '</button></div></div>';
+      if (!list.length) return '<div class="me-mode empty"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">0 games</span></div><p class="note" style="margin:0">Not played yet.</p><div><button class="btn small ghost" type="button" data-act="goto-mode" data-mode="' + m.play + '">Play ' + (m.k === 'fast' ? 'Fast Money' : m.k === 'online' ? 'online' : m.k === 'offline' ? 'vs AI' : m.k === 'past' ? 'a past day' : 'practice') + '</button></div></div>';
       var o = meSum(list), fast = m.k === 'fast';
       var kv = function (lbl, v) { return '<div><dt>' + lbl + '</dt><dd>' + v + '</dd></div>'; };
       var levels = '';
@@ -4944,7 +5045,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
      Each device keeps its own anonymous tally for the day (visits, games started and finished per mode, rooms)
      and sends it to the relay as one retained message per device per day. The organizer page reads them all
      and adds them up. No names or emails are sent. */
-  var STATS_MODES = [['room', 'Online rooms'], ['offline', 'Offline vs AI'], ['practice', 'Practice'], ['fast', 'Fast Money']];
+  var STATS_MODES = [['room', 'Online rooms'], ['offline', 'Offline vs AI'], ['practice', 'Practice'], ['fast', 'Fast Money'], ['past', 'Past days']];
   function statsOn() { return !!S.env.web && (!window.__ROSTER_TEST__ || !!TEST.stats) && store('roster.nostats') !== '1'; }
   function statsKey() { return 'roster.stats' + (TEST.sid ? '.' + TEST.sid : ''); }
   function statsSid() {
@@ -4966,7 +5067,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
   }
   function statGame(g, kind) {
     if (!g || !g.players || !g.players[S.me] || g.players[S.me].bot) return;
-    var mode = g.mode === 'local' ? (g.practice ? 'practice' : 'offline') : 'room';
+    var mode = g.past ? 'past' : g.mode === 'local' ? (g.practice ? 'practice' : 'offline') : 'room';
     var id = kind + ':' + gameId(g);
     statBump(function (r) {
       r.g = r.g || [];
@@ -5392,10 +5493,15 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     else if (act === 'quick') { var qg = S.game; if (qg) applyResults(qg, gameId(qg), builtinResults(qg), ''); }
     else if (act === 'save') saveResult();
     else if (act === 'again') {
-      if (S.lastSettings && S.lastSettings.mode === 'local') playOffline(S.lastSettings.count, S.lastSettings.practice);
+      if (S.lastSettings && S.lastSettings.mode === 'local') playOffline(S.lastSettings.count, S.lastSettings.practice, S.lastSettings.day);
       else leaveGame(false);
     }
     else if (act === 'account') openAccount();
+    else if (act === 'past-day') { S.ui.pastDay = t.getAttribute('data-day'); renderPast(); var pd = $('past-detail'); if (pd && window.innerWidth < 900) pd.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    else if (act === 'past-month') { S.ui.pastMonth = t.getAttribute('data-month'); renderPast(); }
+    else if (act === 'past-ai') { var pb = $('past-bots'); if (pb && $('bot-count')) $('bot-count').value = pb.value; playOffline(parseInt(pb ? pb.value : '3', 10), false, S.ui.pastDay); }
+    else if (act === 'past-room') createRoom(false, null, S.ui.pastDay);
+    else if (act === 'past-fast') openFast(S.ui.pastDay);
     else if (act === 'me-signin') { S.pendingLeague = function () { renderMe(); }; openAccount('Sign in to see your stats.'); }
     else if (act === 'open-me') { closeAccount(); gotoMode('me'); }
     else if (act === 'organizer') openOrganizer();
@@ -5509,7 +5615,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-19-03';
+  var BUILD_ID = '2026-10-19-04';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -5955,13 +6061,17 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
   }
   function fastStoreKey(key) { return 'roster.fast.' + key; }
   if (TEST.exportEngine && window.__ROSTER_ENGINE__) window.__ROSTER_ENGINE__.fastSpec = fastSpec;
-  function loadFastToday() {
-    var key = dateKey(new Date()), f = null;
+  function fastDayKey() { return S.fastDay || dateKey(new Date()); }
+  function loadFastToday() { return loadFastFor(dateKey(new Date())); }
+  function loadFastFor(key) {
+    var f = null;
     try { f = JSON.parse(store(fastStoreKey(key)) || 'null'); } catch (e) {}
     return f && f.dateKey === key && TOPICS[f.topicId] ? f : null;
   }
-  function openFast() {
-    var f = loadFastToday();
+  function openFast(day) {
+    var today = dateKey(new Date());
+    S.fastDay = day && day < today ? day : null;
+    var f = loadFastFor(fastDayKey());
     if (f) { S.fast = f; if (!f.done && now() >= f.endsAt) finishFast(); }
     else S.fast = null;
     S.view = 'play'; S.mode = 'fast';
@@ -5969,11 +6079,11 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     if (S.fast && !S.fast.done) setTimeout(function () { var i = $('fast-in'); if (i) i.focus(); }, 50);
   }
   function startFast() {
-    if (loadFastToday()) { openFast(); return; }
+    if (loadFastFor(fastDayKey())) { openFast(S.fastDay); return; }
     leaveGame(true);
-    var spec = fastSpec(dateKey(new Date()));
+    var spec = fastSpec(fastDayKey());
     var t0 = now();
-    S.fast = { topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, idx: 0, answers: [], startedAt: t0, endsAt: t0 + FAST_SECONDS * 1000, done: false, finishedAt: 0, uid: fbOn() && FB.user ? FB.user.uid : '' };
+    S.fast = { topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, idx: 0, answers: [], startedAt: t0, endsAt: t0 + FAST_SECONDS * 1000, done: false, finishedAt: 0, uid: fbOn() && FB.user ? FB.user.uid : '', past: !!S.fastDay };
     S.ui.fastQ = ''; S.ui.fastSel = 0;
     S.view = 'play'; S.mode = 'fast';
     saveFast(); setMsg(''); render(); window.scrollTo(0, 0);
@@ -6031,7 +6141,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
         var f = null; try { f = JSON.parse(localStorage.getItem(k)); } catch (e) {}
         /* Only your own games: played while signed in as you, or played signed out on this device and not yet claimed by another account. */
         var owner = f && (f.uid || f.claimedBy);
-        if (f && f.done && Array.isArray(f.results) && f.dateKey && !done[f.dateKey] && (!owner || owner === uid)) todo.push({ k: k, f: f });
+        if (f && f.done && !f.past && Array.isArray(f.results) && f.dateKey && !done[f.dateKey] && (!owner || owner === uid)) todo.push({ k: k, f: f });
       }
     } catch (e) {}
     for (var j = 0; j < todo.length; j++) {
@@ -6084,7 +6194,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
       (beat ? 'Beat the ' + fmt1(FAST_TARGET) + ' target by ' + fmt1(f.total - FAST_TARGET) : 'Missed the ' + fmt1(FAST_TARGET) + ' target by ' + fmt1(FAST_TARGET - f.total)) +
       ' · ' + used + ' seconds</p>';
     var d = new Date(), mid = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1), mins = Math.max(0, Math.round((mid - d) / 60000));
-    $('fast-next').textContent = 'You’ve played today’s Fast Money. A new topic unlocks in ' + Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm.';
+    $('fast-next').textContent = f.dateKey !== dateKey(new Date()) ? 'That was the Fast Money from ' + fmtDay(f.dateKey, true) + '. One try per day.' : 'You’ve played today’s Fast Money. A new topic unlocks in ' + Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm.';
     $('fast-results').innerHTML = f.results.map(function (r) {
       var list = TOPICS[f.topicId].ranks[r.sub] || [], topName = list.length ? TOPICS[f.topicId].byKey[list[0]].name : '';
       var top = r.rank === 0;
@@ -6098,6 +6208,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     var t = TOPICS[f.topicId], used = Math.round((f.finishedAt - f.startedAt) / 1000);
     var dateTxt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     var BLUR = '▒▒▒▒▒▒';
+    if (f.dateKey && f.dateKey !== dateKey(new Date())) dateTxt = fmtDay(f.dateKey) + ' (past day)';
     var lines = ['The Roster · Fast Money ⚡ · ' + dateTxt, 'Topic: ' + BLUR + ' (no spoilers)'];
     lines.push((f.total > FAST_TARGET ? '✅ Beat ' : '❌ Missed ') + fmt1(FAST_TARGET) + ' with ' + fmt1(f.total) + '/50 in ' + used + 's');
     f.results.forEach(function (r) { lines.push((r.name ? TIER_SQUARES[tier(r.score)] : '⬛') + ' ' + BLUR + ' ' + fmt1(r.score) + (r.rank === 0 ? ' ⭐' : '')); });
@@ -6129,6 +6240,7 @@ F("disney-channel","Disney Channel Classics","Disney Channel classic","Which Dis
     var m = /^#r-([A-Z]{5})$/i.exec(location.hash || '');
     if (m) { $('room-code').value = m[1].toUpperCase(); S.view = 'play'; S.mode = 'room'; }
     var lm = /^#league-([A-Z]{6})$/i.exec(location.hash || '');
+    if (/^#past$/i.test(location.hash || '')) { S.view = 'play'; S.mode = 'past'; }
     if (lm) { S.view = 'play'; S.mode = 'league'; S.leagueOpenCode = lm[1].toUpperCase(); }
     var restored = null, roomCode = null, orgSaved = null;
     try {
