@@ -275,6 +275,7 @@ select.field { padding-right: 8px; }
 .rv-intro { display: grid; gap: 10px; padding: 22px; border-radius: 16px; background: var(--hi); color: var(--hi-ink); }
 .rv-intro .display { margin: 0; font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1; text-transform: uppercase; }
 .rv-win { display: grid; gap: 8px; justify-items: start; padding: 26px 22px; border-radius: 18px; background: var(--pc, var(--hi)); color: var(--pi, var(--hi-ink)); animation: rvflip 0.6s ease both; }
+.rv-win .mono, .rv-intro .mono { color: inherit; opacity: 0.85; }
 .rv-win .display { margin: 0; font-size: clamp(2.4rem, 8vw, 4.4rem); line-height: 1; text-transform: uppercase; overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) { .rv-card, .rv-win { animation: none; } }
 .winner .mono { color: var(--hi-ink); }
@@ -5945,7 +5946,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-20-10';
+  var BUILD_ID = '2026-10-20-11';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
