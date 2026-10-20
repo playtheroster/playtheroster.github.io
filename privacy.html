@@ -1,0 +1,93 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Privacy Policy — The Roster</title><meta name="description" content="How The Roster handles your information."><link rel="canonical" href="https://playtheroster.com/privacy.html">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Rubik:wght@400;500;700&display=swap">
+<style>
+:root { --bg: #ffffff; --ink: #000000; --muted: #5c5c5c; --line: #dcdcdc; --pop: #ca2430; --hi: #ffb612; --tint: #fff6e2; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #121212; --ink: #f4f4f4; --muted: #b0b0b0; --line: #333333; --tint: #2a2416; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { background: var(--pop); color: #fff; padding: 18px 16px; }
+header a { color: #fff; text-decoration: none; font-family: "Lilita One", "Arial Rounded MT Bold", sans-serif; font-size: 1.5rem; letter-spacing: 0.02em; }
+header a span { color: var(--hi); }
+main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-family: "Lilita One", "Arial Rounded MT Bold", sans-serif; font-weight: 400; font-size: clamp(2rem, 6vw, 2.8rem); line-height: 1.05; margin: 0 0 6px; text-transform: uppercase; text-wrap: balance; }
+h2 { font-size: 1.15rem; margin: 32px 0 6px; }
+.updated { color: var(--muted); font-size: 0.9rem; margin: 0 0 24px; }
+.box { background: var(--tint); border: 2px solid var(--hi); border-radius: 14px; padding: 14px 16px; }
+ul { padding-left: 1.2em; } li { margin: 4px 0; }
+a { color: inherit; }
+.btn { display: inline-block; margin-top: 8px; padding: 10px 16px; border: 2px solid var(--ink); border-radius: 12px; background: var(--bg); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+.btn:hover { background: var(--ink); color: var(--bg); }
+footer { border-top: 1px solid var(--line); padding: 20px 16px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+code { font-size: 0.9em; }
+</style></head><body>
+<header><a href="/">THE ROSTER<span>.</span></a></header>
+<main>
+<h1>Privacy Policy</h1>
+<p class="updated">Last updated October 20, 2026</p>
+<div class="box"><p style="margin:0"><strong>The short version:</strong> you can play without an account, and then everything stays in your own browser. If you make an account, we keep your email, the name you choose and your game results so your stats and leagues work. We don’t show ads, we don’t sell your data and we don’t use tracking cookies.</p></div>
+
+<h2>Who we are</h2>
+<p>The Roster is a free daily draft game at playtheroster.com. Questions about this policy go to <strong>playtherostergame@gmail.com</strong>.</p>
+
+<h2>Playing without an account</h2>
+<p>Your name, settings, game results and progress are saved in your browser’s local storage on your own device. They aren’t sent to us. Clearing your browser’s site data deletes them.</p>
+
+<h2>If you make an account</h2>
+<p>Accounts are optional. Sign-in is handled by Google Firebase Authentication (with Google, an emailed link, or an email and password). We store:</p>
+<ul>
+<li>your email address and the sign-in method (Firebase keeps passwords; we never see them);</li>
+<li>the name you choose for the game;</li>
+<li>your saved game results: date, topic, mode, picks and scores;</li>
+<li>the leagues you create or join, and the date your account was made.</li>
+</ul>
+<p>This is stored in Google Firebase (Cloud Firestore). Only you can read your account and results, except as described below.</p>
+
+<h2>What other players can see</h2>
+<ul>
+<li><strong>Online rooms:</strong> your name, your picks and any chat messages are shared with the players in your room. They travel through public relay servers (HiveMQ and EMQX) run by other companies, and anyone who knows a room code could see them. Please don’t put personal information in your name or in chat.</li>
+<li><strong>Leagues:</strong> other members of a league see your name, your league games and a stats summary (game counts, averages and recent results). They never see your email. Anyone can find a league by its name, and a public league’s leaderboard is visible to anyone signed in.</li>
+</ul>
+
+<h2>Anonymous usage counts</h2>
+<p>To know how many people play, each browser gets a random ID, and the site sends daily counts: page visits, games started and finished in each mode, and rooms created or joined. No names or emails are included. These counts also pass through the public relay servers above.</p>
+<p id="nostats-row"><button class="btn" type="button" id="nostats-btn" hidden>Stop counting this device</button> <span id="nostats-msg"></span></p>
+
+<h2>Services we use</h2>
+<p>These companies process data to run the site, under their own privacy policies: GitHub Pages (hosting), Google Firebase (accounts and database), Google Fonts (lettering), HiveMQ and EMQX (live rooms and usage counts), and the code libraries unpkg, cdnjs and jsDelivr. Like any website, these services can see your IP address when your browser connects to them.</p>
+
+<h2>Cookies</h2>
+<p>We don’t use advertising or tracking cookies. The site uses your browser’s local storage for the things listed above, and Firebase uses its own storage to keep you signed in.</p>
+
+<h2>Children</h2>
+<p>The Roster isn’t directed at children under 13, and we don’t knowingly collect personal information from them. If you think a child under 13 has made an account, email us and we’ll delete it.</p>
+
+<h2>Your choices</h2>
+<ul>
+<li>See or delete your data: email <strong>playtherostergame@gmail.com</strong> from the address on your account and we’ll send it or delete your account and results.</li>
+<li>Leave a league at any time from the Leagues page.</li>
+<li>Delete what’s saved on your device by clearing this site’s data in your browser.</li>
+</ul>
+
+<h2>Changes</h2>
+<p>If this policy changes, we’ll update this page and the date at the top.</p>
+</main>
+<footer><a href="/">Play The Roster</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <span>playtherostergame@gmail.com</span></footer>
+<script>
+(function () {
+  var b = document.getElementById('nostats-btn'), m = document.getElementById('nostats-msg');
+  function get() { try { return localStorage.getItem('roster.nostats') === '1'; } catch (e) { return null; } }
+  function show() {
+    var off = get();
+    if (off === null) { m.textContent = 'Your browser is blocking site storage, so nothing is counted from this device.'; return; }
+    b.hidden = false;
+    b.textContent = off ? 'Start counting this device again' : 'Stop counting this device';
+    m.textContent = off ? 'This device isn’t counted.' : '';
+  }
+  b.addEventListener('click', function () { try { if (get()) localStorage.removeItem('roster.nostats'); else localStorage.setItem('roster.nostats', '1'); } catch (e) {} show(); });
+  show();
+})();
+</script>
+</body></html>
