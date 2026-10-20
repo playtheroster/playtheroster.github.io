@@ -317,6 +317,8 @@ button.bsub[aria-pressed="true"] .mono { color: var(--hi-ink); }
 .footer { border-top: 1px solid var(--line); padding-block: 40px 56px; }
 .footer .wrap { display: flex; justify-content: space-between; align-items: baseline; gap: 12px 32px; flex-wrap: wrap; }
 .footer p { color: var(--muted); }
+.footer-links a { color: inherit; text-underline-offset: 3px; }
+.footer-links a:hover { color: var(--pop); }
 
 .nav-actions { display: flex; align-items: center; gap: 8px; }
 .org-title { font-size: clamp(2.2rem, 6vw, 3.6rem); }
@@ -689,7 +691,18 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .cat-name.one-word { white-space: nowrap; }
 .cat .mono { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; letter-spacing: 0; line-height: 1; color: var(--hi); }
 .tomorrow { border-top: 3px dashed var(--line); }
-.hero-side { align-content: start; padding-top: 8px; }
+.hero-side { align-content: start; padding-top: 8px; gap: 12px; }
+.play-main-box { display: grid; gap: 10px; }
+.btn.play-main { display: grid; justify-items: start; gap: 2px; width: 100%; min-height: 88px; padding: 14px 22px; text-align: left; border: 3px solid #000000; border-radius: 20px; background: var(--hi); color: #000000; box-shadow: 0 6px 0 #000000; }
+.play-main .pm-title { font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.1rem); line-height: 1; text-transform: uppercase; }
+.play-main .pm-sub { font-size: 0.92rem; font-weight: 600; }
+.btn.play-friends { width: 100%; min-height: 48px; justify-content: center; border: 3px solid #000000; border-radius: 16px; background: #ffffff; color: #000000; box-shadow: 0 4px 0 var(--pop); font-size: 1rem; }
+.more-label { margin-top: 10px; color: var(--muted); }
+.cta-row.more-modes .btn { min-height: 46px; font-size: 0.98rem; border-width: 2px; box-shadow: 0 3px 0 var(--pop); }
+@media (hover: hover) and (pointer: fine) {
+  .btn.play-main:hover { background: #000000; color: var(--hi); box-shadow: 0 8px 0 #000000; }
+  .btn.play-friends:hover { background: #000000; color: var(--hi); }
+}
 .cta-row { display: grid; gap: 12px; margin-top: 0; }
 .cta-row .btn { width: 100%; justify-content: flex-start; text-align: left; min-height: 56px; font-size: 1.05rem; border: 3px solid #000000; border-radius: 18px; background: #ffffff; color: #000000; box-shadow: 0 5px 0 var(--pop); }
 @media (hover: hover) and (pointer: fine) {
@@ -922,12 +935,15 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
     </div>
 
     <div class="hero-side">
-      <div class="cta-row">
-        <button class="btn" type="button" data-act="goto-mode" data-mode="room">Play Online</button>
-        <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
+      <div class="play-main-box">
+        <button class="btn primary play-main" type="button" data-act="goto-mode" data-mode="offline" id="play-main"><span class="pm-title">Play today’s topic</span><span class="pm-sub" id="play-main-sub">Draft against the AI · about 3 minutes</span></button>
+        <button class="btn play-friends" type="button" data-act="goto-mode" data-mode="room">Or play with friends online</button>
+      </div>
+      <span class="mono more-label">More ways to play</span>
+      <div class="cta-row more-modes">
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
-        <button class="btn" type="button" data-act="goto-mode" data-mode="past">Past Days 📅</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="irr" id="hero-irr">Mr. Irrelevant</button>
+        <button class="btn" type="button" data-act="goto-mode" data-mode="past">Past Days 📅</button>
       </div>
     </div>
   </section>
@@ -1412,6 +1428,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   <div class="wrap">
     <span class="wordmark"><svg class="logo" viewBox="0 0 200 200" aria-hidden="true"><path d="M72 36 L46 46 L22 74 L42 96 L58 86 L58 168 L142 168 L142 86 L158 96 L178 74 L154 46 L128 36 Q100 62 72 36 Z" fill="#ffb612" stroke="#000" stroke-width="6" stroke-linejoin="round"/><path d="M78 40 Q100 60 122 40" fill="none" stroke="#ca2430" stroke-width="7" stroke-linecap="round"/><path d="M30 78 L44 92 M170 78 L156 92" stroke="#ca2430" stroke-width="7" stroke-linecap="round"/><text x="100" y="146" text-anchor="middle" font-family="Lilita One, sans-serif" font-size="62" fill="#000000">01</text></svg><span>The Roster<i>.</i></span></span>
     <p>Same friends. New topic. Better arguments.</p>
+    <p class="footer-links"><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <span>playtherostergame@gmail.com</span></p>
     <p class="mono">© 2026 The Roster</p>
   </div>
 </footer>
@@ -4346,7 +4363,8 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
           '<label class="mono label" for="acct-pw">Password</label><input class="field" id="acct-pw" type="password" autocomplete="new-password" placeholder="At least 6 characters">' +
           '<button class="btn primary" type="submit">Create account</button></form>' +
           '<p class="note">Your name is what other players see. Your email is never shown to anyone. Rather not use a password? <button class="linkish" type="button" data-act="link-mode" data-on="1">Email me a link instead</button></p>' +
-          '<p class="note">Already have an account? <button class="linkish" type="button" data-act="acct-tab" data-tab="signin">Sign in</button></p>';
+          '<p class="note">Already have an account? <button class="linkish" type="button" data-act="acct-tab" data-tab="signin">Sign in</button></p>' +
+          '<p class="note">By creating an account you agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>';
       else form = '<form id="pw-signin-form" class="acct-form"><label class="mono label" for="acct-email">Email</label><input class="field" id="acct-email" type="email" autocomplete="username" placeholder="you@example.com" value="' + pre + '">' +
           '<label class="mono label" for="acct-pw">Password</label><input class="field" id="acct-pw" type="password" autocomplete="current-password">' +
           '<button class="btn primary" type="submit">Sign in</button></form>' +
@@ -5355,7 +5373,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     }
     function games(list, k, done) { return k === 'room' ? roomDrafts(list, done) : sum(list, function (r) { return (done ? r.done : r.start)[k]; }); }
     var allDrafts = function (list) { return games(list, 'room') + games(list, 'offline') + games(list, 'past'); };
-    var label = { '1': 'today', '7': 'last 7 days', '30': 'last 30 days', all: 'since Oct 16' }[st.range];
+    var label = { '1': 'today', '7': 'last 7 days', '30': 'last 30 days', all: 'since ' + fmtDay(statsSince()) }[st.range];
     function tile(n, lbl, sub) { return '<div class="stat-tile"><b>' + n.toLocaleString() + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; }
     var fbc = st.fb, cutAt = st.range === 'all' ? 0 : new Date(days[Math.min(Number(st.range), 30) - 1] + 'T00:00:00').getTime();
     $('stats-fb').innerHTML = !S.env.web ? '' : !fbc ? '<div class="stat-tile"><b>…</b><span class="lbl">Accounts</span><span class="sub">loading</span></div><div class="stat-tile"><b>…</b><span class="lbl">Leagues</span><span class="sub">loading</span></div>'
@@ -5395,6 +5413,8 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
                 leagues: r[1].docs.map(function (d) { var v = d.data() || {}; return { at: Number(v.createdAt) || 0, vis: v.visibility === 'public' ? 'public' : 'private' }; }) };
     }).catch(function () { st.fb = { error: true }; }).then(function () { if (S.view === 'organizer' && S.org.tab === 'stats') renderStats(); });
   }
+  function statsMonths() { var d = new Date(); return [dateKey(new Date(d.getFullYear(), d.getMonth() - 1, 1)).slice(0, 7), dateKey(d).slice(0, 7)]; }
+  function statsSince() { var k = statsMonths()[0] + '-01'; return k > '2026-10-16' ? k : '2026-10-16'; }
   function loadStats() {
     loadFbCounts();
     var st = S.stats;
@@ -5841,9 +5861,9 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-20-06';
+  var BUILD_ID = '2026-10-20-08';
   var MQTT_ROOT = 'theroster/v2/';
-  var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
+  var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
   function jclone(v) { return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); }
   function webUid() {
@@ -5984,7 +6004,8 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
         showDiag();
       });
     }
-    function statsWatch(cb) { statsCb = cb; return subscribe(topicFor('stats/v1/#')); }
+    /* Only this month and last month: older counts stay on the relay but aren't downloaded, so the page stays fast as the game grows. */
+    function statsWatch(cb) { statsCb = cb; return Promise.all(statsMonths().map(function (m) { return subscribe(topicFor('stats/v1/' + m + '/#')); })); }
     function client() { return whenLive(); }
     /* Send something that the relay acknowledges (publish or subscribe) on every live connection; done when any
        one answers. Connections that don't answer in a few seconds are restarted, and the request is retried. */
