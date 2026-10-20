@@ -491,6 +491,10 @@ body { background-color: var(--bg); background-image: radial-gradient(var(--dot)
 .seg-btn[data-level="hard"][aria-checked="true"] { background: #ca2430; color: #ffffff; }
 /* homepage options: all white; black on hover only where a mouse can hover (not phones) */
 .cta-row .btn, #account-btn { background: var(--surface); color: var(--ink); }
+.cta-row .btn.locked { opacity: 0.72; }
+.cta-row .btn svg, .irr-lock svg { width: 15px; height: 15px; flex: 0 0 auto; margin-right: 8px; vertical-align: -2px; }
+.irr-lock { display: grid; gap: 10px; padding: 14px; border-radius: 14px; border: 2px dashed var(--line); background: var(--tint); }
+.irr-lock b { display: flex; align-items: center; }
 @media (hover: hover) and (pointer: fine) {
   .cta-row .btn:hover, #account-btn:hover { background: var(--ink); color: var(--hi); }
 }
@@ -561,6 +565,9 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .fast-sub { font-size: clamp(2.2rem, 9vw, 3.6rem); color: var(--accent); }
 .fast-list { position: static; margin-top: 8px; max-height: 260px; }
 .fast-done-list .bsub { background: var(--tint); }
+#fast-play.untimed > #fast-done-list { order: 1; }
+#fast-play.untimed > .pickbox { order: 2; }
+#fast-play.untimed > #irr-board-box { order: 3; }
 .fast-rules li { font-size: 0.92rem; color: var(--muted); }
 .fast-verdict.won { background: var(--g5); color: var(--g5-ink); }
 .fast-verdict.won .mono { color: var(--g5-ink); }
@@ -911,6 +918,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
         <button class="btn" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="past">Past Days 📅</button>
+        <button class="btn" type="button" data-act="goto-mode" data-mode="irr" id="hero-irr">Mr. Irrelevant</button>
       </div>
     </div>
   </section>
@@ -1030,6 +1038,12 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <div id="past-body"></div>
               </div>
 
+              <div class="mode" id="mode-irr" hidden="">
+                <h3>Mr. Irrelevant</h3>
+                <p>Today’s topic, upside down. Pick the <strong>least</strong> valuable answer for each of the 5 subtopics, in any order, with no timer and your draft board in view. Stay under <strong>20.0</strong> to win. Solo.</p>
+                <div id="irr-home"></div>
+              </div>
+
               <div class="mode" id="mode-fast">
                 <h3>Fast Money ⚡</h3>
                 <p>A daily challenge with its own topic. 60 seconds on the clock, one subtopic at a time: answer it and the next one appears, until all 5 are done. Score more than <strong>40.0</strong> to win. One try per day.</p>
@@ -1146,7 +1160,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note" id="save-note"></p>
                 <p class="note" id="league-note" hidden=""></p>
-                <p class="note" id="irr-note" hidden="">Mr. Irrelevant: you’ve seen the lists, now try to score as <strong>low</strong> as you can. Pick the least valuable answer for each subtopic in 60 seconds. Stay under 20.0 to win. Solo, one try per draft.</p>
+                <p class="note" id="irr-note" hidden="">Mr. Irrelevant: you’ve seen the lists, now try to score as <strong>low</strong> as you can. No timer: pick a subtopic, then its least valuable answer, like a normal draft, with your draft board in view. Stay under 20.0 to win. Solo, one try per draft.</p>
                 <div class="share-box" id="share-box" hidden="">
                   <span class="mono">Your score card</span>
                   <textarea class="field share-text" id="share-text" readonly="" rows="9" aria-label="Score to share"></textarea>
@@ -1185,13 +1199,17 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <div class="combo">
                 <div class="combo-row">
                   <input class="field" id="fast-in" type="text" autocomplete="off" spellcheck="false" placeholder="Start typing…" role="combobox" aria-controls="fast-list" aria-autocomplete="list" aria-expanded="false">
-                  <button class="btn small" type="button" data-act="fast-skip">Skip</button>
+                  <button class="btn small" type="button" data-act="fast-skip" id="fast-skip">Skip</button>
                 </div>
                 <ul class="list fast-list" id="fast-list" role="listbox" aria-label="Matching answers" hidden=""></ul>
               </div>
               <p class="note">Type, then tap an answer or press Enter for the top match.</p>
             </div>
             <div class="banner-subs fast-done-list" id="fast-done-list"></div>
+            <div id="irr-board-box" hidden="" style="display:grid;gap:8px">
+              <span class="mono">Your draft board</span>
+              <div class="board-wrap"><table class="board" id="irr-board"></table></div>
+            </div>
           </div>
           <div id="fast-done" hidden="" style="display:grid;gap:16px">
             <div class="winner fast-verdict" id="fast-verdict"></div>
@@ -1344,6 +1362,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
             <div class="way"><h4>Online room</h4><p>Create a room and send friends the 5-letter code or link. 2 to 8 players. The host starts the draft when everyone’s in. Or tap <strong>Join a random room</strong> to play people you don’t know.</p></div>
             <div class="way"><h4>Offline vs AI</h4><p>Draft today’s topic on your own device against 1 to 7 AI players. Pick Easy, Medium or Hard.</p></div>
             <div class="way"><h4>Past Days 📅</h4><p>Missed a day? Open the calendar to play any earlier day’s topic against AI or with friends, or try that day’s Fast Money. Just for fun: past days don’t count toward stats or leagues.</p></div>
+            <div class="way"><h4>Mr. Irrelevant</h4><p>Unlocks once you’ve played today’s topic. Now try to score as low as possible: the least valuable answer for each subtopic, no timer. Under 20.0 wins.</p></div>
             <div class="way"><h4>Fast Money ⚡</h4><p>A solo bonus round, once a day. You get 60 seconds to name one answer for each of 5 subtopics. Score 40 or more to beat it. A skip scores 0.</p></div>
           </div>
           <p class="note">Want it harder? Before a game, answer <strong>No</strong> to “Show draft options?” to hide the answer list, so you have to type answers from memory.</p>
@@ -3202,11 +3221,15 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     persistSession();
     if ($('fast-start-btn')) $('fast-start-btn').textContent = S.fastDay ? 'Start the Fast Money from ' + fmtDay(S.fastDay) : 'Start today’s Fast Money';
     if (S.mode === 'practice') S.mode = 'offline';
-    ['room', 'offline', 'fast', 'league', 'me', 'past'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    ['room', 'offline', 'fast', 'league', 'me', 'past', 'irr'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    var irrOpen = irrUnlocked();
+    $('hero-irr').innerHTML = (irrOpen ? '' : LOCK_SVG) + 'Mr. Irrelevant'; $('hero-irr').classList.toggle('locked', !irrOpen);
+    $('hero-irr').setAttribute('aria-label', irrOpen ? 'Mr. Irrelevant' : 'Mr. Irrelevant (locked until you play today’s topic)');
+    if (!S.game && inPlay && S.mode === 'irr') renderIrrHome();
     $('league-btn').hidden = !fbOn(); $('me-btn').hidden = !fbOn();
     var rln = $('room-league-note');
     if (rln) { rln.hidden = !fbOn(); rln.innerHTML = (lgSignedIn() ? 'Playing with your league? ' : 'Playing with your league? <a href="#" data-act="account">Sign in</a>. ') + 'A game counts on its leaderboard when everyone in the room is in the league (2 or more players) and nobody has played today’s topic yet, online or against AI.' + (lgSignedIn() ? ' <a href="#" data-act="goto-mode" data-mode="league">See your leagues</a>' : ''); }
-    document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league' || S.mode === 'me';
+    document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league' || S.mode === 'me' || S.mode === 'irr';
     document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league' || S.mode === 'me' || S.mode === 'past');
     if (!S.game && inPlay && S.mode === 'me') renderMe();
     if (!S.game && inPlay && S.mode === 'past') renderPast();
@@ -3236,7 +3259,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
       : 'Rooms and matchmaking need you signed in to claude.ai with “Can edit” access to this page.';
     on.className = 'note bad';
     document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online || (S.creating && b.getAttribute('data-act') === 'create-room'); });
-    $('console-label').textContent = scr === 'modes' ? ({ room: 'Online game', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money', league: 'Leagues' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
+    $('console-label').textContent = scr === 'modes' ? ({ room: 'Online game', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money', league: 'Leagues', irr: 'Mr. Irrelevant' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
     renderChat();
     var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
     if (scr === 'lobby') renderLobby();
@@ -3257,9 +3280,17 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
       $('tb-name').textContent = ft.name; $('tb-q').textContent = ft.q;
       if (tbl) tbl.textContent = S.fast.kind === 'irr' ? 'Mr. Irrelevant · lowest score wins' : S.fast.dateKey !== dateKey(new Date()) ? 'Fast Money · ' + fmtDay(S.fast.dateKey) : 'Fast Money · today';
       $('tb-subs').innerHTML = S.fast.subs.map(function (s, i) {
-        var shown = S.fast.done || i <= S.fast.idx, a = S.fast.answers[i];
-        return '<span class="bsub' + (i < S.fast.idx || S.fast.done ? ' done' : '') + (shown ? '' : ' locked') + '"><span class="mono">0' + (i + 1) + '</span>' + (shown ? esc(s) : '???') + (a && a.name ? '<span class="bpick">' + esc(a.name) + '</span>' : a && a.skipped ? '<span class="bpick">skipped</span>' : '') + '</span>';
+        var shown = S.fast.done || S.fast.untimed || i <= S.fast.idx, a = S.fast.answers[i];
+        return '<span class="bsub' + ((S.fast.untimed ? !!a : i < S.fast.idx) || S.fast.done ? ' done' : '') + (shown ? '' : ' locked') + '"><span class="mono">0' + (i + 1) + '</span>' + (shown ? esc(s) : '???') + (a && a.name ? '<span class="bpick">' + esc(a.name) + '</span>' : a && a.skipped ? '<span class="bpick">skipped</span>' : '') + '</span>';
       }).join('');
+      return;
+    }
+    if (!g && S.mode === 'irr') {
+      var isrc = irrTodaySrc();
+      $('tb-name').textContent = isrc ? TOPICS[isrc.topicId].name : 'Mr. Irrelevant';
+      $('tb-q').textContent = isrc ? 'Now score as low as you can on today’s topic.' : 'Unlocks once you’ve played today’s topic.';
+      $('tb-subs').innerHTML = isrc ? isrc.subs.map(function (x, i) { return '<span class="bsub"><span class="mono">0' + (i + 1) + '</span>' + esc(x) + '</span>'; }).join('') : '<span class="bsub locked">' + LOCK_SVG + 'Play today’s draft first</span>';
+      if (tbl) tbl.textContent = 'Mr. Irrelevant';
       return;
     }
     if (!g && S.mode === 'fast') {
@@ -3450,7 +3481,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     table.classList.toggle('tight', w < 560);
     table.classList.toggle('stack', colW < 72);
   }
-  window.addEventListener('resize', function () { ['board', 'final-board'].forEach(function (id) { var t = $(id); if (t) fitBoard(t); }); });
+  window.addEventListener('resize', function () { ['board', 'final-board', 'irr-board'].forEach(function (id) { var t = $(id); if (t) fitBoard(t); }); });
 
   /* ---------- results ---------- */
   function renderResults() {
@@ -3506,8 +3537,9 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     $('save-btn').textContent = saved ? (fbOn() ? 'Saved to your stats' : 'Saved to your account') : 'Save my result';
     if (res && inGame && !saved) autoSaveResult(g);
     if (res && inGame) recordDay(g);
-    var irrDone = loadIrr(gameId(g));
-    $('irr-btn').hidden = !(res && inGame); $('irr-note').hidden = !(res && inGame) || !!irrDone;
+    if (res && inGame && !g.past) irrSaveSrc(g);
+    var irrDone = loadIrr(gameId(g)), irrOk = !!(res && inGame && irrUnlocked());
+    $('irr-btn').hidden = !irrOk; $('irr-note').hidden = !irrOk || !!irrDone;
     $('irr-btn').textContent = irrDone && irrDone.done ? 'See your Mr. Irrelevant' : irrDone ? 'Back to Mr. Irrelevant' : 'Play Mr. Irrelevant';
     $('share-btn').hidden = !(res && inGame);
     if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; }
@@ -5607,7 +5639,9 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     else if (act === 'share') { ev.preventDefault(); shareScore(); }
     else if (act === 'fast-start') startFast();
     else if (act === 'irr-start') startIrr();
+    else if (act === 'irr-home') { var isrc = irrTodaySrc(); if (isrc && !S.game) startIrr(isrc); }
     else if (act === 'fast-skip') fastSubmit(null);
+    else if (act === 'irr-sub') irrChooseSub(parseInt(t.getAttribute('data-i'), 10));
     else if (act === 'fast-share') { ev.preventDefault(); shareFast(); }
     else if (act === 'go-home') { ev.preventDefault(); leaveGame(false); }
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
@@ -5782,7 +5816,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-20-03';
+  var BUILD_ID = '2026-10-20-05';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -6228,24 +6262,57 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
   }
   function fastStoreKey(key) { return 'roster.fast.' + key; }
   /* Mr. Irrelevant: after a draft, one solo round on the same topic and subtopics. Pick the least valuable answer
-     for each subtopic in 60 seconds; the lowest total wins, under 20.0 counts as a win. Skips and running out of
-     time score 10.0. One try per draft. */
+     for each subtopic, in any order and with no timer (older timed rounds still finish on their clock); the lowest
+     total wins, under 20.0 counts as a win. The draft board stays in view. One try per draft. */
   var IRR_TARGET = 20, IRR_SKIP = 10;
   function irrKey(gid) { return 'roster.irr.' + String(gid).replace(/[^A-Za-z0-9]/g, '-'); }
   function loadIrr(gid) { var f = null; try { f = JSON.parse(store(irrKey(gid)) || 'null'); } catch (e) {} return f && f.kind === 'irr' && TOPICS[f.topicId] ? f : null; }
-  function startIrr() {
-    var g = S.game; if (!g || !g.results) return;
-    var gid = gameId(g), f = loadIrr(gid);
+  /* Mr. Irrelevant is locked until you've played today's topic (online or against AI, not a past day).
+     The latest finished draft of today's topic is kept on this device so the homepage can open it with its board. */
+  function irrSrcFromGame(g) {
+    return { gid: gameId(g), topicId: g.topicId, subs: g.subs.slice(), dateKey: g.dateKey, past: !!g.past, me: S.me,
+      snap: { topicId: g.topicId, subs: g.subs.slice(), order: (g.order || []).slice(), players: JSON.parse(JSON.stringify(g.players)), picks: JSON.parse(JSON.stringify(g.picks)), results: g.results && g.results.scores ? { scores: JSON.parse(JSON.stringify(g.results.scores)) } : null } };
+  }
+  function irrSaveSrc(g) {
+    if (!g || g.past || g.dateKey !== dateKey(new Date())) return;
+    try {
+      for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && k.indexOf('roster.irrSrc.') === 0 && k !== 'roster.irrSrc.' + g.dateKey) localStorage.removeItem(k); }
+    } catch (e) {}
+    store('roster.irrSrc.' + g.dateKey, JSON.stringify(irrSrcFromGame(g)));
+  }
+  function irrTodaySrc() {
+    var k = dateKey(new Date()), src = null;
+    try { src = JSON.parse(store('roster.irrSrc.' + k) || 'null'); } catch (e) {}
+    if (src && TOPICS[src.topicId] && Array.isArray(src.subs)) return src;
+    var d = dayLog()[k];
+    if (d && d.n) { var sp = dailySpec(k); return { gid: 'day:' + k, topicId: sp.topicId, subs: sp.subs.slice(), dateKey: k, past: false, me: null, snap: null }; }
+    return null;
+  }
+  function irrUnlocked() { return !!irrTodaySrc(); }
+  function renderIrrHome() {
+    var src = irrTodaySrc(), box = $('irr-home'); if (!box) return;
+    if (!src) {
+      box.innerHTML = '<div class="irr-lock"><b>' + LOCK_SVG + 'Locked until you play today’s topic</b><p class="note" style="margin:0">Finish today’s draft first, against the AI or online with friends. Then Mr. Irrelevant opens on the same topic.</p>' +
+        '<div class="actions"><button class="btn primary" type="button" data-act="goto-mode" data-mode="offline">Offline vs AI</button><button class="btn" type="button" data-act="goto-mode" data-mode="room">Play Online</button></div></div>';
+      return;
+    }
+    var f = loadIrr(src.gid);
+    box.innerHTML = '<button class="btn primary block" type="button" data-act="irr-home" id="irr-home-btn">' + (f && f.done ? 'See your Mr. Irrelevant' : f ? 'Back to Mr. Irrelevant' : 'Play Mr. Irrelevant') + '</button>' +
+      '<p class="note">Uses your latest draft of today’s topic' + (src.snap ? ', and shows its board while you pick.' : '.') + ' One try per draft.</p>';
+  }
+  function startIrr(src) {
+    if (!src) { var g = S.game; if (!g || !g.results) return; src = irrSrcFromGame(g); }
+    var gid = src.gid, f = loadIrr(gid);
     leaveGame(true); S.fastDay = null;
     if (!f) {
       var t0 = now();
-      f = { kind: 'irr', gid: gid, topicId: g.topicId, subs: g.subs.slice(), dateKey: g.dateKey, past: !!g.past, idx: 0, answers: [], startedAt: t0, endsAt: t0 + FAST_SECONDS * 1000, done: false, finishedAt: 0, uid: fbOn() && FB.user ? FB.user.uid : '' };
+      f = { kind: 'irr', untimed: true, gid: gid, topicId: src.topicId, subs: src.subs.slice(), dateKey: src.dateKey, past: !!src.past, idx: 0, answers: [], startedAt: t0, endsAt: t0, done: false, finishedAt: 0, uid: fbOn() && FB.user ? FB.user.uid : '', game: src.snap, me: src.me };
       statIrr('start');
     }
     S.fast = f; S.ui.fastQ = ''; S.ui.fastSel = 0;
     try { sessionStorage.setItem('roster.irrNow', gid); } catch (e) {}
     S.view = 'play'; S.mode = 'fast';
-    if (!f.done && now() >= f.endsAt) finishFast(); else saveFast();
+    if (!f.done && fastExpired(f)) finishFast(); else saveFast();
     setMsg(''); render(); window.scrollTo(0, 0);
     if (!f.done) setTimeout(function () { var i = $('fast-in'); if (i) i.focus(); }, 50);
   }
@@ -6267,7 +6334,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     var today = dateKey(new Date());
     S.fastDay = day && day < today ? day : null;
     var f = loadFastFor(fastDayKey());
-    if (f) { S.fast = f; if (!f.done && now() >= f.endsAt) finishFast(); }
+    if (f) { S.fast = f; if (!f.done && fastExpired(f)) finishFast(); }
     else S.fast = null;
     S.view = 'play'; S.mode = 'fast';
     render(); window.scrollTo(0, 0);
@@ -6297,9 +6364,25 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
       if (S.fast === f && !f.done && S.ui.fastQ === q2) renderFast();
     }).map(function (r) { return { e: r.e, s: 9, near: r.ai ? 'ai' : 'spell' }; });
   }
+  function fastExpired(f) { return !f.untimed && now() >= f.endsAt; }
+  function irrNextOpen(f, from) { for (var k = 1; k <= f.subs.length; k++) { var j = (from + k) % f.subs.length; if (!f.answers[j]) return j; } return -1; }
+  function irrChooseSub(i) {
+    var f = S.fast; if (!f || f.done || !f.untimed || !(i >= 0 && i < f.subs.length) || f.answers[i]) return;
+    f.idx = i; S.ui.fastQ = ''; S.ui.fastSel = 0; var inp = $('fast-in'); if (inp) inp.value = '';
+    saveFast(); renderFast(); if (inp) inp.focus();
+  }
   function fastSubmit(entry) {
     var f = S.fast; if (!f || f.done) return;
-    if (now() >= f.endsAt) { finishFast(); return; }
+    if (f.untimed) {   /* untimed Mr. Irrelevant: fill the chosen subtopic, then move to the next open one */
+      if (!entry || f.answers[f.idx]) return;
+      f.answers[f.idx] = { key: entry.key, name: entry.name };
+      S.ui.fastQ = ''; S.ui.fastSel = 0;
+      var nx = irrNextOpen(f, f.idx);
+      if (nx < 0) { finishFast(); return; }
+      f.idx = nx; saveFast(); render(); var i0 = $('fast-in'); if (i0) { i0.value = ''; i0.focus(); }
+      return;
+    }
+    if (fastExpired(f)) { finishFast(); return; }
     f.answers[f.idx] = entry ? { key: entry.key, name: entry.name } : { skipped: true };
     f.idx++;
     S.ui.fastQ = ''; S.ui.fastSel = 0;
@@ -6308,7 +6391,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
   }
   function finishFast() {
     var f = S.fast; if (!f || f.done) return;
-    f.done = true; f.finishedAt = Math.min(now(), f.endsAt);
+    f.done = true; f.finishedAt = f.untimed ? now() : Math.min(now(), f.endsAt);
     var irr = f.kind === 'irr';
     if (irr) { statIrr('done'); try { sessionStorage.removeItem('roster.irrNow'); } catch (e) {} } else statFast('done');
     f.results = f.subs.map(function (sub, i) {
@@ -6357,7 +6440,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     if (todo.length && S.mode === 'me' && S.view === 'play' && !S.game) renderMe();
   }
   function fastTick() {
-    var f = S.fast; if (!f || f.done || S.view !== 'play') return;
+    var f = S.fast; if (!f || f.done || f.untimed || S.view !== 'play') return;
     var rem = f.endsAt - now();
     if (rem <= 0) { finishFast(); return; }
     var el = $('fast-clock-t'); if (!el) return;
@@ -6372,7 +6455,10 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     $('fast-play').hidden = f.done; $('fast-done').hidden = !f.done;
     var irr = f.kind === 'irr';
     if (!f.done) {
-      $('fast-step').textContent = 'Subtopic ' + (f.idx + 1) + ' of ' + f.subs.length + (irr ? ' · Stay under ' + fmt1(IRR_TARGET) : ' · Beat ' + fmt1(FAST_TARGET));
+      var untimed = !!f.untimed, nPicked = f.answers.filter(function (a) { return !!a; }).length;
+      $('fast-clock').hidden = untimed; $('fast-bar').hidden = untimed; $('fast-skip').hidden = untimed; $('fast-play').classList.toggle('untimed', untimed);
+      $('fast-step').textContent = untimed ? 'Mr. Irrelevant · ' + nPicked + ' of ' + f.subs.length + ' picked · Stay under ' + fmt1(IRR_TARGET) + ' · No timer'
+        : 'Subtopic ' + (f.idx + 1) + ' of ' + f.subs.length + (irr ? ' · Stay under ' + fmt1(IRR_TARGET) : ' · Beat ' + fmt1(FAST_TARGET));
       $('fast-sub').textContent = f.subs[f.idx];
       $('fast-label').textContent = (irr ? 'Least valuable ' : 'Best ') + t.noun + ' for ' + f.subs[f.idx];
       var ms = fastMatches();
@@ -6383,7 +6469,16 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
           (r.near ? '<span class="near-tag">' + (r.near === 'ai' ? 'AI best match' : 'Closest match') + '</span>' : '') + '</li>';
       }).join('') ||((S.ui.fastQ || '').trim() ? '<li class="opt none">No match. Only answers on the list count.</li>' : '');
       $('fast-list').hidden = !(S.ui.fastQ || '').trim();
-      $('fast-done-list').innerHTML = f.answers.map(function (a, i) { return '<span class="bsub done"><span class="mono">0' + (i + 1) + '</span>' + esc(f.subs[i]) + '<span class="bpick">' + (a && a.name ? esc(a.name) : 'skipped') + '</span></span>'; }).join('');
+      $('fast-done-list').innerHTML = untimed
+        ? f.subs.map(function (sub, i) {
+            var a = f.answers[i];
+            if (a) return '<span class="bsub done"><span class="mono">0' + (i + 1) + '</span>' + esc(sub) + '<span class="bpick">' + esc(a.name) + '</span></span>';
+            return '<button type="button" class="bsub" data-act="irr-sub" data-i="' + i + '" aria-pressed="' + (i === f.idx) + '"><span class="mono">0' + (i + 1) + '</span>' + esc(sub) + '</button>';
+          }).join('')
+        : f.answers.map(function (a, i) { return '<span class="bsub done"><span class="mono">0' + (i + 1) + '</span>' + esc(f.subs[i]) + '<span class="bpick">' + (a && a.name ? esc(a.name) : 'skipped') + '</span></span>'; }).join('');
+      var bg = untimed && f.game && f.game.players && Array.isArray(f.game.picks) ? f.game : null;
+      $('irr-board-box').hidden = !bg;
+      if (bg) { var meWas = S.me; S.me = f.me; try { renderBoard($('irr-board'), bg, null, bg.results ? bg.results.scores : null); } finally { S.me = meWas; } }
       fastTick();
       return;
     }
@@ -6391,7 +6486,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     $('fast-verdict').className = 'winner fast-verdict ' + (beat ? 'won' : 'lost');
     $('fast-verdict').innerHTML = irr
       ? '<span class="mono">Mr. Irrelevant · ' + (beat ? 'Gloriously irrelevant' : 'Too relevant') + '</span><h3 class="display">' + fmt1(f.total) + ' <small>/ 50</small></h3><p>' +
-        (beat ? 'Under the ' + fmt1(IRR_TARGET) + ' line by ' + fmt1(IRR_TARGET - f.total) : 'Over the ' + fmt1(IRR_TARGET) + ' line by ' + fmt1(f.total - IRR_TARGET)) + ' · lowest possible is 12.5 · ' + used + ' seconds</p>'
+        (beat ? 'Under the ' + fmt1(IRR_TARGET) + ' line by ' + fmt1(IRR_TARGET - f.total) : 'Over the ' + fmt1(IRR_TARGET) + ' line by ' + fmt1(f.total - IRR_TARGET)) + ' · lowest possible is 12.5' + (f.untimed ? '' : ' · ' + used + ' seconds') + '</p>'
       : '<span class="mono">' + (beat ? 'You beat it' : 'Not this time') + '</span><h3 class="display">' + fmt1(f.total) + ' <small>/ 50</small></h3><p>' +
       (beat ? 'Beat the ' + fmt1(FAST_TARGET) + ' target by ' + fmt1(f.total - FAST_TARGET) : 'Missed the ' + fmt1(FAST_TARGET) + ' target by ' + fmt1(FAST_TARGET - f.total)) +
       ' · ' + used + ' seconds</p>';
@@ -6484,9 +6579,9 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
       orgSaved = sessionStorage.getItem('roster.orgSaved');
       sessionStorage.removeItem('roster.orgSaved');
     } catch (e) {}
-    var fr = loadFastToday(); if (!m && !lm && fr && !fr.done) { S.fast = fr; S.view = 'play'; S.mode = 'fast'; if (now() >= fr.endsAt) finishFast(); }
+    var fr = loadFastToday(); if (!m && !lm && fr && !fr.done) { S.fast = fr; S.view = 'play'; S.mode = 'fast'; if (fastExpired(fr)) finishFast(); }
     var irrNow = null; try { irrNow = sessionStorage.getItem('roster.irrNow'); } catch (e) {}
-    var ir = irrNow ? loadIrr(irrNow) : null; if (!m && !lm && ir && !ir.done) { S.fast = ir; S.view = 'play'; S.mode = 'fast'; if (now() >= ir.endsAt) finishFast(); }
+    var ir = irrNow ? loadIrr(irrNow) : null; if (!m && !lm && ir && !ir.done) { S.fast = ir; S.view = 'play'; S.mode = 'fast'; if (fastExpired(ir)) finishFast(); }
     if (!m && !lm && restored && restored.game && restored.game.mode === 'local' && TOPICS[restored.game.topicId] && Array.isArray(restored.game.picks)) {
       S.game = restored.game; S.me = 'you'; S.view = 'play';
       S.lastSettings = restored.settings || { mode: 'local', count: 3 };
