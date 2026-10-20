@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-19",
- "updatedAt": 1792448878568,
+ "updatedAt": 1792465765430,
  "days": {
   "2026-10-19": {
    "topicId": "cartoon-characters",
@@ -14,23 +14,23 @@
    ]
   },
   "2026-10-20": {
-   "topicId": "pizza-toppings",
+   "topicId": "candy",
    "subs": [
-    "Classic",
-    "Popularity",
-    "Crowd-pleaser",
-    "Taste",
-    "Versatility"
+    "Nostalgia",
+    "Shareability",
+    "Texture",
+    "Halloween value",
+    "Taste"
    ]
   },
   "2026-10-21": {
-   "topicId": "cars",
+   "topicId": "fortune-500",
    "subs": [
-    "Reliability",
-    "Speed",
-    "Luxury",
-    "Style",
-    "Iconic status"
+    "Employees",
+    "Innovation",
+    "Revenue",
+    "Brand love",
+    "Profit"
    ]
   },
   "2026-10-22": {
