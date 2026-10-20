@@ -535,6 +535,15 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 @media (max-height: 640px) { .intro-q { display: none; } }
 /* browse answers while waiting */
 .browse { display: grid; gap: 8px; margin-top: 14px; }
+.irr-listopt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 12px; }
+.irr-listopt .seg { min-width: 160px; }
+.irr-all { display: grid; gap: 8px; margin-top: 12px; }
+.irr-letters { display: flex; flex-wrap: wrap; gap: 4px; }
+.irr-letters button { min-width: 30px; height: 30px; padding: 0 6px; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+@media (hover: hover) and (pointer: fine) { .irr-letters button:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); } }
+.irr-list { position: relative; max-height: 420px; }
+.irr-list .list-head { margin: 4px -6px 2px; }
+.irr-list .list-head:first-child { margin-top: -6px; }
 .browse-list { list-style: none; margin: 0; padding: 6px; max-height: 320px; overflow-y: auto; overscroll-behavior: contain; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--surface); }
 .browse-list .list-head { margin: -6px -6px 4px; }
 .bopt { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 12px; border-radius: 8px; }
@@ -1204,6 +1213,18 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <ul class="list fast-list" id="fast-list" role="listbox" aria-label="Matching answers" hidden=""></ul>
               </div>
               <p class="note">Type, then tap an answer or press Enter for the top match.</p>
+              <div class="irr-listopt" id="irr-listopt" hidden="">
+                <span class="mono label" id="irr-listopt-label">Show every answer?</span>
+                <div class="seg two" role="radiogroup" aria-labelledby="irr-listopt-label">
+                  <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="irr-list" data-list="show">Yes</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="irr-list" data-list="hide">No</button>
+                </div>
+              </div>
+              <div class="irr-all" id="irr-all" hidden="">
+                <span class="mono label" id="irr-all-label">Every answer</span>
+                <div class="irr-letters" id="irr-letters" aria-label="Jump to a letter"></div>
+                <ul class="browse-list irr-list" id="irr-list" aria-label="Every answer"></ul>
+              </div>
             </div>
             <div class="banner-subs fast-done-list" id="fast-done-list"></div>
             <div id="irr-board-box" hidden="" style="display:grid;gap:8px">
@@ -5642,6 +5663,8 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     else if (act === 'irr-home') { var isrc = irrTodaySrc(); if (isrc && !S.game) startIrr(isrc); }
     else if (act === 'fast-skip') fastSubmit(null);
     else if (act === 'irr-sub') irrChooseSub(parseInt(t.getAttribute('data-i'), 10));
+    else if (act === 'irr-list') { store('roster.irrList', t.getAttribute('data-list') === 'show' ? 'show' : 'hide'); if (S.fast) renderFast(); }
+    else if (act === 'irr-letter') irrJump(t.getAttribute('data-l'));
     else if (act === 'fast-share') { ev.preventDefault(); shareFast(); }
     else if (act === 'go-home') { ev.preventDefault(); leaveGame(false); }
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
@@ -5803,6 +5826,8 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     if (S.ui.sub) { setMsg(''); $('lock-btn').focus({ preventScroll: true }); }
     else setMsg('Now choose a subtopic for ' + e.name + ', then lock it in.');
   }
+  $('irr-list').addEventListener('click', function (ev) { var li = ev.target.closest ? ev.target.closest('.bopt.pick') : null; if (li && S.fast && S.fast.untimed) fastSubmit(TOPICS[S.fast.topicId].byKey[li.getAttribute('data-key')]); });
+  $('irr-list').addEventListener('keydown', function (ev) { if (ev.key !== 'Enter' && ev.key !== ' ') return; var li = ev.target.closest ? ev.target.closest('.bopt.pick') : null; if (li && S.fast && S.fast.untimed) { ev.preventDefault(); fastSubmit(TOPICS[S.fast.topicId].byKey[li.getAttribute('data-key')]); } });
   $('browse-list').addEventListener('click', function (ev) { var li = ev.target.closest ? ev.target.closest('.bopt.pick') : null; if (li) browseChoose(li.getAttribute('data-key')); });
   $('browse-list').addEventListener('keydown', function (ev) { if (ev.key !== 'Enter' && ev.key !== ' ') return; var li = ev.target.closest ? ev.target.closest('.bopt.pick') : null; if (li) { ev.preventDefault(); browseChoose(li.getAttribute('data-key')); } });
   $('answer-list').addEventListener('mousedown', function (ev) {
@@ -5816,7 +5841,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-20-05';
+  var BUILD_ID = '2026-10-20-06';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -6364,12 +6389,32 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
       if (S.fast === f && !f.done && S.ui.fastQ === q2) renderFast();
     }).map(function (r) { return { e: r.e, s: 9, near: r.ai ? 'ai' : 'spell' }; });
   }
+  /* Mr. Irrelevant can list every answer (alphabetical, with letter jumps) so you can pick without typing. Remembered per device. */
+  function irrListOn() { var v = store('roster.irrList'); return v ? v === 'show' : currentListPref() === 'show'; }
+  function renderIrrAll(f) {
+    var t = TOPICS[f.topicId], q = (S.ui.fastQ || '').trim(), used = {}, html = '', last = '', letters = [];
+    f.answers.forEach(function (a, i) { if (a && a.key) used[a.key] = f.subs[i]; });
+    var res = search(f.topicId, q);
+    $('irr-all-label').textContent = (q ? res.length + ' match' + (res.length === 1 ? '' : 'es') : 'All ' + t.pool.length + ' ' + plural(t.noun)) + ' · tap one to pick it for ' + f.subs[f.idx];
+    res.forEach(function (r) {
+      if (!q) {
+        var L = norm(r.e.name).charAt(0).toUpperCase(); if (!/[A-Z]/.test(L)) L = '#';
+        if (L !== last) { html += '<li class="list-head" role="presentation" id="irr-l-' + (L === '#' ? 'num' : L) + '">' + L + '</li>'; last = L; letters.push(L); }
+      }
+      var tk = used[r.e.key];
+      html += '<li class="bopt' + (tk ? ' taken' : ' pick') + '"' + (tk ? '' : ' data-key="' + esc(r.e.key) + '" role="button" tabindex="0"') + '><span><span class="nm">' + esc(r.e.name) + '</span>' + (r.via ? ' <span class="via">' + esc(r.via) + '</span>' : '') + '</span>' + (tk ? '<span class="why">Your pick for ' + esc(tk) + '</span>' : '') + '</li>';
+    });
+    $('irr-letters').hidden = !!q;
+    $('irr-letters').innerHTML = letters.map(function (L) { return '<button type="button" data-act="irr-letter" data-l="' + (L === '#' ? 'num' : L) + '">' + L + '</button>'; }).join('');
+    $('irr-list').innerHTML = html || '<li class="bopt">No match. Only answers on the list count.</li>';
+  }
+  function irrJump(L) { var list = $('irr-list'), el = $('irr-l-' + L); if (list && el) list.scrollTop = el.offsetTop; }
   function fastExpired(f) { return !f.untimed && now() >= f.endsAt; }
   function irrNextOpen(f, from) { for (var k = 1; k <= f.subs.length; k++) { var j = (from + k) % f.subs.length; if (!f.answers[j]) return j; } return -1; }
   function irrChooseSub(i) {
     var f = S.fast; if (!f || f.done || !f.untimed || !(i >= 0 && i < f.subs.length) || f.answers[i]) return;
     f.idx = i; S.ui.fastQ = ''; S.ui.fastSel = 0; var inp = $('fast-in'); if (inp) inp.value = '';
-    saveFast(); renderFast(); if (inp) inp.focus();
+    saveFast(); renderFast(); if (inp && !irrListOn()) inp.focus();
   }
   function fastSubmit(entry) {
     var f = S.fast; if (!f || f.done) return;
@@ -6379,7 +6424,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
       S.ui.fastQ = ''; S.ui.fastSel = 0;
       var nx = irrNextOpen(f, f.idx);
       if (nx < 0) { finishFast(); return; }
-      f.idx = nx; saveFast(); render(); var i0 = $('fast-in'); if (i0) { i0.value = ''; i0.focus(); }
+      f.idx = nx; saveFast(); render(); var i0 = $('fast-in'); if (i0) { i0.value = ''; if (!irrListOn()) i0.focus(); }
       return;
     }
     if (fastExpired(f)) { finishFast(); return; }
@@ -6468,7 +6513,12 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
           '<li class="opt' + (r.near ? ' near' : '') + '" role="option" data-act="fast-pick" data-key="' + esc(r.e.key) + '" aria-selected="' + (i === S.ui.fastSel) + '"><span class="nm">' + esc(r.e.name) + '</span>' + (r.via ? '<span class="via">' + esc(r.via) + '</span>' : '') +
           (r.near ? '<span class="near-tag">' + (r.near === 'ai' ? 'AI best match' : 'Closest match') + '</span>' : '') + '</li>';
       }).join('') ||((S.ui.fastQ || '').trim() ? '<li class="opt none">No match. Only answers on the list count.</li>' : '');
-      $('fast-list').hidden = !(S.ui.fastQ || '').trim();
+      var showAll = !!f.untimed && irrListOn();
+      $('fast-list').hidden = !(S.ui.fastQ || '').trim() || showAll;
+      $('irr-listopt').hidden = !f.untimed;
+      document.querySelectorAll('[data-act="irr-list"]').forEach(function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-list') === 'show') === irrListOn())); });
+      $('irr-all').hidden = !showAll;
+      if (showAll) renderIrrAll(f);
       $('fast-done-list').innerHTML = untimed
         ? f.subs.map(function (sub, i) {
             var a = f.answers[i];
