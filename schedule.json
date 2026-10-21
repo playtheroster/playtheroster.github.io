@@ -1,229 +1,199 @@
 {
-  "version": 1,
-  "from": "2026-10-19",
-  "updatedAt": 1792466869716,
-  "days": {
-    "2026-10-19": {
-      "topicId": "cartoon-characters",
-      "subs": [
-        "Humor",
-        "Popularity",
-        "Personality",
-        "Catchphrases",
-        "Merch appeal"
-      ]
-    },
-    "2026-10-20": {
-      "topicId": "candy",
-      "subs": [
-        "Sweet",
-        "Sour",
-        "Chocolate",
-        "Fruity",
-        "Popular"
-      ]
-    },
-    "2026-10-21": {
-      "topicId": "fortune-500",
-      "subs": [
-        "Logo",
-        "Innovation",
-        "Revenue",
-        "Brand love",
-        "Profit"
-      ]
-    },
-    "2026-10-22": {
-      "topicId": "sandwiches",
-      "subs": [
-        "Fillingness",
-        "Taste",
-        "Portability",
-        "Healthiness",
-        "Classic status"
-      ]
-    },
-    "2026-10-23": {
-      "topicId": "nfl-players",
-      "subs": [
-        "Clutch",
-        "Rushing",
-        "Passing",
-        "Receiving",
-        "Defense"
-      ]
-    },
-    "2026-10-26": {
-      "topicId": "superheroes",
-      "subs": [
-        "Popularity",
-        "Gadgets",
-        "Speed",
-        "Intelligence",
-        "Strength"
-      ]
-    },
-    "2026-10-28": {
-      "topicId": "vegetables",
-      "subs": [
-        "Roasted",
-        "Taste",
-        "Nutrition",
-        "Raw crunch",
-        "Versatility"
-      ]
-    },
-    "2026-10-29": {
-      "topicId": "animated-movies",
-      "subs": [
-        "Story",
-        "Animation",
-        "Villain",
-        "Songs",
-        "Heart"
-      ]
-    },
-    "2026-10-30": {
-      "topicId": "jobs",
-      "subs": [
-        "Impact",
-        "Salary",
-        "Job security",
-        "Prestige",
-        "Fun"
-      ]
-    },
-    "2026-11-03": {
-      "topicId": "fashion-brands",
-      "subs": [
-        "Quality",
-        "Celebrity appeal",
-        "Luxury",
-        "Streetwear cred",
-        "Iconic logo"
-      ]
-    },
-    "2026-11-11": {
-      "topicId": "countries",
-      "subs": [
-        "Culture",
-        "Sports",
-        "Innovation",
-        "Natural beauty",
-        "Quality of life"
-      ]
-    }
+ "version": 1,
+ "from": "2026-10-21",
+ "updatedAt": 1792614400786,
+ "days": {
+  "2026-10-21": {
+   "topicId": "fortune-500",
+   "subs": [
+    "Logo",
+    "Innovation",
+    "Revenue",
+    "Brand love",
+    "Profit"
+   ]
   },
-  "fast": {
-    "2026-10-20": {
-      "topicId": "cheeses",
-      "subs": [
-        "On pizza",
-        "Pairing",
-        "Taste",
-        "Meltability",
-        "Snacking"
-      ]
-    },
-    "2026-10-21": {
-      "topicId": "tailgate",
-      "subs": [
-        "Fun",
-        "Popularity",
-        "Tradition",
-        "Effort-free",
-        "Taste"
-      ]
-    },
-    "2026-10-23": {
-      "topicId": "seafood",
-      "subs": [
-        "Texture",
-        "Versatility",
-        "Healthiness",
-        "Luxury",
-        "Taste"
-      ]
-    },
-    "2026-10-24": {
-      "topicId": "game-franchises",
-      "subs": [
-        "Longevity",
-        "Sales",
-        "Gameplay",
-        "Cultural impact",
-        "Story"
-      ]
-    },
-    "2026-10-25": {
-      "topicId": "excuses",
-      "subs": [
-        "Believability",
-        "Commonness",
-        "Creativity",
-        "Reusability",
-        "Sympathy"
-      ]
-    },
-    "2026-10-26": {
-      "topicId": "got-characters",
-      "subs": [
-        "Fame",
-        "Cunning",
-        "Power",
-        "Honor",
-        "Survival skills"
-      ]
-    },
-    "2026-10-28": {
-      "topicId": "fall-favorites",
-      "subs": [
-        "Coziness",
-        "Affordability",
-        "Fun",
-        "Popularity",
-        "Nostalgia"
-      ]
-    },
-    "2026-10-29": {
-      "topicId": "dorm-essentials",
-      "subs": [
-        "Space-saving",
-        "Comfort",
-        "Affordability",
-        "Popularity",
-        "Usefulness"
-      ]
-    },
-    "2026-10-30": {
-      "topicId": "phobias",
-      "subs": [
-        "Commonness",
-        "Fame",
-        "Intensity",
-        "Relatability",
-        "Weirdness"
-      ]
-    },
-    "2026-11-02": {
-      "topicId": "explorers",
-      "subs": [
-        "Distance traveled",
-        "Discoveries",
-        "Navigation",
-        "Bravery",
-        "Fame"
-      ]
-    },
-    "2026-11-14": {
-      "topicId": "sidekicks",
-      "subs": [
-        "Humor",
-        "Usefulness",
-        "Iconic",
-        "Could lead their own story",
-        "Loyalty"
-      ]
-    }
+  "2026-10-22": {
+   "topicId": "nfl-qbs",
+   "subs": [
+    "Clutch performance",
+    "Mobility",
+    "Accuracy",
+    "Arm strength",
+    "Pocket presence"
+   ]
+  },
+  "2026-10-23": {
+   "topicId": "sandwiches",
+   "subs": [
+    "Portability",
+    "Healthiness",
+    "Taste",
+    "Fillingness",
+    "Classic status"
+   ]
+  },
+  "2026-10-26": {
+   "topicId": "superheroes",
+   "subs": [
+    "Popularity",
+    "Gadgets",
+    "Speed",
+    "Intelligence",
+    "Strength"
+   ]
+  },
+  "2026-10-28": {
+   "topicId": "vegetables",
+   "subs": [
+    "Roasted",
+    "Taste",
+    "Nutrition",
+    "Raw crunch",
+    "Versatility"
+   ]
+  },
+  "2026-10-29": {
+   "topicId": "animated-movies",
+   "subs": [
+    "Story",
+    "Animation",
+    "Villain",
+    "Songs",
+    "Heart"
+   ]
+  },
+  "2026-10-30": {
+   "topicId": "jobs",
+   "subs": [
+    "Impact",
+    "Salary",
+    "Job security",
+    "Prestige",
+    "Fun"
+   ]
+  },
+  "2026-11-03": {
+   "topicId": "fashion-brands",
+   "subs": [
+    "Quality",
+    "Celebrity appeal",
+    "Luxury",
+    "Streetwear cred",
+    "Iconic logo"
+   ]
+  },
+  "2026-11-11": {
+   "topicId": "countries",
+   "subs": [
+    "Culture",
+    "Sports",
+    "Innovation",
+    "Natural beauty",
+    "Quality of life"
+   ]
   }
+ },
+ "fast": {
+  "2026-10-21": {
+   "topicId": "tailgate",
+   "subs": [
+    "Fun",
+    "Popularity",
+    "Tradition",
+    "Effort-free",
+    "Taste"
+   ]
+  },
+  "2026-10-23": {
+   "topicId": "seafood",
+   "subs": [
+    "Texture",
+    "Versatility",
+    "Healthiness",
+    "Luxury",
+    "Taste"
+   ]
+  },
+  "2026-10-24": {
+   "topicId": "game-franchises",
+   "subs": [
+    "Longevity",
+    "Sales",
+    "Gameplay",
+    "Cultural impact",
+    "Story"
+   ]
+  },
+  "2026-10-25": {
+   "topicId": "excuses",
+   "subs": [
+    "Believability",
+    "Commonness",
+    "Creativity",
+    "Reusability",
+    "Sympathy"
+   ]
+  },
+  "2026-10-26": {
+   "topicId": "got-characters",
+   "subs": [
+    "Fame",
+    "Cunning",
+    "Power",
+    "Honor",
+    "Survival skills"
+   ]
+  },
+  "2026-10-28": {
+   "topicId": "fall-favorites",
+   "subs": [
+    "Coziness",
+    "Affordability",
+    "Fun",
+    "Popularity",
+    "Nostalgia"
+   ]
+  },
+  "2026-10-29": {
+   "topicId": "dorm-essentials",
+   "subs": [
+    "Space-saving",
+    "Comfort",
+    "Affordability",
+    "Popularity",
+    "Usefulness"
+   ]
+  },
+  "2026-10-30": {
+   "topicId": "phobias",
+   "subs": [
+    "Commonness",
+    "Fame",
+    "Intensity",
+    "Relatability",
+    "Weirdness"
+   ]
+  },
+  "2026-11-02": {
+   "topicId": "explorers",
+   "subs": [
+    "Distance traveled",
+    "Discoveries",
+    "Navigation",
+    "Bravery",
+    "Fame"
+   ]
+  },
+  "2026-11-14": {
+   "topicId": "sidekicks",
+   "subs": [
+    "Humor",
+    "Usefulness",
+    "Iconic",
+    "Could lead their own story",
+    "Loyalty"
+   ]
+  }
+ }
 }
