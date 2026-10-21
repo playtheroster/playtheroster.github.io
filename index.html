@@ -307,7 +307,7 @@ select.field { padding-right: 8px; }
 .podium-rest .rk { font-family: var(--font-mono); color: var(--muted); }
 @keyframes rvin { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }
 /* The reveal runs full screen, styled like the draft's intro screen. */
-.reveal.rv-full { position: fixed; inset: 0; z-index: 80; overflow-y: auto; display: block; padding: calc(64px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px)); background: var(--pop); color: #ffffff; }
+.reveal.rv-full { position: fixed; inset: 0; z-index: 80; overflow-y: auto; display: block; padding: calc(28px + env(safe-area-inset-top, 0px)) 16px calc(112px + env(safe-area-inset-bottom, 0px)); background: var(--pop); color: #ffffff; }
 .reveal.rv-full::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,0.08) 79px 81px); }
 html.rv-on, html.rv-on body { overflow: hidden; }
 .rv-in { position: relative; width: 100%; max-width: 900px; margin: 0 auto; min-height: calc(100% - 8px); display: grid; align-content: center; justify-items: center; gap: clamp(12px, 2.4vh, 22px); text-align: center; }
@@ -345,10 +345,24 @@ html.rv-on, html.rv-on body { overflow: hidden; }
 .rv-second .top .tot { margin-left: auto; font-family: var(--font-display); font-size: 1.6rem; }
 .rv-second .top .mono { color: var(--pop); }
 .rv-second .picks { font-size: 0.88rem; color: var(--muted); }
-.rv-go { min-height: 56px; padding: 0 28px; border: 3px solid #000000; border-radius: 18px; background: #ffffff; color: #000000; font: inherit; font-weight: 800; font-size: 1.15rem; box-shadow: 0 6px 0 #000000; cursor: pointer; }
-.rv-go:hover { background: #000000; color: var(--hi); }
-.rv-skip { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; min-height: 40px; padding: 0 16px; border: 2.5px solid #000000; border-radius: 999px; background: #ffffff; color: #000000; font: inherit; font-weight: 800; cursor: pointer; z-index: 2; }
-.rv-skip:hover { background: #000000; color: var(--hi); }
+.rv-hint { margin: 0; font-weight: 700; opacity: 0.85; }
+/* Controls stay pinned at the bottom: Next (with a bar filling up until it moves on by itself) and Skip. */
+.rv-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; justify-content: center; gap: 12px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--pop); border-top: 3px solid #000000; }
+.rv-go, .rv-skip { position: relative; overflow: hidden; min-height: 56px; padding: 0 28px; border: 3px solid #000000; border-radius: 18px; font: inherit; font-weight: 800; font-size: 1.15rem; box-shadow: 0 6px 0 #000000; cursor: pointer; }
+.rv-go { min-width: 180px; background: #ffffff; color: #000000; }
+.rv-skip { background: var(--hi); color: #000000; }
+.rv-go:hover, .rv-skip:hover { background: #000000; color: var(--hi); }
+.rv-go:active, .rv-skip:active { transform: translateY(4px); box-shadow: 0 2px 0 #000000; }
+.rv-go .fill { position: absolute; left: 0; bottom: 0; height: 6px; width: 0; background: var(--pop); }
+.rv-go.counting .fill { animation: rvfill var(--rv-auto, 2s) linear forwards; }
+@keyframes rvfill { to { width: 100%; } }
+/* The winner: the card turns into a yellow trophy card with a WINNER stamp. */
+.rv-in .rv-stage.crowned { padding: 18px clamp(18px, 4vw, 40px) 22px; border: 4px solid #000000; border-radius: 22px; background: var(--hi); color: #000000; box-shadow: 8px 8px 0 #000000; animation: rvcrown 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+.rv-in .rv-stage.crowned .mono, .rv-in .rv-stage.crowned .intro-topic { color: #000000; }
+.rv-crown { display: inline-block; margin-bottom: 6px; padding: 8px 24px 4px; border-radius: 14px; background: #000000; color: var(--hi); font-family: var(--font-display); font-size: clamp(2.6rem, 10vw, 5.2rem); line-height: 1; text-transform: uppercase; transform: rotate(-3deg); animation: rvstamp 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+@keyframes rvstamp { from { opacity: 0; transform: rotate(-3deg) scale(2.2); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
+@keyframes rvcrown { 0% { transform: scale(0.9); } 60% { transform: scale(1.04); } 100% { transform: none; } }
+.rv-in .podium .crown-tag { padding: 2px 10px; border: 2px solid #000000; border-radius: 999px; background: var(--hi); color: #000000; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
 .rv-in .podium { width: 100%; max-width: 640px; border-bottom-color: #000000; }
 .rv-in .podium .spot .pn { color: #ffffff; text-shadow: 2px 2px 0 #000000; }
 .rv-in .podium .spot .pt { color: var(--hi); }
@@ -357,7 +371,9 @@ html.rv-on, html.rv-on body { overflow: hidden; }
 .rv-in .podium-rest { width: 100%; max-width: 640px; }
 .rv-in .podium-rest li { background: #ffffff; color: #000000; border: 3px solid #000000; }
 @media (max-width: 640px) {
-  .reveal.rv-full { padding-top: calc(58px + env(safe-area-inset-top, 0px)); }
+  .reveal.rv-full { padding-top: calc(18px + env(safe-area-inset-top, 0px)); padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .rv-bar { gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .rv-go, .rv-skip { flex: 1 1 0; min-width: 0; min-height: 52px; padding: 0 10px; font-size: 1rem; }
   .rv-in { gap: 10px; }
   .rv-in .intro-topic { font-size: clamp(2.2rem, 11vw, 3.4rem); }
   .rv-in .av.big { width: 46px; height: 46px; font-size: 1.4rem; }
@@ -368,7 +384,6 @@ html.rv-on, html.rv-on body { overflow: hidden; }
   .rv-list .pk { font-size: 0.95rem; }
   .rv-box.intro-cd { order: -1; flex: 1 1 100%; max-width: none; grid-auto-flow: column; justify-content: center; align-items: baseline; gap: 10px; padding: 6px 16px; }
   .rv-box.intro-cd .intro-n { font-size: 2.6rem; }
-  .rv-skip { min-height: 34px; padding: 0 12px; font-size: 0.85rem; }
 }
 /* suspense: names spin before landing, picks come in one by one, the total counts up */
 .rv-place.pending { box-shadow: inset 8px 0 0 var(--line); }
@@ -3681,9 +3696,9 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
 
   /* ---------- results ---------- */
   /* ---------- online results reveal ----------
-     Online games only: when the scores are in, each player taps through the reveal on their own screen: a waiting
+     Online games only: when the scores are in, the reveal plays by itself on each player's screen: a waiting
      room, then each place from last up with that player's roster and scores, the winner (with 2nd), then a podium.
-     Skippable; once finished or skipped it isn't shown again for that game. */
+     Next jumps ahead at any moment; Skip goes straight to the results. Once finished or skipped it isn't shown again. */
   function revealOn(g) { return !!(g && g.mode === 'shared' && g.results && g.results.scores && (!window.__ROSTER_TEST__ || TEST.reveal)); }
   function revealedList() { try { var a = JSON.parse(store('roster.revealed') || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
   function revealDone(g) { return revealedList().indexOf(gameId(g)) >= 0; }
@@ -3713,7 +3728,7 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
     RV.t = end;
   };
   /* Keep what was just revealed on screen (phones): scroll only if it's out of view. */
-  function rvNear(el) { try { var r = el.getBoundingClientRect(); if (r.bottom > window.innerHeight || r.top < 0) el.scrollIntoView({ block: r.height > window.innerHeight * 0.8 ? 'start' : 'nearest', behavior: rvCalm() ? 'auto' : 'smooth' }); } catch (e) {} }
+  function rvNear(el) { try { var r = el.getBoundingClientRect(), bar = document.querySelector('.rv-bar'), lim = window.innerHeight - (bar ? bar.offsetHeight : 0); if (r.bottom > lim || r.top < 0) el.scrollIntoView({ block: r.height > window.innerHeight * 0.8 ? 'start' : 'nearest', behavior: rvCalm() ? 'auto' : 'smooth' }); } catch (e) {} }
   function rvCalm() { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
   function rvConfetti(g) {
     if (rvCalm()) return;
@@ -3732,7 +3747,6 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
     rvClear();
     S.reveal.key = key;
     var t = TOPICS[g.topicId], scores = g.results.scores, rows = plan.rows, n = rows.length, calm = rvCalm(), maxPts = g.subs.length * 10;
-    var skip = '<button class="btn small ghost" type="button" data-act="reveal-skip">Skip to results</button>';
     function you(pid) { return pid === S.me ? ' (you)' : ''; }
     function av(r) { return avatar(r.name, pci(g, r.pid)); }
     function placeLabel(r) { var tied = rows.filter(function (x) { return x.rank === r.rank; }).length > 1; return (tied ? 'Tied ' : '') + ordinal(r.rank) + ' place'; }
@@ -3749,8 +3763,8 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
         '<div class="tot">' + fmt1(r.total) + ' <small>/ ' + maxPts + '</small></div></div>' + roster(r.pid, false) + '</div>';
     }
     /* A card that starts face down: the name spins through the candidates, lands, then the picks come in one by one. */
-    function mystery(r, lbl) {
-      return '<div class="rv-stage" id="rv-card"><span class="mono" id="rv-lbl">' + esc(lbl) + '</span><div style="display:grid;justify-items:center;gap:10px;margin-top:10px"><span class="av big blank" id="rv-av">?</span><h2 class="intro-topic" id="rv-nm">? ? ?</h2></div></div>' +
+    function mystery(r, lbl, win) {
+      return '<div class="rv-stage" id="rv-card">' + (win ? '<div class="rv-crown" id="rv-crown" hidden>' + esc(winLabel()) + '</div><br>' : '') + '<span class="mono" id="rv-lbl">' + esc(lbl) + '</span><div style="display:grid;justify-items:center;gap:10px;margin-top:10px"><span class="av big blank" id="rv-av">?</span><h2 class="intro-topic" id="rv-nm">? ? ?</h2></div></div>' +
         '<div class="intro-row"><div class="intro-clock rv-box"><span class="mono">Their roster</span>' + rosterList(r.pid, true) + '</div>' +
         '<div class="intro-cd rv-box"><span class="mono">Total</span><div class="intro-n" id="rv-tot">–</div><small>of ' + maxPts + '</small></div></div>';
     }
@@ -3764,7 +3778,7 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
     function steps() { return '<div class="rv-steps" aria-hidden="true">' + Array.apply(null, Array(plan.last)).map(function (x, i) { return '<i class="' + (i < step ? 'on' : '') + '"></i>'; }).join('') + '</div>'; }
     function runCard(r, pool, opt, done) {
       var card = $('rv-card'), nm = $('rv-nm'), avEl = $('rv-av'), lbl = $('rv-lbl'), tot = $('rv-tot');
-      var delays = calm ? [] : (opt.slow ? [140, 140, 150, 170, 200, 240, 290, 350, 430, 540, 660] : [70, 70, 75, 85, 100, 120, 150, 190, 240, 310]);
+      var delays = calm ? [] : (opt.slow ? [100, 110, 130, 160, 200, 260, 340, 440] : [60, 70, 85, 110, 150, 210]);
       var at = opt.wait || 0, k = 0, cands = pool.length > 1 ? pool : [r];
       var start = cands.indexOf(r) >= 0 ? (cands.indexOf(r) - delays.length % cands.length + cands.length * 4) % cands.length : 0;
       function show(x) { nm.textContent = x.name; avEl.textContent = (x.name || '?').charAt(0).toUpperCase(); avEl.className = 'av big pc' + pci(g, x.pid); }
@@ -3772,13 +3786,14 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
       at += calm ? 0 : 200;
       rvAfter(at, function () {
         show(r); nm.textContent = r.name + you(r.pid);
-        card.className = 'rv-stage landed';
-        lbl.textContent = opt.win ? (winLabel() === 'Winner' ? 'The winner' : winLabel()) : placeLabel(r);
+        card.className = 'rv-stage landed' + (opt.win ? ' crowned' : '');
+        var crown = $('rv-crown'); if (crown) crown.hidden = false;
+        lbl.textContent = opt.win ? 'Built the best roster' : placeLabel(r);
         var chip = document.querySelector('.rv-wait li[data-pid="' + r.pid + '"]'); if (chip) chip.remove();
         var wait = document.querySelector('.rv-wait'); if (wait && !wait.querySelector('li')) wait.remove();
         if (opt.win) { rvConfetti(g); document.querySelectorAll('.rv-vs li').forEach(function (c) { if (c.getAttribute('data-pid') !== r.pid) c.classList.add('gone'); }); }
       });
-      var sum = 0, rowEls = document.querySelectorAll('#reveal .rv-row'), gap = calm ? 0 : (opt.slow ? 420 : 520);
+      var sum = 0, rowEls = document.querySelectorAll('#reveal .rv-row'), gap = calm ? 0 : (opt.slow ? 420 : 440);
       at += calm ? 0 : 450;
       g.subs.forEach(function (sub, i) {
         var add = pickScore(r.pid, sub), from = sum; sum = round1(sum + add);
@@ -3790,39 +3805,39 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
       rvAfter(at, function () { tot.textContent = fmt1(r.total); done && done(); });
       return at;
     }
-    function showNext() { var b = $('reveal-next') || $('reveal-done'); if (b) { b.hidden = false; rvNear(b); } }
-    var html, run = null, skipBtn = '<button class="rv-skip" type="button" data-act="reveal-skip">Skip to results</button>';
+    /* Moves on by itself after ms (the Next button fills up meanwhile); Next works at any moment. */
+    function autoNext(ms) { var b = $('reveal-next'); if (!b) return; b.style.setProperty('--rv-auto', ms + 'ms'); b.classList.add('counting'); rvAfter(ms, function () { revealStep(step + 1); }); }
+    var html, run = null;
+    var bar = '<div class="rv-bar">' + (step >= plan.last ? '<button class="rv-go" type="button" data-act="reveal-done" id="reveal-done">See full results</button>' :
+      '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next"><span>' + (step === 0 ? 'Start now' : 'Next') + ' ›</span><i class="fill"></i></button><button class="rv-skip" type="button" data-act="reveal-skip">Skip to results »</button>') + '</div>';
     if (step === 0) {
-      html = '<span class="mono">The results are in</span><h2 class="intro-topic">' + esc(t.name) + '</h2><p class="intro-q">' + n + ' players. Places are revealed from last to first, then the podium.</p>' +
+      html = '<span class="mono">The results are in</span><h2 class="intro-topic">' + esc(t.name) + '</h2><p class="intro-q">' + n + ' players. Places are revealed from last to first, then the podium.</p><p class="rv-hint">It plays by itself. Tap Next any time to jump ahead.</p>' +
         chips(sortedPlayers(g).filter(function (p) { return rows.some(function (r) { return r.pid === p.id; }); }).map(function (p) { return rows.filter(function (r) { return r.pid === p.id; })[0]; })) +
-        '<div class="intro-row"><div class="intro-clock"><span class="mono">Who built the best roster?</span><span class="who">Let’s find out</span></div></div>' +
-        '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next">Start the reveal</button>';
+        '<div class="intro-row"><div class="intro-clock"><span class="mono">Who built the best roster?</span><span class="who">Let’s find out</span></div></div>';
+      run = function () { autoNext(calm ? 2500 : 4000); };
     } else if (step <= plan.places.length) {
       var r = plan.places[step - 1], before = plan.places.slice(0, step - 1).map(function (x) { return x.pid; });
       var pool = rows.filter(function (x) { return before.indexOf(x.pid) < 0; }), nextR = plan.places[step];
       html = steps() + mystery(r, ordinal(r.rank) + ' place goes to…') +
-        '<div class="rv-wait" style="display:grid;gap:8px;justify-items:center"><span class="mono">Still to come</span>' + chips(pool) + '</div>' +
-        '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next" hidden>' + (nextR ? 'Reveal ' + ordinal(nextR.rank) + ' place' : 'Down to the final two') + '</button>';
-      run = function () { runCard(r, pool, { wait: 600 }, showNext); };
+        '<div class="rv-wait" style="display:grid;gap:8px;justify-items:center"><span class="mono">Still to come</span>' + chips(pool) + '</div>';
+      run = function () { runCard(r, pool, { wait: 300 }, function () { autoNext(2200); }); };
     } else if (step === plan.places.length + 1) {
       var two = rows.slice(0, 2), w0 = rows[0], s1 = rows[1];
       html = steps() + '<div class="rv-final" style="display:grid;gap:10px;justify-items:center"><span class="mono">Down to the final two</span><div class="rv-vs">' + chips(two) + '</div></div>' +
-        mystery(w0, 'And the winner is…') +
+        mystery(w0, 'And the winner is…', true) +
         (s1 ? '<div class="rv-second" id="rv-second" hidden><div class="top">' + av(s1) + '<div><span class="mono">' + placeLabel(s1) + '</span><br><b>' + esc(s1.name) + esc(you(s1.pid)) + '</b></div><span class="tot">' + fmt1(s1.total) + '</span></div>' +
-          '<div class="picks">' + g.subs.map(function (sub) { var p = filled(g, s1.pid, sub); return esc(sub) + ': <strong>' + (p ? esc(p.name) : '—') + '</strong> ' + fmt1(pickScore(s1.pid, sub)); }).join(' · ') + '</div></div>' : '') +
-        '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next" hidden>See the podium</button>';
-      run = function () { runCard(w0, two, { wait: 1400, slow: true, win: true }, function () { var s2 = $('rv-second'); if (s2) { s2.hidden = false; rvNear(s2); } rvAfter(calm ? 0 : 900, showNext); }); };
+          '<div class="picks">' + g.subs.map(function (sub) { var p = filled(g, s1.pid, sub); return esc(sub) + ': <strong>' + (p ? esc(p.name) : '—') + '</strong> ' + fmt1(pickScore(s1.pid, sub)); }).join(' · ') + '</div></div>' : '');
+      run = function () { runCard(w0, two, { wait: 900, slow: true, win: true }, function () { var s2 = $('rv-second'); if (s2) { s2.hidden = false; rvNear(s2); } rvAfter(calm ? 0 : 600, function () { autoNext(3500); }); }); };
     } else {
       var top = rows.slice(0, 3), cls = ['p1', 'p2', 'p3'], order = [1, 0, 2];
       html = steps() + '<span class="mono">The podium</span><h2 class="intro-topic" style="font-size:clamp(2rem,7vw,4rem)">' + esc(t.name) + '</h2><div class="podium">' + order.map(function (i) {
         var r2 = top[i]; if (!r2) return '<div></div>';
-        return '<div class="spot ' + cls[i] + ' pc' + pci(g, r2.pid) + '">' + av(r2) + '<span class="pn">' + esc(r2.name) + esc(you(r2.pid)) + '</span><span class="pt">' + fmt1(r2.total) + '</span><div class="block">' + r2.rank + '</div></div>';
+        return '<div class="spot ' + cls[i] + ' pc' + pci(g, r2.pid) + '">' + (r2.rank === 1 ? '<span class="crown-tag">Winner</span>' : '') + av(r2) + '<span class="pn">' + esc(r2.name) + esc(you(r2.pid)) + '</span><span class="pt">' + fmt1(r2.total) + '</span><div class="block">' + r2.rank + '</div></div>';
       }).join('') + '</div>' +
-        (rows.length > 3 ? '<ol class="podium-rest">' + rows.slice(3).map(function (r2) { return '<li class="pc' + pci(g, r2.pid) + '"><span class="rk">' + ordinal(r2.rank) + '</span><span>' + esc(r2.name) + esc(you(r2.pid)) + '</span><span>' + fmt1(r2.total) + '</span></li>'; }).join('') + '</ol>' : '') +
-        '<button class="rv-go" type="button" data-act="reveal-done" id="reveal-done" hidden>See full results</button>';
-      run = function () { rvAfter(calm ? 0 : 3300, function () { rvConfetti(g); }); rvAfter(calm ? 0 : 3800, showNext); };
+        (rows.length > 3 ? '<ol class="podium-rest">' + rows.slice(3).map(function (r2) { return '<li class="pc' + pci(g, r2.pid) + '"><span class="rk">' + ordinal(r2.rank) + '</span><span>' + esc(r2.name) + esc(you(r2.pid)) + '</span><span>' + fmt1(r2.total) + '</span></li>'; }).join('') + '</ol>' : '');
+      run = function () { rvAfter(calm ? 0 : 3300, function () { rvConfetti(g); }); };
     }
-    html = skipBtn + '<div class="rv-in">' + html + '</div>';
+    html = '<div class="rv-in">' + html + '</div>' + bar;
     $('reveal').innerHTML = html;
     if (run) run();
   }
@@ -6171,7 +6186,7 @@ F("heisman-winners","Heisman Winners","Heisman winner","Which Heisman winners ma
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-21-06';
+  var BUILD_ID = '2026-10-21-07';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
