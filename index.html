@@ -343,6 +343,20 @@ html.rv-on, html.rv-on body { overflow: hidden; }
 .rv-in .podium .block { border-color: #000000; background: #ffffff; color: #000000; box-shadow: inset 0 10px 0 var(--pc, var(--hi)); padding-top: 18px; }
 .rv-in .podium-rest { width: 100%; max-width: 640px; }
 .rv-in .podium-rest li { background: #ffffff; color: #000000; border: 3px solid #000000; }
+@media (max-width: 640px) {
+  .reveal.rv-full { padding-top: calc(58px + env(safe-area-inset-top, 0px)); }
+  .rv-in { gap: 10px; }
+  .rv-in .intro-topic { font-size: clamp(2.2rem, 11vw, 3.4rem); }
+  .rv-in .av.big { width: 46px; height: 46px; font-size: 1.4rem; }
+  .rv-stage > div { margin-top: 4px !important; gap: 6px !important; }
+  .rv-box.intro-clock { padding: 10px 12px; }
+  .rv-list { gap: 5px; }
+  .rv-list li { padding: 6px 8px; }
+  .rv-list .pk { font-size: 0.95rem; }
+  .rv-box.intro-cd { order: -1; flex: 1 1 100%; max-width: none; grid-auto-flow: column; justify-content: center; align-items: baseline; gap: 10px; padding: 6px 16px; }
+  .rv-box.intro-cd .intro-n { font-size: 2.6rem; }
+  .rv-skip { min-height: 34px; padding: 0 12px; font-size: 0.85rem; }
+}
 /* suspense: names spin before landing, picks come in one by one, the total counts up */
 .rv-place.pending { box-shadow: inset 8px 0 0 var(--line); }
 .rv-place.pending .av { background: var(--line); color: var(--ink); }
@@ -6114,7 +6128,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-21-02';
+  var BUILD_ID = '2026-10-21-03';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
