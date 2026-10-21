@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-21",
- "updatedAt": 1792614400786,
+ "updatedAt": 1792614424539,
  "days": {
   "2026-10-21": {
    "topicId": "fortune-500",
@@ -91,6 +91,16 @@
     "Innovation",
     "Natural beauty",
     "Quality of life"
+   ]
+  },
+  "2026-10-24": {
+   "topicId": "2000s-movies",
+   "subs": [
+    "Legacy",
+    "Quotability",
+    "Rewatchability",
+    "Box office",
+    "Story"
    ]
   }
  },
