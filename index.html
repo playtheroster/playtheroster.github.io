@@ -293,6 +293,56 @@ select.field { padding-right: 8px; }
 .podium-rest li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 10px; border-radius: 10px; background: var(--tint); font-weight: 700; }
 .podium-rest .rk { font-family: var(--font-mono); color: var(--muted); }
 @keyframes rvin { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }
+/* The reveal runs full screen, styled like the draft's intro screen. */
+.reveal.rv-full { position: fixed; inset: 0; z-index: 80; overflow-y: auto; display: block; padding: calc(64px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px)); background: var(--pop); color: #ffffff; }
+.reveal.rv-full::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,0.08) 79px 81px); }
+html.rv-on, html.rv-on body { overflow: hidden; }
+.rv-in { position: relative; width: 100%; max-width: 900px; margin: 0 auto; min-height: calc(100% - 8px); display: grid; align-content: center; justify-items: center; gap: clamp(12px, 2.4vh, 22px); text-align: center; }
+.rv-in .mono { color: var(--hi); letter-spacing: 0.14em; }
+.rv-in .intro-topic { font-size: clamp(2.8rem, 12vw, 7.5rem); }
+.rv-in .intro-topic .vs { display: block; font-size: 0.45em; color: var(--hi); margin: 0.12em 0; }
+.rv-steps { display: flex; gap: 6px; justify-content: center; }
+.rv-steps i { width: 26px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.35); }
+.rv-steps i.on { background: var(--hi); }
+.rv-in .av.big { width: 64px; height: 64px; font-size: 2rem; border: 3px solid #000000; box-shadow: 4px 4px 0 #000000; }
+.rv-in .av.big.blank { background: #ffffff; color: #000000; }
+.rv-players { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.rv-players li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border: 3px solid #000000; border-radius: 999px; background: #ffffff; color: #000000; font-weight: 800; font-size: clamp(0.95rem, 2.4vw, 1.1rem); box-shadow: 0 4px 0 #000000; }
+.rv-players li .av { width: 30px; height: 30px; font-size: 0.95rem; }
+.rv-players li.gone { opacity: 0.45; text-decoration: line-through; box-shadow: none; }
+.rv-players li .tag { font-size: 0.7rem; color: var(--pop); }
+.rv-box { text-align: left; }
+.rv-box.intro-clock { flex: 1 1 380px; max-width: 560px; justify-items: stretch; padding: 16px 18px; }
+.rv-box.intro-cd { flex: 0 1 220px; }
+.rv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rv-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.08); }
+.rv-list .sub { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hi); }
+.rv-list .pk { font-weight: 800; font-size: 1.05rem; overflow-wrap: anywhere; }
+.rv-list .pk small { font-weight: 500; font-size: 0.8rem; opacity: 0.7; margin-left: 6px; }
+.rv-list li.rv-row { opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease, transform 0.35s ease; }
+.rv-list li.rv-row.show { opacity: 1; transform: none; }
+.rv-list li.rv-row .sc { transform: scale(0.3); opacity: 0; transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) 0.2s, opacity 0.2s ease 0.2s; }
+.rv-list li.rv-row.show .sc { transform: none; opacity: 1; }
+.rv-box.intro-cd .intro-n { font-size: clamp(2.8rem, 8vw, 4.4rem); }
+.rv-box.intro-cd small { font-weight: 800; }
+.rv-stage.landed .intro-topic { animation: rvland 0.5s ease both; }
+.rv-second { display: grid; gap: 8px; width: 100%; max-width: 560px; padding: 14px 16px; border: 3px solid #000000; border-radius: 18px; background: #ffffff; color: #000000; box-shadow: 6px 6px 0 #000000; text-align: left; animation: rvin 0.5s ease both; }
+.rv-second .top { display: flex; align-items: center; gap: 10px; }
+.rv-second .top b { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; text-transform: uppercase; }
+.rv-second .top .tot { margin-left: auto; font-family: var(--font-display); font-size: 1.6rem; }
+.rv-second .top .mono { color: var(--pop); }
+.rv-second .picks { font-size: 0.88rem; color: var(--muted); }
+.rv-go { min-height: 56px; padding: 0 28px; border: 3px solid #000000; border-radius: 18px; background: #ffffff; color: #000000; font: inherit; font-weight: 800; font-size: 1.15rem; box-shadow: 0 6px 0 #000000; cursor: pointer; }
+.rv-go:hover { background: #000000; color: var(--hi); }
+.rv-skip { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; min-height: 40px; padding: 0 16px; border: 2.5px solid #000000; border-radius: 999px; background: #ffffff; color: #000000; font: inherit; font-weight: 800; cursor: pointer; z-index: 2; }
+.rv-skip:hover { background: #000000; color: var(--hi); }
+.rv-in .podium { width: 100%; max-width: 640px; border-bottom-color: #000000; }
+.rv-in .podium .spot .pn { color: #ffffff; text-shadow: 2px 2px 0 #000000; }
+.rv-in .podium .spot .pt { color: var(--hi); }
+.rv-in .podium .spot .av { border: 3px solid #000000; }
+.rv-in .podium .block { border-color: #000000; background: #ffffff; color: #000000; box-shadow: inset 0 10px 0 var(--pc, var(--hi)); padding-top: 18px; }
+.rv-in .podium-rest { width: 100%; max-width: 640px; }
+.rv-in .podium-rest li { background: #ffffff; color: #000000; border: 3px solid #000000; }
 /* suspense: names spin before landing, picks come in one by one, the total counts up */
 .rv-place.pending { box-shadow: inset 8px 0 0 var(--line); }
 .rv-place.pending .av { background: var(--line); color: var(--ink); }
@@ -3353,7 +3403,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
     if (scr === 'lobby') renderLobby();
     if (scr === 'draft') renderDraft();
-    if (scr === 'results') renderResults();
+    if (scr === 'results') renderResults(); else document.documentElement.classList.remove('rv-on');
     if (fastOn) { var fname = S.fast.kind === 'irr' ? 'Mr. Irrelevant' : 'Fast Money'; $('console-label').textContent = S.fast.done ? fname + ' · results' : fname; renderFast(); }
     renderAccountBtn();
   }
@@ -3582,9 +3632,9 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
   function revealDone(g) { return revealedList().indexOf(gameId(g)) >= 0; }
   function revealFinish(g) {
     var a = revealedList().filter(function (x) { return x !== gameId(g); }); a.push(gameId(g)); store('roster.revealed', JSON.stringify(a.slice(-30)));
-    rvClear(); S.reveal = null; render(); window.scrollTo(0, 0);
+    rvClear(); S.reveal = null; document.documentElement.classList.remove('rv-on'); render(); window.scrollTo(0, 0);
   }
-  function revealStep(n) { var g = S.game; if (!g || !S.reveal || S.reveal.gid !== gameId(g)) return; S.reveal.step = Math.max(0, Math.min(revealPlan(g).last, n)); render(); var r = $('reveal'); if (r) r.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+  function revealStep(n) { var g = S.game; if (!g || !S.reveal || S.reveal.gid !== gameId(g)) return; S.reveal.step = Math.max(0, Math.min(revealPlan(g).last, n)); render(); var r = $('reveal'); if (r) r.scrollTop = 0; }
   function ordinal(n) { var v = n % 100; return n + ((v >= 11 && v <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' })[n % 10] || 'th'); }
   /* Steps: 0 waiting room · one step per place from last up to 3rd · the winner (with 2nd) · the podium. */
   function revealPlan(g) {
@@ -3643,27 +3693,35 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     }
     /* A card that starts face down: the name spins through the candidates, lands, then the picks come in one by one. */
     function mystery(r, lbl) {
-      return '<div class="rv-place pending" id="rv-card"><div class="rv-top"><span class="av" id="rv-av">?</span><div><div class="lbl" id="rv-lbl">' + esc(lbl) + '</div><div class="nm" id="rv-nm">? ? ?</div></div>' +
-        '<div class="tot"><span id="rv-tot">–</span> <small>/ ' + maxPts + '</small></div></div>' + roster(r.pid, true) + '</div>';
+      return '<div class="rv-stage" id="rv-card"><span class="mono" id="rv-lbl">' + esc(lbl) + '</span><div style="display:grid;justify-items:center;gap:10px;margin-top:10px"><span class="av big blank" id="rv-av">?</span><h2 class="intro-topic" id="rv-nm">? ? ?</h2></div></div>' +
+        '<div class="intro-row"><div class="intro-clock rv-box"><span class="mono">Their roster</span>' + rosterList(r.pid, true) + '</div>' +
+        '<div class="intro-cd rv-box"><span class="mono">Total</span><div class="intro-n" id="rv-tot">–</div><small>of ' + maxPts + '</small></div></div>';
     }
-    function chips(list, cls) { return list.map(function (r) { return '<span class="rv-chip" data-pid="' + esc(r.pid) + '">' + av(r) + esc(r.name) + '</span>'; }).join(cls || ''); }
+    function rosterList(pid, hidden) {
+      return '<ol class="rv-list">' + g.subs.map(function (sub) {
+        var p = filled(g, pid, sub), sc = p ? scores['p' + p.n] : null, list = t.ranks[sub] || [], idx = p ? list.indexOf(p.key) : -1;
+        return '<li class="' + (hidden ? 'rv-row' : '') + '"><span class="sub">' + esc(sub) + '</span><span class="pk">' + (p ? esc(p.name) : '—') + '<small>' + (!p ? 'no pick' : idx >= 0 ? '#' + (idx + 1) + ' of ' + list.length : 'not on the list') + '</small></span>' + (p && sc ? scoreBadge(Number(sc.score) || 0) : '<span class="sc tier t1">0.0</span>') + '</li>';
+      }).join('') + '</ol>';
+    }
+    function chips(list) { return '<ul class="rv-players">' + list.map(function (r) { return '<li data-pid="' + esc(r.pid) + '">' + av(r) + esc(r.name) + (r.pid === S.me ? ' <span class="mono tag">You</span>' : '') + '</li>'; }).join('') + '</ul>'; }
+    function steps() { return '<div class="rv-steps" aria-hidden="true">' + Array.apply(null, Array(plan.last)).map(function (x, i) { return '<i class="' + (i < step ? 'on' : '') + '"></i>'; }).join('') + '</div>'; }
     function runCard(r, pool, opt, done) {
       var card = $('rv-card'), nm = $('rv-nm'), avEl = $('rv-av'), lbl = $('rv-lbl'), tot = $('rv-tot');
       var delays = calm ? [] : (opt.slow ? [140, 140, 150, 170, 200, 240, 290, 350, 430, 540, 660] : [70, 70, 75, 85, 100, 120, 150, 190, 240, 310]);
       var at = opt.wait || 0, k = 0, cands = pool.length > 1 ? pool : [r];
       var start = cands.indexOf(r) >= 0 ? (cands.indexOf(r) - delays.length % cands.length + cands.length * 4) % cands.length : 0;
-      function show(x) { nm.textContent = x.name; avEl.textContent = (x.name || '?').charAt(0).toUpperCase(); avEl.className = 'av pc' + pci(g, x.pid); }
+      function show(x) { nm.textContent = x.name; avEl.textContent = (x.name || '?').charAt(0).toUpperCase(); avEl.className = 'av big pc' + pci(g, x.pid); }
       delays.forEach(function (d) { at += d; var x = cands[(start + k++) % cands.length]; rvAfter(at, function () { show(x); }); });
       at += calm ? 0 : 200;
       rvAfter(at, function () {
         show(r); nm.textContent = r.name + you(r.pid);
-        card.className = 'rv-place pc' + pci(g, r.pid) + (opt.win ? ' win' : '') + ' landed';
-        lbl.textContent = opt.win ? winLabel() : placeLabel(r);
-        var chip = document.querySelector('.rv-wait .rv-chip[data-pid="' + r.pid + '"]'); if (chip) chip.remove();
-        var wait = document.querySelector('.rv-wait'); if (wait && !wait.querySelector('.rv-chip')) wait.remove();
-        if (opt.win) { rvConfetti(g); document.querySelectorAll('.rv-vs .rv-chip').forEach(function (c) { if (c.getAttribute('data-pid') !== r.pid) c.classList.add('gone'); }); }
+        card.className = 'rv-stage landed';
+        lbl.textContent = opt.win ? (winLabel() === 'Winner' ? 'The winner' : winLabel()) : placeLabel(r);
+        var chip = document.querySelector('.rv-wait li[data-pid="' + r.pid + '"]'); if (chip) chip.remove();
+        var wait = document.querySelector('.rv-wait'); if (wait && !wait.querySelector('li')) wait.remove();
+        if (opt.win) { rvConfetti(g); document.querySelectorAll('.rv-vs li').forEach(function (c) { if (c.getAttribute('data-pid') !== r.pid) c.classList.add('gone'); }); }
       });
-      var sum = 0, rowEls = card.querySelectorAll('.rv-row'), gap = calm ? 0 : (opt.slow ? 420 : 520);
+      var sum = 0, rowEls = document.querySelectorAll('#reveal .rv-row'), gap = calm ? 0 : (opt.slow ? 420 : 520);
       at += calm ? 0 : 450;
       g.subs.forEach(function (sub, i) {
         var add = pickScore(r.pid, sub), from = sum; sum = round1(sum + add);
@@ -3676,37 +3734,38 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
       return at;
     }
     function showNext() { var b = $('reveal-next') || $('reveal-done'); if (b) { b.hidden = false; rvNear(b); } }
-    var html, run = null;
+    var html, run = null, skipBtn = '<button class="rv-skip" type="button" data-act="reveal-skip">Skip to results</button>';
     if (step === 0) {
-      html = '<div class="rv-lobby"><div style="display:grid;gap:12px"><span class="mono">The results are in</span><div class="code">' + esc(t.name) + '</div><p class="note" style="margin:0">' + n + ' players. Places are revealed from last to first, then the podium.</p>' +
-        '<div class="actions"><button class="btn primary" type="button" data-act="reveal-next" id="reveal-next">Start the reveal</button>' + skip + '</div></div>' +
-        '<div style="display:grid;gap:12px"><span class="mono">Players</span><ul class="players">' + sortedPlayers(g).filter(function (p) { return rows.some(function (r) { return r.pid === p.id; }); }).map(function (p) {
-          return '<li>' + avatar(p.name, pci(g, p.id)) + '<span class="pn">' + esc(p.name) + '</span>' + (p.id === S.me ? '<span class="mono tag">You</span>' : '') + '<span class="q">?</span></li>';
-        }).join('') + '</ul></div></div>';
+      html = '<span class="mono">The results are in</span><h2 class="intro-topic">' + esc(t.name) + '</h2><p class="intro-q">' + n + ' players. Places are revealed from last to first, then the podium.</p>' +
+        chips(sortedPlayers(g).filter(function (p) { return rows.some(function (r) { return r.pid === p.id; }); }).map(function (p) { return rows.filter(function (r) { return r.pid === p.id; })[0]; })) +
+        '<div class="intro-row"><div class="intro-clock"><span class="mono">Who built the best roster?</span><span class="who">Let’s find out</span></div></div>' +
+        '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next">Start the reveal</button>';
     } else if (step <= plan.places.length) {
       var r = plan.places[step - 1], before = plan.places.slice(0, step - 1).map(function (x) { return x.pid; });
       var pool = rows.filter(function (x) { return before.indexOf(x.pid) < 0; }), nextR = plan.places[step];
-      html = '<span class="mono">The reveal · ' + esc(t.name) + '</span>' + mystery(r, ordinal(r.rank) + ' place goes to…') +
-        '<div class="rv-wait"><span class="mono">Still to come</span>' + chips(pool) + '</div>' +
-        '<div class="actions"><button class="btn primary" type="button" data-act="reveal-next" id="reveal-next" hidden>' + (nextR ? 'Reveal ' + ordinal(nextR.rank) + ' place' : 'Down to the final two') + '</button>' + skip + '</div>';
+      html = steps() + mystery(r, ordinal(r.rank) + ' place goes to…') +
+        '<div class="rv-wait" style="display:grid;gap:8px;justify-items:center"><span class="mono">Still to come</span>' + chips(pool) + '</div>' +
+        '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next" hidden>' + (nextR ? 'Reveal ' + ordinal(nextR.rank) + ' place' : 'Down to the final two') + '</button>';
       run = function () { runCard(r, pool, { wait: 600 }, showNext); };
     } else if (step === plan.places.length + 1) {
-      var two = rows.slice(0, 2);
-      html = '<span class="mono">The reveal · ' + esc(t.name) + '</span>' +
-        '<div class="rv-final"><span class="mono">Down to the final two</span><div class="rv-vs">' + chips(two, '<b>vs</b>') + '</div></div>' +
-        mystery(rows[0], 'And the winner is…') + (rows[1] ? '<div class="rv-second" id="rv-second" hidden>' + place(rows[1], false) + '</div>' : '') +
-        '<div class="actions"><button class="btn primary" type="button" data-act="reveal-next" id="reveal-next" hidden>See the podium</button>' + skip + '</div>';
-      run = function () { runCard(rows[0], two, { wait: 1400, slow: true, win: true }, function () { var s2 = $('rv-second'); if (s2) { s2.hidden = false; rvNear(s2); } rvAfter(calm ? 0 : 900, showNext); }); };
+      var two = rows.slice(0, 2), w0 = rows[0], s1 = rows[1];
+      html = steps() + '<div class="rv-final" style="display:grid;gap:10px;justify-items:center"><span class="mono">Down to the final two</span><div class="rv-vs">' + chips(two) + '</div></div>' +
+        mystery(w0, 'And the winner is…') +
+        (s1 ? '<div class="rv-second" id="rv-second" hidden><div class="top">' + av(s1) + '<div><span class="mono">' + placeLabel(s1) + '</span><br><b>' + esc(s1.name) + esc(you(s1.pid)) + '</b></div><span class="tot">' + fmt1(s1.total) + '</span></div>' +
+          '<div class="picks">' + g.subs.map(function (sub) { var p = filled(g, s1.pid, sub); return esc(sub) + ': <strong>' + (p ? esc(p.name) : '—') + '</strong> ' + fmt1(pickScore(s1.pid, sub)); }).join(' · ') + '</div></div>' : '') +
+        '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next" hidden>See the podium</button>';
+      run = function () { runCard(w0, two, { wait: 1400, slow: true, win: true }, function () { var s2 = $('rv-second'); if (s2) { s2.hidden = false; rvNear(s2); } rvAfter(calm ? 0 : 900, showNext); }); };
     } else {
       var top = rows.slice(0, 3), cls = ['p1', 'p2', 'p3'], order = [1, 0, 2];
-      html = '<span class="mono">The podium · ' + esc(t.name) + '</span><div class="podium">' + order.map(function (i) {
+      html = steps() + '<span class="mono">The podium</span><h2 class="intro-topic" style="font-size:clamp(2rem,7vw,4rem)">' + esc(t.name) + '</h2><div class="podium">' + order.map(function (i) {
         var r2 = top[i]; if (!r2) return '<div></div>';
         return '<div class="spot ' + cls[i] + ' pc' + pci(g, r2.pid) + '">' + av(r2) + '<span class="pn">' + esc(r2.name) + esc(you(r2.pid)) + '</span><span class="pt">' + fmt1(r2.total) + '</span><div class="block">' + r2.rank + '</div></div>';
       }).join('') + '</div>' +
         (rows.length > 3 ? '<ol class="podium-rest">' + rows.slice(3).map(function (r2) { return '<li class="pc' + pci(g, r2.pid) + '"><span class="rk">' + ordinal(r2.rank) + '</span><span>' + esc(r2.name) + esc(you(r2.pid)) + '</span><span>' + fmt1(r2.total) + '</span></li>'; }).join('') + '</ol>' : '') +
-        '<div class="actions"><button class="btn primary" type="button" data-act="reveal-done" id="reveal-done" hidden>See full results</button></div>';
+        '<button class="rv-go" type="button" data-act="reveal-done" id="reveal-done" hidden>See full results</button>';
       run = function () { rvAfter(calm ? 0 : 3300, function () { rvConfetti(g); }); rvAfter(calm ? 0 : 3800, showNext); };
     }
+    html = skipBtn + '<div class="rv-in">' + html + '</div>';
     $('reveal').innerHTML = html;
     if (run) run();
   }
@@ -3714,6 +3773,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     var g = S.game, res = g.results;
     var revealing = revealOn(g) && !revealDone(g);
     $('reveal').hidden = !revealing; $('results-main').hidden = revealing;
+    $('reveal').classList.toggle('rv-full', revealing); document.documentElement.classList.toggle('rv-on', revealing);
     if (revealing) renderReveal(g); else if (S.reveal) S.reveal = null;
     var scores = res ? res.scores : null;
     var rows = standings(g, scores);
@@ -6054,7 +6114,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-20-13';
+  var BUILD_ID = '2026-10-21-02';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
