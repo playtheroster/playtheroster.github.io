@@ -223,6 +223,19 @@ select.field { padding-right: 8px; }
 .board.board.many thead th { font-size: 0.82rem; }
 .board.many tbody th { font-size: 0.95rem; }
 .board.many td .sc { min-width: 0; margin: 0 4px 2px 0; padding: 1px 4px; font-size: 0.72rem; }
+/* Phones and big rooms: players as rows, the 5 subtopics as columns, small type, so the whole board fits on screen. */
+.board.tp th, .board.tp td { padding: 6px 4px; font-size: 0.72rem; line-height: 1.15; vertical-align: top; border-top: 1px solid var(--line); }
+.board.board.tp thead th { font-size: 0.6rem; letter-spacing: 0.02em; line-height: 1.1; padding: 7px 3px; vertical-align: bottom; white-space: normal; overflow-wrap: break-word; hyphens: auto; }
+.board.tp thead th.corner { width: 19%; }
+.board.board.tp tbody th { position: static; font-size: 0.78rem; line-height: 1.05; box-shadow: inset 4px 0 0 var(--pc); padding-left: 8px; overflow-wrap: anywhere; }
+.board.tp tbody th small { display: block; font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.06em; color: var(--muted); margin-top: 2px; }
+.board.tp tbody th small.up { color: var(--pop); }
+.board.tp tr.mine td, .board.tp tr.mine th { background: var(--tint); }
+.board.tp tr.turn th { background: var(--pc); color: var(--pi, var(--p-ink)); }
+.board.tp tr.turn th small { color: inherit; }
+.board.tp td strong { display: block; font-size: 0.7rem; overflow-wrap: break-word; word-break: normal; hyphens: auto; }
+.board.tp td .sc { display: inline-block; min-width: 0; margin: 3px 0 0; padding: 0 4px; font-size: 0.62rem; }
+.board.tp td.has { box-shadow: none; }
 /* Narrow screens or big rooms: each subtopic becomes a block of player cells, so every pick shows without sideways dragging. */
 .board.stack, .board.stack tbody { display: block; }
 .board.stack thead { display: none; }
@@ -752,7 +765,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 @media (prefers-reduced-motion: reduce) { .btn, .btn:hover, .btn:active { transition: none; transform: none; } .topic, .mark { transform: none; } }
 
 @media (max-width: 920px) {
-  .hero, .how, .draft-grid, .draft-grid.wide-board, .lobby, .results-grid, .banner { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .hero, .how, .draft-grid, .draft-grid.wide-board, .draft-grid.wide-board.huge, .lobby, .results-grid, .banner { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .banner { gap: 14px; }
   .section { padding-block: 52px; }
 }
@@ -3602,8 +3615,28 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     $('lock-btn').hidden = !(S.ui.sub && S.ui.chosen);
     if (S.ui.sub && S.ui.chosen) $('lock-btn').textContent = 'Lock in ' + S.ui.chosen.name + ' for ' + S.ui.sub;
   }
+  function boardWidth(table) { var pw = table.parentNode ? table.parentNode.clientWidth : 0; return pw || Math.min(window.innerWidth, 1100) - 32; }
+  function boardTransposed(table, n) { return boardWidth(table) * (n >= 5 ? 0.85 : 0.8) / n < 72; }
+  /* Phones and big rooms: players down the side and the 5 subtopics across, so the whole board fits the screen. */
+  function renderBoardTp(table, g, d, scores, cols) {
+    var h = '<thead><tr><th scope="col" class="corner">Player</th>' + g.subs.map(function (sub) { return '<th scope="col">' + esc(sub) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    cols.forEach(function (pid) {
+      var up = d && pid === d.current;
+      h += '<tr class="pc' + pci(g, pid) + (up ? ' turn' : '') + (pid === S.me ? ' mine' : '') + '"><th scope="row">' + esc(playerName(g, pid)) + (pid === S.me ? '<small>you</small>' : '') + (up ? '<small class="up">on the clock</small>' : '') + '</th>' + g.subs.map(function (sub) {
+        var p = filled(g, pid, sub), sc = p && scores ? scores['p' + p.n] : null;
+        return '<td class="' + (p ? 'has' : '') + '">' + (p ? '<strong>' + esc(p.name) + '</strong>' + (sc ? scoreBadge(sc.score) : '') : '<span class="empty">—</span>') + '</td>';
+      }).join('') + '</tr>';
+    });
+    table.innerHTML = h + '</tbody>';
+  }
   function renderBoard(table, g, d, scores) {
     var cols = g.order.length ? g.order : sortedPlayers(g).map(function (p) { return p.id; });
+    table._args = [g, d, scores];
+    var grid = table.closest ? table.closest('.draft-grid') : null;
+    if (grid) { grid.classList.toggle('wide-board', cols.length >= 5); grid.classList.toggle('huge', cols.length >= 7); }
+    var tp = boardTransposed(table, cols.length);
+    table.classList.toggle('tp', tp);
+    if (tp) { renderBoardTp(table, g, d, scores, cols); table.setAttribute('data-cols', cols.length); table.classList.remove('stack', 'many'); return; }
     var h = '<thead><tr><th scope="col" class="corner">Subtopic</th>' + cols.map(function (pid) {
       var up = d && pid === d.current;
       return '<th scope="col" class="pc' + pci(g, pid) + (up ? ' turn' : '') + '">' + esc(playerName(g, pid)) + (pid === S.me ? ' · you' : '') + '</th>';
@@ -3619,8 +3652,6 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     });
     table.innerHTML = h + '</tbody>';
     table.setAttribute('data-cols', cols.length);
-    var grid = table.closest ? table.closest('.draft-grid') : null;
-    if (grid) { grid.classList.toggle('wide-board', cols.length >= 5); grid.classList.toggle('huge', cols.length >= 7); }
     fitBoard(table);
   }
   /* Fit the whole board on screen: smaller type for big rooms, and a stacked layout when columns would get too narrow. */
@@ -3630,9 +3661,11 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
     if (!pw && !table._fitRetry) { table._fitRetry = 1; requestAnimationFrame(function () { table._fitRetry = 0; if (table.parentNode && table.parentNode.clientWidth) fitBoard(table); }); }
     var w = pw || Math.min(window.innerWidth, 1100) - 32;
     var colW = w * (n >= 5 ? 0.85 : 0.8) / n;
+    if ((colW < 72) !== table.classList.contains('tp') && table._args) { var a = table._args; renderBoard(table, a[0], a[1], a[2]); return; }
+    if (table.classList.contains('tp')) return;
     table.classList.toggle('many', n >= 5);
     table.classList.toggle('tight', w < 560);
-    table.classList.toggle('stack', colW < 72);
+    table.classList.toggle('stack', false);
   }
   window.addEventListener('resize', function () { ['board', 'final-board', 'irr-board'].forEach(function (id) { var t = $(id); if (t) fitBoard(t); }); });
 
@@ -6128,7 +6161,7 @@ F("fictional-athletes","Fictional Athletes","fictional athlete","Which fictional
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-21-03';
+  var BUILD_ID = '2026-10-21-04';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
