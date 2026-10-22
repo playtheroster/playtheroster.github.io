@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-21",
- "updatedAt": 1792614424539,
+ "updatedAt": 1792635506871,
  "days": {
   "2026-10-21": {
    "topicId": "fortune-500",
@@ -14,23 +14,23 @@
    ]
   },
   "2026-10-22": {
-   "topicId": "nfl-qbs",
+   "topicId": "cereals",
    "subs": [
-    "Clutch performance",
-    "Mobility",
-    "Accuracy",
-    "Arm strength",
-    "Pocket presence"
+    "Sugar",
+    "Nostalgia",
+    "Crunch",
+    "Taste",
+    "Healthiness"
    ]
   },
   "2026-10-23": {
-   "topicId": "sandwiches",
+   "topicId": "us-presidents",
    "subs": [
-    "Portability",
-    "Healthiness",
-    "Taste",
-    "Fillingness",
-    "Classic status"
+    "Public persuasion",
+    "Crisis leadership",
+    "Foreign policy",
+    "Economy",
+    "Legacy"
    ]
   },
   "2026-10-26": {
@@ -101,6 +101,26 @@
     "Rewatchability",
     "Box office",
     "Story"
+   ]
+  },
+  "2026-10-25": {
+   "topicId": "nfl-qbs",
+   "subs": [
+    "Pocket presence",
+    "Accuracy",
+    "Clutch performance",
+    "Mobility",
+    "Arm strength"
+   ]
+  },
+  "2026-11-01": {
+   "topicId": "mlb-hitters",
+   "subs": [
+    "Clutch hitting",
+    "Contact",
+    "Plate discipline",
+    "Power",
+    "Speed"
    ]
   }
  },
