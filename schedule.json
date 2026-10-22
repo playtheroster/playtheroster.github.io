@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-21",
- "updatedAt": 1792635506871,
+ "updatedAt": 1792635529552,
  "days": {
   "2026-10-21": {
    "topicId": "fortune-500",
@@ -121,6 +121,16 @@
     "Plate discipline",
     "Power",
     "Speed"
+   ]
+  },
+  "2026-11-02": {
+   "topicId": "famous-duos",
+   "subs": [
+    "Chemistry",
+    "Iconic moments",
+    "Fame",
+    "Longevity",
+    "Humor"
    ]
   }
  },
