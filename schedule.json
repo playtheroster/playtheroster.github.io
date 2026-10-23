@@ -1,36 +1,16 @@
 {
  "version": 1,
- "from": "2026-10-21",
- "updatedAt": 1792637447428,
+ "from": "2026-10-23",
+ "updatedAt": 1792782934020,
  "days": {
-  "2026-10-21": {
-   "topicId": "fortune-500",
-   "subs": [
-    "Logo",
-    "Innovation",
-    "Revenue",
-    "Brand love",
-    "Profit"
-   ]
-  },
-  "2026-10-22": {
-   "topicId": "2000s-movies",
-   "subs": [
-    "Box office",
-    "Story",
-    "Legacy",
-    "Quotability",
-    "Rewatchability"
-   ]
-  },
   "2026-10-23": {
-   "topicId": "us-presidents",
+   "topicId": "pop-stars",
    "subs": [
-    "Public persuasion",
-    "Crisis leadership",
-    "Foreign policy",
-    "Economy",
-    "Legacy"
+    "Vocal ability",
+    "Stage presence",
+    "Cultural influence",
+    "Live performances",
+    "Hit songs"
    ]
   },
   "2026-10-26": {
@@ -94,13 +74,13 @@
    ]
   },
   "2026-10-24": {
-   "topicId": "coaches",
+   "topicId": "us-presidents",
    "subs": [
-    "Championships",
-    "Wins",
-    "Strategy",
-    "Motivation",
-    "Fame"
+    "Crisis leadership",
+    "Economy",
+    "Foreign policy",
+    "Public persuasion",
+    "Legacy"
    ]
   },
   "2026-10-25": {
@@ -135,16 +115,6 @@
   }
  },
  "fast": {
-  "2026-10-21": {
-   "topicId": "tailgate",
-   "subs": [
-    "Fun",
-    "Popularity",
-    "Tradition",
-    "Effort-free",
-    "Taste"
-   ]
-  },
   "2026-10-23": {
    "topicId": "seafood",
    "subs": [
