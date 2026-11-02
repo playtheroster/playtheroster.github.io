@@ -3539,8 +3539,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
   var BOT_WEIGHTS = [0.5, 0.27, 0.15, 0.08];
   /* AI difficulty: how far down the available list a bot may reach, and how smartly it picks a subtopic. */
   /* depth[r]: on its (r+1)th pick a bot takes one of the top depth[r] answers still available, so every level
-     grabs the best answers first and only reaches deeper later in the draft. Tuned so the average total is about
-     40 for Easy, 45 for Medium and 47.5 for Hard. */
+     grabs the best answers first and only reaches deeper later in the draft. */
   var BOT_LEVELS = {
     easy: { weights: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], depth: [2,16,30,42,52], smartSub: true },
     medium: { weights: [0.3, 0.24, 0.18, 0.13, 0.09, 0.06], depth: [1,7,13,19,25], smartSub: true },
@@ -4606,7 +4605,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
   }
 
   /* ---------- offline ---------- */
-  var LEVEL_NOTES = { easy: 'Easy: the AI grabs a top answer first, then often settles for decent ones. It usually scores around 40.', medium: 'Medium: the AI takes the best answer first, then strong but not always the best ones. It usually scores around 45.', hard: 'Hard: the AI takes the best answers first and rarely slips after that. It usually scores around 47 to 48.' };
+  var LEVEL_NOTES = { easy: 'Easy: the AI grabs a top answer first, then often settles for decent ones.', medium: 'Medium: the AI takes the best answer first, then strong but not always the best ones.', hard: 'Hard: the AI takes the best answers first and rarely slips after that.' };
   var LEVEL_NAMES = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
   /* Whether players can see the full answer list during the draft. Offline and practice: the player's own
      choice, remembered on this device. Rooms: the host's choice, saved on the room. */
@@ -6625,7 +6624,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-02';
+  var BUILD_ID = '2026-11-02-03';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
