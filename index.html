@@ -103,6 +103,8 @@ select.field { padding-right: 8px; }
 .bsub.done { background: var(--hi); color: var(--hi-ink); }
 .bsub .bpick { font-weight: 500; font-size: 0.88rem; }
 .topic-body .q { margin-top: 8px; color: var(--muted); }
+/* Stop phone and tablet browsers from enlarging some text blocks on their own (it made one subtopic bigger than the rest). */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
 .cat { display: flex; align-items: baseline; gap: 10px; padding: 11px 14px; background: var(--tint); border-radius: 10px; font-weight: 600; min-width: 0; }
 .cat:last-child:nth-child(odd) { grid-column: 1 / -1; }
@@ -3852,16 +3854,21 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     el.textContent = pad(Math.floor(sec / 3600)) + ':' + pad(Math.floor(sec / 60) % 60) + ':' + pad(sec % 60);
   }
   setInterval(bandClock, 1000);
-  /* A one-word subtopic never wraps: shrink its text until it fits its chip. */
+  /* Subtopic chips share one text size: the largest size at which every name fits its chip (one-word names never wrap). */
   function fitCats() {
-    var els = document.querySelectorAll('#today-subs .cat-name.one-word');
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i], box = el.parentNode, cs = getComputedStyle(box);
-      var room = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      el.style.fontSize = '';
-      var size = parseFloat(getComputedStyle(el).fontSize);
-      while (el.scrollWidth > room + 0.5 && size > 9) { size -= 0.5; el.style.fontSize = size + 'px'; }
-    }
+    var els = document.querySelectorAll('#today-subs .cat-name'); if (!els.length) return;
+    var i, box0 = els[0].parentNode; if (!box0.clientWidth) return;
+    for (i = 0; i < els.length; i++) els[i].style.fontSize = '';
+    var size = parseFloat(getComputedStyle(els[0]).fontSize);
+    var fits = function () {
+      for (var k = 0; k < els.length; k++) {
+        var el = els[k], box = el.parentNode, cs = getComputedStyle(box);
+        var room = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        if (el.scrollWidth > room + 0.5) return false;
+      }
+      return true;
+    };
+    while (!fits() && size > 9) { size -= 0.5; for (i = 0; i < els.length; i++) els[i].style.fontSize = size + 'px'; }
   }
   window.addEventListener('resize', fitCats);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCats);
@@ -3893,6 +3900,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var inPlay = !inOrg && (!!S.game || S.view === 'play');
     $('hero').hidden = inPlay || inOrg; $('band-hero').hidden = inPlay || inOrg; $('how').hidden = inPlay || inOrg; $('play').hidden = !inPlay; $('organizer').hidden = !inOrg;
     $('org-btn').hidden = !orgAllowed() || inOrg;
+    if (!$('hero').hidden) fitCats();
     persistSession();
     if ($('fast-start-btn')) $('fast-start-btn').textContent = S.fastDay ? 'Start the Fast Money from ' + fmtDay(S.fastDay) : 'Start today’s Fast Money';
     if (S.mode === 'practice') S.mode = 'offline';
@@ -7107,7 +7115,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-15';
+  var BUILD_ID = '2026-11-02-16';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
