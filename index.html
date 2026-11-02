@@ -132,6 +132,11 @@ select.field { padding-right: 8px; }
 .mode h3 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 1.9rem; line-height: 1; }
 .mode p { color: var(--muted); font-size: 0.95rem; }
 .mode .or { text-align: center; }
+.invite-box { display: grid; gap: 12px; padding: 18px; border: 2.5px solid var(--edge); border-radius: 20px; background: var(--surface); }
+.invite-box h3 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 1.9rem; line-height: 1; color: var(--accent); }
+.invite-box .inv-code { letter-spacing: 0.12em; }
+.invite-box p { color: var(--muted); font-size: 0.95rem; }
+.invite-box .inv-other { justify-self: start; }
 .msg { min-height: 1.4em; font-size: 0.95rem; }
 .msg.bad { color: var(--bad); }
 
@@ -291,11 +296,11 @@ select.field { padding-right: 8px; }
 .rv-chip .av { width: 24px; height: 24px; font-size: 0.8rem; }
 .podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: end; padding-top: 10px; border-bottom: 5px solid var(--edge); }
 .podium .spot { display: grid; justify-items: center; gap: 6px; text-align: center; min-width: 0; }
-.podium .spot > :not(.block) { animation: rvin 0.45s ease both; }
-.podium .block { transform-origin: bottom; animation: rvrise 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.15) both; }
-.podium .p3 .block { animation-delay: 0.3s; } .podium .p3 > :not(.block) { animation-delay: 0.9s; }
-.podium .p2 .block { animation-delay: 1.2s; } .podium .p2 > :not(.block) { animation-delay: 1.8s; }
-.podium .p1 .block { animation-delay: 2.3s; } .podium .p1 > :not(.block) { animation-delay: 3.0s; }
+.podium .spot > :not(.block) { animation: rvin 0.3s ease both; }
+.podium .block { transform-origin: bottom; animation: rvrise 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.15) both; }
+.podium .p3 .block { animation-delay: 0.1s; } .podium .p3 > :not(.block) { animation-delay: 0.4s; }
+.podium .p2 .block { animation-delay: 0.45s; } .podium .p2 > :not(.block) { animation-delay: 0.75s; }
+.podium .p1 .block { animation-delay: 0.8s; } .podium .p1 > :not(.block) { animation-delay: 1.15s; }
 @keyframes rvrise { from { transform: scaleY(0); } to { transform: none; } }
 .podium .spot .av { width: 56px; height: 56px; font-size: 1.7rem; }
 .podium .spot .pn { font-weight: 800; font-size: 1.05rem; overflow-wrap: anywhere; }
@@ -1121,6 +1126,15 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <input class="field" id="player-name" type="text" maxlength="20" autocomplete="nickname" placeholder="What should other players call you?">
               </div>
               <span class="pill soft mono">No account needed</span>
+            </div>
+            <div class="invite-box" id="invite-box" hidden="">
+              <span class="mono">You’re invited</span>
+              <h3>Join room <span class="inv-code" id="inv-code"></span></h3>
+              <p id="inv-topic">Checking the room…</p>
+              <label class="mono label" for="inv-name">Your name</label>
+              <input class="field" id="inv-name" type="text" maxlength="20" autocomplete="nickname" placeholder="Type your name">
+              <button class="btn primary block" type="button" data-act="invite-join" id="invite-join">Join room</button>
+              <button class="btn small inv-other" type="button" data-act="invite-other">Other ways to play</button>
             </div>
             <p class="note" id="online-note" hidden=""></p>
 
@@ -3185,6 +3199,11 @@ F("supercars","Supercars","supercar","Which supercars make the ultimate garage?"
 F("pickups-suvs","Pickup Trucks & SUVs","truck or SUV","Which trucks and SUVs make the ultimate driveway?",["Towing", "Fuel economy", "Sales", "Price", "Space"],"Ford F-150|Chevrolet Silverado|Ram 1500|GMC Sierra|Toyota Tacoma|Toyota Tundra|Nissan Frontier|Nissan Titan|Honda Ridgeline|Ford Ranger|Ford Maverick|Hyundai Santa Cruz|Chevrolet Colorado|Jeep Gladiator|Ford F-250 Super Duty|Ram 2500|Chevrolet Silverado HD|Ford F-150 Lightning|Rivian R1T|Tesla Cybertruck|Chevrolet Silverado EV|GMC Hummer EV|Toyota RAV4|Honda CR-V|Toyota Highlander|Toyota 4Runner|Toyota Land Cruiser|Toyota Sequoia|Chevrolet Tahoe|Chevrolet Suburban|Chevrolet Equinox|Chevrolet Traverse|GMC Yukon|Cadillac Escalade|Ford Explorer|Ford Expedition|Ford Bronco|Ford Bronco Sport|Ford Escape|Jeep Wrangler|Jeep Grand Cherokee|Jeep Cherokee|Jeep Wagoneer|Honda Pilot|Honda Passport|Honda HR-V|Nissan Rogue|Nissan Pathfinder|Nissan Armada|Hyundai Tucson|Hyundai Santa Fe|Hyundai Palisade|Kia Telluride|Kia Sportage|Kia Sorento|Subaru Outback|Subaru Forester|Subaru Crosstrek|Subaru Ascent|Mazda CX-5|Mazda CX-90|Volkswagen Atlas|Volkswagen Tiguan|BMW X5|Mercedes GLE|Mercedes G-Class|Audi Q5|Lexus RX|Range Rover|Land Rover Defender|Porsche Cayenne|Tesla Model Y|Tesla Model X|Rivian R1S|Kia EV9|Hyundai Ioniq 5|Ford Mustang Mach-E|Chevrolet Blazer EV|Hummer H1|Toyota FJ Cruiser",["0e0f0g00030102050z160j0x0t0s0l0i0k0w0r1c070h211w1y1x0q1r0y141s04091t060c0d261g1f1o1p1b0p200o17220v0818101m1315271z1v1j1e1i1u0b0n0m1a1d1h0u1k0a1n25121q1123241l19", "1z20230a2422250h210i0k0j1v0n0m1a1d1h1l190l0o1j1e1i0u1k1n121q0b1o1u1g1f170v09081m11000301021r0y1s041p1b18060c1505141y0r070t0s0w0z1x0p0d100e0x0f0g1w161c0q13271t26", "001z0m0n010214040u030s0y1a1d130e051g0o1v171j1h1k0a101n1l0x0t0f0g0w1r1f0v090p1e1i1u1211190h0j0z1w1s1y1x1o1p1b08231824060c0d1q15210l0i20160r221c070q1t1m250b270k26", "0l1t1w0x1y0j210i0k1r20161s1x26030e0h0t0f0g0w0r0q0s0z1v05221c1u0001021o070d1z1g0o141f171p0p08231824250y0v041b101m131j091e1i060c1q15270n0m1a1d1h1k1n12110b0u1l0a19", "0t0z160x0s0w0r1c0e210f0g1g1f220v1p000301020h050k1w200o0y171o070q1b1m0j1z0l0i1r141s1x0p1e1i0818260n1j1k1v1y0m1a1d1h0u23251q04091u1t24060c0d101n121527131l110a190b"],"Mercedes G-Class=G-Wagon","2026-10-27");
 F("electric-vehicles","Electric Vehicles","EV","Which EVs make the ultimate charging station?",["Range", "Acceleration", "Price", "Charging speed", "Sales"],"Tesla Model 3|Tesla Model Y|Tesla Model S|Tesla Model X|Tesla Cybertruck|Lucid Air|Lucid Gravity|Rivian R1T|Rivian R1S|Rivian R2|Ford Mustang Mach-E|Ford F-150 Lightning|Chevrolet Bolt|Chevrolet Equinox EV|Chevrolet Blazer EV|Chevrolet Silverado EV|GMC Hummer EV|Cadillac Lyriq|Cadillac Escalade IQ|Hyundai Ioniq 5|Hyundai Ioniq 6|Hyundai Ioniq 5 N|Kia EV6|Kia EV9|Kia Niro EV|Volkswagen ID.4|Volkswagen ID. Buzz|Nissan Leaf|Nissan Ariya|Polestar 2|Polestar 3|Volvo EX30|Volvo XC40 Recharge|BMW i4|BMW iX|BMW i7|Mercedes EQS|Mercedes EQE|Mercedes G 580 EV|Audi e-tron GT|Audi Q4 e-tron|Audi Q6 e-tron|Porsche Taycan|Porsche Macan EV|Jaguar I-Pace|Genesis GV60|Genesis Electrified G80|Toyota bZ4X|Subaru Solterra|Honda Prologue|Acura ZDX|Mini Cooper SE|Fiat 500e|BYD Seal|BYD Atto 3|BYD Seagull|BYD Han|NIO ET7|XPeng G6|Zeekr 001|Li Auto L9|Xiaomi SU7|Wuling Hongguang Mini EV|Renault Zoe|Renault 5 E-Tech|Peugeot e-208|Skoda Enyaq|Cupra Born|Rimac Nevera|Lotus Eletre|Rolls-Royce Spectre|Fisker Ocean|Scout Traveler|Slate Truck|Jeep Wagoneer S|Dodge Charger Daytona EV|Kia EV3|Hyundai Kona Electric|Lexus RZ",["0510060f1l021n0i1w1p0k0301000y07080z1h1k111m1e0d20150e16170j0m040g0x1o1x0a0u1u220h1y1d09241z0n131a0b0t1i250p0s1914181v0o0l120w230v0q1t261s1b0c1r1j1c0r211f1g1q", "1w02160g23051x0l03171n061p040708132201000i1l1h1k190u120v100m0y0f0z150x1a0b1e0w180j0k0n1o111m0a0h0t1y0e20091z261u0d1d141i25241v0s1f0p0q1t0o1s1b0c1g1c1j1r0r211q", "1w1y0g120i0z16101x050306041302170y0f0708110u1a22180n150x0l190b0h1e23200q2601001n0j0k0m1l1o0a1u0t0w1d0e14090p0s1z1b1c1p1h1k1m0d250v1v0o1f1g1i241t1s0c1r0r211j1q", "16170j0k0m0l191m051n061w1p0n13151x1a02031001000y0i0f0z1l1h1k1o24040g0x110u1u1222231v07080a0h1e0t1y0d0w1d0e141i2009250v1z1t1s0b180p0s0q260o1f1g1b0c1j1c1r210r1q", "01001j1q1i0r1p0j1h1k1o020m0a1u0d0p1t0c1r16031n0k0n0x1m0b0t0w1d14250o1s10170y040708151l110h0e240v1v0s0q1b1f1g050f0g0z130l190u1e18091c060i121a2223261x1y201z211w"],"Volvo XC40 Recharge=Volvo EX40","2026-10-27");
 F("classic-cars","Classic Cars","classic car","Which classics make the ultimate car show?",["Horsepower", "Value today", "Production", "Fame", "Design"],"Ford Model T|Volkswagen Beetle|Ford Mustang (1965)|Chevrolet Corvette (C1)|Chevrolet Corvette Stingray (C2)|Chevrolet Bel Air (1957)|Chevrolet Camaro (1969)|Pontiac GTO|Dodge Charger (1969)|Plymouth Hemi Cuda|Plymouth Road Runner|Dodge Challenger (1970)|Shelby GT500 (1967)|Shelby Cobra 427|Ford GT40|Ford Thunderbird (1955)|Cadillac Eldorado (1959)|Chevrolet Impala (1964)|Chevrolet Chevelle SS|Oldsmobile 442|Buick GNX|DeLorean DMC-12|Jeep Willys|Ford Bronco (1966)|Toyota Land Cruiser FJ40|Land Rover Series I|Mini Cooper (1959)|Fiat 500 (1957)|Citroen 2CV|Citroen DS|Jaguar E-Type|Aston Martin DB5|Mercedes-Benz 300SL Gullwing|Porsche 356|Porsche 911 (1964)|Porsche 550 Spyder|Ferrari 250 GTO|Ferrari 250 GT California|Ferrari Dino 246|Ferrari Daytona 365 GTB/4|Lamborghini Miura|Lamborghini Countach (1974)|Alfa Romeo Spider|BMW 2002|BMW M1|Datsun 240Z|Toyota 2000GT|Mazda RX-7 (FD)|Toyota Supra (Mk4)|Nissan Skyline GT-R R34|Honda NSX (1990)|Lancia Stratos|Lancia Delta Integrale|Audi Quattro|Volkswagen Microbus|Volkswagen Golf GTI (Mk1)|Chevrolet Nomad|Chrysler 300 letter series|Studebaker Avanti|Tucker 48|Duesenberg Model J|Bugatti Type 57 Atlantic|Rolls-Royce Silver Ghost|Packard Twelve|Cord 810|Auburn Speedster|Hudson Hornet|Ford Coupe (1932)|Chevrolet El Camino|AMC Gremlin|Ford Torino|Pontiac Firebird Trans Am|Chevrolet Nova SS|Mercury Cougar|AMC Javelin|Triumph TR6|MG MGB|Austin-Healey 3000|Lotus Seven|Shelby Daytona Coupe",["0d090e080i0b0c15271c0a13140j0u0604071z1d0w0v2010110k1l0h1b0g1e1o1w1y1h1g211f182202050y03190f12251p0z1a1k1u1s1t1r1m0t0n0x0o1v16171j0l1q23261n1x240m0p011i0q000r0s", "0d0e0w1011271o1p0z1n0c09140v1a1q151d131f080u041c0y030x120k18060i0b1i1e0n1g1s1t0205071z0a1b0g250o1h1k1r0h2019010f0j0t1v0l1l260p1w1y0q0m210016171j1u23221m0r0s241x", "01000m020h0q0r0s1i060519241x0i07200t171j080u040b1z0y0a1b0f0j1w1y0n0o2116231c0g030x251v1u260p0c091d131e121h1g1k0l220d150e0w140v111o0k1l1q1s1t1r1m101f0z1a18271p1n", "010002150v101i0l080u050d1c1z0y0e1d0w0q06040c0g1403110m1v0r0i0b070h091b130f0n0x0o1p0z0a19270t1e1o1w1y121h1a1j1u1q0s0p20251g0k1f1816171k24261n0j211l231s1t221r1m1x", "0u0w14101p04050d0y150e0g0v110t1o1a08020c03270x121s1t060b091b1d13010f1i1e0q251v1f0z0r18161k0l1q1n0i070h1c1z190n1l1r1m0a0o1h1g0k171u0s2324200j1w1y0m211j26220p001x"],"Ford Mustang (1965)=1965 Mustang | Chevrolet Corvette (C1)=1953 Corvette | Chevrolet Corvette Stingray (C2)=1963 Corvette Stingray | Chevrolet Bel Air (1957)=1957 Bel Air | Chevrolet Camaro (1969)=1969 Camaro | Dodge Charger (1969)=1969 Charger | Dodge Challenger (1970)=1970 Challenger | Shelby GT500 (1967)=Eleanor | Ford Thunderbird (1955)=1955 Thunderbird | Cadillac Eldorado (1959)=1959 Cadillac | Chevrolet Impala (1964)=1964 Impala | Jeep Willys=Willys MB | Ford Bronco (1966)=Classic Bronco | Mini Cooper (1959)=Classic Mini | Fiat 500 (1957)=Classic Fiat 500 | Mercedes-Benz 300SL Gullwing=300SL Gullwing | Porsche 911 (1964)=Classic 911 | Lamborghini Countach (1974)=Classic Countach | Mazda RX-7 (FD)=RX-7 | Toyota Supra (Mk4)=Mk4 Supra | Nissan Skyline GT-R R34=R34 GT-R | Honda NSX (1990)=Original NSX | Volkswagen Microbus=VW Bus | Volkswagen Golf GTI (Mk1)=Mk1 GTI | Chrysler 300 letter series=Chrysler 300C (1957) | Ford Coupe (1932)=Deuce Coupe","2026-10-27");
+F("trains","Trains & Locomotives","train","Which trains make the ultimate railway?",["Speed", "Size", "Age", "Passengers", "Fame"],"Orient Express|Flying Scotsman|Mallard|Shinkansen|TGV|Eurostar|Acela|Amtrak Southwest Chief|California Zephyr|Empire Builder|Coast Starlight|Trans-Siberian Railway|Glacier Express|Bernina Express|Rocky Mountaineer|The Canadian|The Ghan|Indian Pacific|Blue Train|Maglev|Big Boy|Hogwarts Express|Polar Express|Thomas the Tank Engine|Jacobite Steam Train|Durango and Silverton|Rocket|General|Tom Thumb|Royal Scotsman|Venice Simplon-Orient-Express|Palace on Wheels|Maharajas' Express|Seven Stars in Kyushu|Fuxing Hao|ICE|AVE|Frecciarossa|KTX|Thalys|Brightline|Amtrak Northeast Regional|Metro-North|Long Island Rail Road|New York City Subway|London Underground|Paris Metro|Tokyo Metro|Moscow Metro|Chicago L|BART|Washington Metro|San Francisco cable cars|Hong Kong Peak Tram|Monorail|Pikes Peak Cog Railway|Jungfrau Railway|Darjeeling Himalayan Railway|Tren a las Nubes|Hiram Bingham train|Qinghai-Tibet Railway|Coal train|Caboose|Steam locomotive|Diesel locomotive|Electric locomotive|Handcar|Trolley|Light rail|Funicular|Gondola|Model train|Pullman car|Sleeper train|Toy train|Ghost train|Wuppertal Schwebebahn|Mount Washington Cog Railway|Ferrocarril de Chihuahua",["0j03040y110z1005121302061401151t170b16001f1s1e080k09210g0a0h0u0f1o0i0718191a1b1c1d1r0l1i201p0m0o261w0e0v0w0t0x1v241k0c0d0p0q0r1n1g1h1y1l1j251m0n0s1x1u1q231z22", "0k1p1s0g0h1t181b0b1c0y1r0f1o0304190z1a171005111215160809210a07011d020j13001f1e0l060u200i0m14260e0v0w1v1i241k0o0c0d0p1w1m0t1n0x1y1x1j250r231g1h1l0q0n1q0s1u1z22", "191r240q0r0s18171d201g1h1l1j25011a0b02000k1v1k1p0p1x1q1u1z1b1c091s081t0l210u0i0o0c0d1m0n03161f1e0g0a1i0h0f1y26040z101315070m0v0t23220511120j061o1w0e0w1n0y0x14", "0318191a1b171c0y16040z1d121f100511151e1w1v1i0b0j1306241y011r1s081t090l210a1k1o071g141h1x02000g0h0f200m0o0c0d0p1l0e1j25230u0i260v1m0w1n0q0r0n0t0s0x221u0k1p1q1z", "000l0318191g0n01041a1b0b051r0m1c0j0k1i0u0c0q0z1d021k0o1h0d1l0e100y1108060g1v1o1y1q1z171213151f1s1e09210a0h240f200i140p261x1j250v0r1m0w0t1n0x231u161t071p1w0s22"],"Shinkansen=Bullet train | Maglev=Shanghai Maglev | Big Boy=Union Pacific Big Boy | Rocket=Stephenson's Rocket | General=The General | Fuxing Hao=CR400 Fuxing | ICE=Intercity-Express | London Underground=The Tube | Monorail=Disney Monorail | Darjeeling Himalayan Railway=Darjeeling toy train | Coal train=Freight train | Trolley=Streetcar | Gondola=Cable car | Sleeper train=Night train | Toy train=Kiddie train | Ferrocarril de Chihuahua=El Chepe","2026-11-05");
+F("high-speed-trains","High-Speed Trains","high-speed train","Which trains make the ultimate bullet train network?",["Top speed", "Ridership", "Network length", "Comfort", "Fame"],"Shanghai Maglev|Shinkansen N700S|Shinkansen E5|Shinkansen 0 Series|Chuo Shinkansen maglev|CR400 Fuxing Hao|CRH380A|TGV Duplex|TGV POS|TGV inOui|Ouigo|Eurostar e320|ICE 3|ICE 4|AVE S-103|Avlo|Frecciarossa 1000|Italo|KTX-Sancheon|Taiwan High Speed Rail|Al Boraq|Haramain High Speed Railway|Acela|Avelia Liberty|Brightline West|Brightline Florida|California High-Speed Rail|Thalys|Talgo 350|Sapsan|X 2000|Pendolino|Avanti West Coast|HS2|Railjet|Vande Bharat Express|Mumbai-Ahmedabad bullet train|Whoosh|Laos-China Railway|Turkish YHT|Velaro|Zefiro|Hikari|Nozomi|Kodama|Hayabusa|Komachi|Gran Class|Hokkaido Shinkansen|Hokuriku Shinkansen|Kyushu Shinkansen|Beijing-Shanghai HSR|Beijing-Guangzhou HSR|Fuxing Smart EMU|CR450|TGV M|Lyntog|Westbahn|SNCF TGV Lyria|Nightjet|Hyperloop|Transrapid|Aerotrain|Turbotrain|Metroliner|APT|InterCity 125|ETR 500|Velaro Novo|SRT|Ankara-Istanbul HSR|Madrid-Barcelona AVE|Paris-Lyon TGV|London-Paris Eurostar",["001i041o051f1h081p061g0g011707090c0e022119200b0i160h141z0j0a0r1x1v0k0s110l1j0x150q101w0f1m0o1d1e1a0n1y131c1b1q0d1u0v180m0y0t1s1t0z030w0p0u121l1r1n1k", "0501171g1f06200709210c0g0i0z161z031u0e02190b1h0d140j0a080h0r0v1x181d1e1v1a0m0y0t0w000k0s0n110l1y150f130p1c0u1m1n1s121j1b1p1l1r1k1i1w1t0x0q04100o1o1q", "05061g011707090e0z0c0d140a1f0g02190i16080h1u0v180f21200b1h1z0j030r1x1d1e1v1a0y0s0w1j1y0x150q130u1n0m0k0n0t0l0p1c1b1i1m1s10120o1w1k111l001p041r1t1o1q", "1b010g02191h05171f0c0e210b0d0h1z0j1d1e0n0l1j1i1w061g0709200i1608140r1x1a0y0k110x150q0p1c1m04100o0z0v181v0m000s0t0w1y0u1p1n1l031u131s121k0a0f1o1r1t1q", "01210b03170007090c0g02200z0x04051f0e190m0q1o061g0i161h0d080h1z0j0a0r1u0v0k0n0t110p1i1p10141x181d1e1v1a0y0s0l0w1j1y0f131c0u1b1n1s120o1r1t1q151m1w1l1k"],"Chuo Shinkansen maglev=L0 Series | Avelia Liberty=NextGen Acela | Thalys=Eurostar Red | Whoosh=Jakarta-Bandung HSR | Hikari=Hikari Shinkansen | TGV M=Avelia Horizon | APT=Advanced Passenger Train | SRT=Super Rapid Train","2026-11-05");
+F("boats","Boats & Ships","vessel","Which vessels make the ultimate harbor?",["Speed", "Size", "Cost", "Luxury", "Usefulness"],"Speedboat|Yacht|Sailboat|Catamaran|Canoe|Kayak|Rowboat|Paddleboat|Pontoon boat|Fishing boat|Jet ski|Houseboat|Gondola|Ferry|Cruise ship|Aircraft carrier|Submarine|Tugboat|Container ship|Oil tanker|Icebreaker|Hovercraft|Hydrofoil|Airboat|Dinghy|Inflatable raft|Lifeboat|Coast Guard cutter|Fireboat|Police boat|Dragon boat|Longboat|Galleon|Clipper ship|Steamboat|Junk|Dhow|Felucca|Outrigger canoe|Bass boat|Bowrider|Cabin cruiser|Trawler|Sportfishing yacht|Ski boat|Narrowboat|Barge|Water taxi|Amphibious vehicle|Racing shell|America's Cup yacht|Offshore powerboat|Hydroplane|Pirate ship|Tall ship|Paddleboard|Pedal boat|Banana boat|Bumper boat|Research vessel|Hospital ship|Battleship|Destroyer|Frigate|Patrol boat|Mega yacht|Ice yacht|Electric boat|Solar boat|Trimaran|Pram|Coracle|Reed boat|Bathyscaphe|Deep-sea submersible",["1e1f1g1u0m1x000a1q180l131s0n170r1r0x140t1d1t01150f1p0g031h0s1v1b0v0u121l0e0i1n0d1i0k0w09080z020q101o0j160y1c1w0h11051a220b2104060p1j0o190c071k1y201m1z", "0e0f0i0j1t1p011o1a1i0k1q1n0d0g0w1h1r0x17150r1e160y0z1f1x0m030l0s0b1c0v190u10181413221s001v0t1b091g0821021w0h0q1d12110n1u0c0504061l0p071k200a1j0o1y1m1z", "0e1t010f1e221p0i0g0j211q171f1o1n1r1i0k151x0r0d0w161h1g0m180l1a0s1w0x0314130y1s1v0b0t1c001b09080z0n020v1u190h1d0c0u0q100a12110504061l0p1j071k1m0o1y201z", "1t010e17150c1f1x1803140y1v0b0m1e0x1i0w220008021w191o1n0d0l16131h1b090z1c1u0u0a110r0n101q0f1p1r0g0k1a0s1s0t1g210v0h1d120504061l071k1m0q0p1j0o1y201z0i0j", "0i1o0d0r1n0j1a090h0q0k1q0f1r0g16220s1s0t1b171p13210e150m18030l140b080504061x0x1i0w0y001v0z0n1c020v1910120p1j0o1t011f1h1w0u1d0c0a11071y1k201z1e1g1u1l1m"],"Yacht=Superyacht | Jet ski=Personal watercraft | Longboat=Viking longship | Steamboat=Paddle steamer | Junk=Chinese junk | Ski boat=Wakeboard boat | Amphibious vehicle=Duck boat | Racing shell=Rowing shell | America's Cup yacht=AC75 | Offshore powerboat=Cigarette boat | Pedal boat=Swan boat | Pram=Pram dinghy","2026-11-05");
+F("cruise-ships","Cruise Ships","cruise ship","Which ships make the ultimate cruise?",["Size", "Passengers", "Attractions", "Age", "Fame"],"Icon of the Seas|Star of the Seas|Wonder of the Seas|Symphony of the Seas|Harmony of the Seas|Oasis of the Seas|Allure of the Seas|Utopia of the Seas|Freedom of the Seas|Navigator of the Seas|Quantum of the Seas|Odyssey of the Seas|MSC World Europa|MSC World America|MSC Meraviglia|MSC Seashore|Carnival Celebration|Mardi Gras|Carnival Jubilee|Carnival Vista|Norwegian Prima|Norwegian Viva|Norwegian Encore|Norwegian Bliss|Norwegian Getaway|Norwegian Aqua|Disney Wish|Disney Treasure|Disney Destiny|Disney Dream|Disney Fantasy|Disney Magic|Disney Wonder|Disney Adventure|Queen Mary 2|Queen Elizabeth|Queen Anne|Queen Mary|Celebrity Edge|Celebrity Beyond|Celebrity Xcel|Celebrity Apex|Sun Princess|Discovery Princess|Royal Princess|Love Boat|P&O Iona|P&O Arvia|AIDAnova|Costa Smeralda|Costa Toscana|Holland America Rotterdam|Holland America Koningsdam|Virgin Scarlet Lady|Virgin Valiant Lady|Viking Octantis|Viking Star|Regent Seven Seas Grandeur|Silversea Silver Nova|Scenic Eclipse|Ritz-Carlton Evrima|Explora I|Hurtigruten|Windstar Wind Surf|Star Clipper|Sea Cloud|Mississippi riverboat|Viking Longship|Galapagos expedition ship|Antarctic expedition ship|SS Norway|SS United States|Queen Elizabeth 2|Sovereign of the Seas|Carnival Destiny|Majesty of the Seas|Grand Princess",["000103020c070d0506040h0g0e0f0i1a1d1b1e0a0n0m0b0p1c160x080y0j0o0q120r18150s0k0l13171420090t1y0u22241z0z100v0w2111231h1g1i1f191k1l1p1m1u1q1r1o1n1j1v1x1s1w1t", "000103020c070d0506040h0g0e0f0i1a1d1b1e0a0n0m0b1c080j0o180p1617090t1y0u0q2224120r150s0k0l130x140y200v0w210z231h1g1i101f111z191u1q1r1k1l1p1m1j1o1n1v1x1s1w1t", "000103020h050604070c0n0g0m0d0q0i0r0p0s0x0a0t0e0f0b0u0k0l080j0o121a151b13161h141i1o1n0y0v090w181d1e1c17101l1p22240z1g1f1m201y21231u1r1k1v1x1j111z191q1t1s1w", "1y111z1t2021191q230v0w22241u09080y1r1s05060a0t0u0j0o180z1g1k040n030h0m0e0f0b121a1d151c1h1i1f1n1v1x1w020c0g0q1b0k0l1e13171o1j00070i0r161l1p1m010d0p0s0x1410", "000y050302111906040h01200q0c070v0t0r1z080a0n0g0m0d0w0b0u120z0s1h1v1x091y0e0f0j0o0i21150p0k0l13160x101u1q1o1w22241a181d1b1e1c23171g141i1f1r1k1n1t1l1p1m1s1j"],"Mardi Gras=Carnival Mardi Gras | Queen Elizabeth=Cunard Queen Elizabeth | Queen Mary=RMS Queen Mary | Love Boat=Pacific Princess | Mississippi riverboat=American Queen | Viking Longship=Viking river cruise | Queen Elizabeth 2=QE2","2026-11-05");
+F("construction-vehicles","Big Machines","machine","Which machines make the ultimate construction site?",["Size", "Power", "Price", "Usefulness", "Fame"],"Excavator|Bulldozer|Dump truck|Crane|Mobile crane|Backhoe loader|Wheel loader|Skid steer|Forklift|Cement mixer|Road roller|Grader|Paver|Scraper|Trencher|Pile driver|Cherry picker|Scissor lift|Telehandler|Tractor|Combine harvester|Mining truck|Bagger 293|Big Muskie|Dragline excavator|Bucket-wheel excavator|Tunnel boring machine|Liebherr LR 13000|Caterpillar 797|Caterpillar D11|Komatsu D575A|Garbage truck|Fire truck|Tow truck|Snowplow|Street sweeper|Semi truck|Flatbed truck|Logging truck|Monster truck|Zamboni|Asphalt milling machine|Demolition excavator|Wrecking ball crane|Jackhammer|Compact excavator|Cold planer|Feller buncher|Harvester|Rock crusher|Drill rig|Concrete pump truck|Water truck|Lowboy trailer|Crawler crane|Gantry crane|Reach stacker|Straddle carrier|Airport tug|Hydraulic hammer|Wheel trencher|Track loader|Compactor|Light tower|Generator|Golf cart|Riding lawn mower|Wood chipper|Stump grinder|Snowcat|Space Shuttle crawler",["1y0l0m0s0p0o0r0n030q1i1j0u040t160k1e1f1l10170d1d1k1h00010w02060f1b1c1215111o0v09050y0b1x1p0c131a1g0j0x0a1m0i1n0g0e0z08071v14191w0h1r1u1s181t1q", "0q0m0p0r0n0u1y0l0s0o0t011i1j161e0f1d131n03040010170d1b1c0k1k151m1o0w02060y1f0b1l0x121p1h1a0v09050j1x110c0a0i1v0e181w08071g191s0g0z1q141u0h1t1r", "0q1y0m0p0o0r0n0l0s1i03040k0t1j0u161e1b1c1f0d1d1k1l1x150001100w0f170b0c131o1a02060v09050y0j12111p1m0i0x0a1h1n0g1v0e0z1g141u1w0807191s0h1t1r181q", "0300100w020v0j080q1y040k011j0609050y0x07191u1s1i1e1f1k1l111p1m0i0g0l0s0t160f1d0b120c0a1h0z180h0m0p0o0r0u0d1x1b1c151n1v1g141r1q171o1a0e1w1t0n13", "00010w0j02091303100v0508140k0x0a070l0m0406170y180q1y0s0p0g1u1t0o0t0n0f0b1x1v0z190h0r1i1j0u161e1f0d12111p0c1m0i1n0e1s1d1k1l1b1c151h1g1w1q1o1a1r"],"Crane=Tower crane | Wheel loader=Front loader | Skid steer=Bobcat | Cement mixer=Concrete mixer truck | Road roller=Steamroller | Grader=Motor grader | Paver=Asphalt paver | Cherry picker=Boom lift | Mining truck=Haul truck | Semi truck=Big rig | Demolition excavator=High reach excavator | Compact excavator=Mini excavator | Harvester=Timber harvester | Airport tug=Pushback tractor | Compactor=Plate compactor | Generator=Portable generator | Space Shuttle crawler=Crawler-transporter","2026-11-05");
   /* NEW TOPICS (fully ranked) END */
   /* A fully ranked (100-answer) version of a topic replaces its older version. */
   TOPIC_DEFS = TOPIC_DEFS.filter(function (t) { return !FULL_IDS[t.id]; });
@@ -3290,11 +3309,20 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
   function keyBefore(key) { var p = key.split('-').map(Number), d = new Date(Date.UTC(p[0], p[1] - 1, p[2]) - 86400000); return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0'); }
   /* From Oct 15 the rotation runs in segments. A segment starts on any day a new batch of topics becomes
      available (a topic's 'since' date), so adding topics never changes a day that has already started. */
-  function segmentFor(key) {
+  /* From Nov 4, 2026 each topic belongs to the daily draft, Fast Money, or both. Draft topics have lots of well-known
+     answers to argue over; Fast Money topics have scores you can reason out quickly. Topics not listed here are draft topics. */
+  var SPLIT_START = '2026-11-04';
+  var FAST_ONLY_IDS = ["african-animals","african-countries","aircraft","airports","ancient-inventions","ancient-sites","appliances","archaeological-finds","architects","art-movements","art-supplies","asian-countries","bbq","beach-towns","beaches","beans-legumes","beers","boats","body-parts","bridges","british-irish-foods","building-materials","business-icons","canadian-cities","capital-cities","castles-palaces","chemical-compounds","chess-openings","chess-players","classic-cars","cocktails","coffee-chains","college-football","college-towns","composers","constellations","cooking-methods","crafts","cricketers","cruise-ships","cyclists","dance-styles","deep-sea-creatures","dive-sites","draft-busts","dumplings","egg-dishes","electric-vehicles","endangered-animals","energy-drinks","european-countries","european-dishes","exercises","exotic-fruits","explorers","fabrics","famous-experiments","famous-markets","famous-neighborhoods","famous-paintings","famous-ships","famous-streets","famous-voyages","fantasy-novels","fastest-animals","fonts","fortune-500","frozen-foods","game-consoles","gardens","golf-courses","greek-foods","heisman-winners","herbs","high-speed-trains","hiking-trails","historical-eras","horse-breeds","hotels","iconic-phones","insects","inventors","jazz-legends","juices-smoothies","keyboard-shortcuts","kitchen-tools","korean-foods","lakes","land-predators","landforms","latin-american-cities","legendary-places","martial-arts","math-concepts","mathematicians","meat-cuts","medical-breakthroughs","medical-pioneers","medieval-jobs","metals","middle-eastern-foods","motorcycles","mountain-towns","movie-studios","museums","mushrooms","music-videos","mystery-novels","natural-wonders","nba-coaches","nfl-coaches","nfl-teams","nhl-goalies","noodle-dishes","nuts-seeds","obsolete-jobs","office-supplies","olympic-events","operas","perfumes","pharaohs","philosophers","physicists","pickups-suvs","pizza-styles","planets-moons","poets","programming-languages","punctuation-symbols","racehorses","racetracks","reptiles","rice-dishes","rivers","rockets-spacecraft","rocks-minerals","roman-emperors","royal-dynasties","salads","scenic-drives","scientific-discoveries","scientific-theories","scifi-novels","sculptures","shapes","sharks","skate-tricks","ski-resorts","skylines","skyscrapers","snakes","southeast-asian-foods","southern-foods","space-missions","space-movies","spanish-portuguese-foods","spiders","spirits","sports-equipment","sports-leagues","sports-records","sports-trophies","streaming-originals","subway-systems","sweets-world","swimmers","telescopes","thai-foods","towers","track-athletes","trains","trees","tv-networks","units-of-measurement","us-landmarks","us-presidents","us-state-capitals","us-state-flags","vegetarian-dishes","venomous-animals","volcanoes","watches","water-sports","waterfalls","weather-phenomena","westerns","whales-dolphins","wild-cats","winter-olympians","winter-sports","world-breakfasts","world-flags","world-heritage-sites","yoga-poses"];
+  var BOTH_IDS = ["2000s-songs","2000s-tv-shows","2010s-songs","2010s-tv-shows","2020s-movies","2020s-songs","60s-songs","70s-movies","70s-songs","80s-tv-shows","90s-songs","90s-tv-shows","acronyms","african-cities","african-dishes","americas-countries","amphibians","appetizers","architectural-styles","asian-cities","australian-animals","authors","best-picture-winners","best-selling-games","beverage-brands","birds-of-prey","book-adaptations","box-office-hits","breads","burgers","cakes","canyons","cartoon-network-shows","caves","cereals","chicken-dishes","chili-peppers","chinese-dishes","chips-crisps","chocolate-bars","city-parks","classical-music","coaches","coffee-drinks","comedy-actors","coming-of-age-movies","concert-halls","concert-tours","construction-vehicles","cooking-shows","cover-songs","crops","currencies","curries","dance-movies","dance-songs","deserts","dinosaurs","dips-spreads","directors","disaster-movies","djs-producers","documentaries","drummers","duets","elements","european-cities","f1-drivers","famous-computers","famous-diamonds","famous-numbers","famous-poems","famous-races","fast-food-sides","fermented-foods","fictional-spaceships","fighters","figure-skaters","film-composers","french-foods","freshwater-fish","fried-foods","frozen-treats","galaxies-nebulae","game-studios","gemstones","golfers","grocery-stores","gym-equipment","gymnasts","heist-movies","historical-documents","holiday-foods","home-styles","hot-sauces","hot-springs","household-inventions","iconic-products","indian-dishes","indie-games","islands","italian-dishes","japanese-foods","kpop-songs","latin-caribbean-foods","latin-hits","libraries","lighthouses","long-running-tv","manga-series","mexican-foods","miniseries","mountain-ranges","mountains","movie-musicals","movie-sequels","movie-soundtracks","nascar-drivers","national-animals","national-dishes","nba-centers","nba-players","nfl-players","nhl-players","nickelodeon-shows","nintendo-games","nocturnal-animals","nursery-rhymes","olympic-powerhouses","pastries","pc-xbox-games","picnic-foods","pies","playstation-games","polar-animals","potato-dishes","prehistoric-animals","primates","pro-sports-teams","rainforest-animals","regional-american-foods","retro-tech","road-trip-songs","roadside-attractions","roller-coasters","sea-creatures","seas-oceans","shopping-malls","small-pets","soccer-players","social-media","sports-brands","sports-video-games","stadiums","stars","stores","streamed-songs","summer-songs","supercars","superfoods","sushi","talk-shows","teas","time-travel-stories","traditional-games","train-journeys","train-stations","video-game-movies","viral-videos","vocalists","wnba-players","womens-soccer-players","world-drinks","world-festivals","world-sports","writing-systems","young-adult-books","youtube-channels","zoos-aquariums"];
+  var TOPIC_MODE = {}; FAST_ONLY_IDS.forEach(function (id) { TOPIC_MODE[id] = 'fast'; }); BOTH_IDS.forEach(function (id) { TOPIC_MODE[id] = 'both'; });
+  function topicMode(id) { return TOPIC_MODE[id] || 'draft'; }
+  function segmentFor(key, kind) {
     var start = ROTATION2_START;
     TOPIC_DEFS.forEach(function (t) { var sn = t.since || ROTATION2_START; if (sn > start && sn <= key) start = sn; });
-    var ids = TOPIC_DEFS.filter(function (t) { return (t.since || ROTATION2_START) <= start; }).map(function (t) { return t.id; }).sort();
-    return { start: start, ids: ids };
+    if (SPLIT_START > start && SPLIT_START <= key) start = SPLIT_START;
+    var ids = TOPIC_DEFS.filter(function (t) { return (t.since || ROTATION2_START) <= start; }).map(function (t) { return t.id; });
+    if (key >= SPLIT_START) ids = ids.filter(function (id) { var m = topicMode(id); return m === 'both' || m === (kind === 'fast' ? 'fast' : 'draft'); });
+    return { start: start, ids: ids.sort() };
   }
   function cycleOrder(c, seg) {
     return seg ? shuffled(seg.ids, rng(hashStr('cycle2:' + seg.start + ':' + c))) : shuffled(LEGACY_ORDER, rng(hashStr('cycle:' + c)));
@@ -3759,6 +3787,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
     if ($('fast-start-btn')) $('fast-start-btn').textContent = S.fastDay ? 'Start the Fast Money from ' + fmtDay(S.fastDay) : 'Start today’s Fast Money';
     if (S.mode === 'practice') S.mode = 'offline';
     ['room', 'offline', 'fast', 'league', 'me', 'past', 'irr'].forEach(function (m) { $('mode-' + m).hidden = m !== S.mode; });
+    renderInvite();
     var irrOpen = irrUnlocked();
     $('hero-irr').innerHTML = (irrOpen ? '' : LOCK_SVG) + 'Mr. Irrelevant'; $('hero-irr').classList.toggle('locked', !irrOpen);
     $('hero-irr').setAttribute('aria-label', irrOpen ? 'Mr. Irrelevant' : 'Mr. Irrelevant (locked until you play today’s topic)');
@@ -3766,7 +3795,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
     $('league-btn').hidden = !fbOn(); $('me-btn').hidden = !fbOn();
     var rln = $('room-league-note');
     if (rln) { rln.hidden = !fbOn(); rln.innerHTML = (lgSignedIn() ? 'Playing with your league? ' : 'Playing with your league? <a href="#" data-act="account">Sign in</a>. ') + 'A game counts on its leaderboard when everyone in the room is in the league (2 or more players) and nobody has played today’s topic yet, online or against AI.' + (lgSignedIn() ? ' <a href="#" data-act="goto-mode" data-mode="league">See your leagues</a>' : ''); }
-    document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league' || S.mode === 'me' || S.mode === 'irr';
+    document.querySelector('#scr-modes .namebar').hidden = S.mode === 'league' || S.mode === 'me' || S.mode === 'irr' || !$('invite-box').hidden;
     document.querySelector('#scr-modes .setup').classList.toggle('wide', S.mode === 'league' || S.mode === 'me' || S.mode === 'past');
     if (!S.game && inPlay && S.mode === 'me') renderMe();
     if (!S.game && inPlay && S.mode === 'past') renderPast();
@@ -3798,7 +3827,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
     document.querySelectorAll('[data-act="create-room"],[data-act="join-room"],[data-act="find-match"]').forEach(function (b) { b.disabled = !online || (S.creating && b.getAttribute('data-act') === 'create-room'); });
     $('console-label').textContent = scr === 'modes' ? ({ room: 'Online game', offline: 'Offline vs AI', practice: 'Practice', fast: 'Fast Money', league: 'Leagues', irr: 'Mr. Irrelevant' })[S.mode] : scr === 'lobby' ? 'Room lobby' : scr === 'draft' ? 'Draft in progress' : 'Final results';
     renderChat();
-    var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
+    var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !S.env.showRelay || !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
     if (scr === 'lobby') renderLobby();
     if (scr === 'draft') renderDraft();
     if (scr === 'results') renderResults(); else document.documentElement.classList.remove('rv-on');
@@ -3808,10 +3837,11 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
 
   /* ---------- topic banner ---------- */
   function renderBanner() {
-    var g = S.game, topicId = g ? g.topicId : TODAY.topicId, subs = g ? g.subs : TODAY.subs, t = TOPICS[topicId];
+    var g = S.game, inv = !g && !S.fast && S.mode === 'room' ? inviteSpec() : null;
+    var topicId = g ? g.topicId : inv ? inv.topicId : TODAY.topicId, subs = g ? g.subs : inv ? inv.subs : TODAY.subs, t = TOPICS[topicId];
     var mineOn = g && g.players[S.me] && g.status === 'drafting';
     $('tb-name').textContent = t.name;
-    var tbl = document.querySelector('#topic-banner .banner-main .mono'); if (tbl) tbl.textContent = g && g.practice ? 'Practice topic' : g && g.past ? 'Topic from ' + fmtDay(g.dateKey) : 'Topic';
+    var tbl = document.querySelector('#topic-banner .banner-main .mono'); if (tbl) tbl.textContent = g && g.practice ? 'Practice topic' : g && g.past ? 'Topic from ' + fmtDay(g.dateKey) : inv && inv.past ? 'Topic from ' + fmtDay(inv.dateKey) : 'Topic';
     if (!g && S.fast) {
       var ft = TOPICS[S.fast.topicId];
       $('tb-name').textContent = ft.name; $('tb-q').textContent = ft.q;
@@ -3868,7 +3898,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
     $('lobby-kind').textContent = g.isPublic ? 'Public room · anyone can join' : 'Private room · code only';
     $('lobby-code').textContent = g.code;
     $('lobby-hint').textContent = (g.past ? 'This room plays the topic from ' + fmtDay(g.dateKey, true) + ' (a past day, just for fun: it doesn’t count toward stats or leagues). ' : '') + (g.isPublic ? 'Players who tap “Join a random room” can be matched here. You can also share the code or the link.' : 'Only people with the code or the link can join. Share it with your friends.') + '';
-    $('share-link').value = (S.env.web ? location.origin + location.pathname : ARTIFACT_URL) + '#r-' + g.code;
+    $('share-link').value = (S.env.web ? location.origin + location.pathname : ARTIFACT_URL) + roomHash(g);
     $('lobby-count').textContent = 'Players · ' + ps.length + ' of ' + MAX_PLAYERS;
     var canKick = g.mode === 'shared' && g.hostId === S.me && g.status === 'lobby';
     $('lobby-players').innerHTML = ps.map(function (p, i) {
@@ -4181,7 +4211,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
         return '<div class="spot ' + cls[i] + ' pc' + pci(g, r2.pid) + '">' + (r2.rank === 1 ? '<span class="crown-tag">Winner</span>' : '') + av(r2) + '<span class="pn">' + esc(r2.name) + esc(you(r2.pid)) + '</span><span class="pt">' + fmt1(r2.total) + '</span><div class="block">' + r2.rank + '</div></div>';
       }).join('') + '</div>' +
         (rows.length > 3 ? '<ol class="podium-rest">' + rows.slice(3).map(function (r2) { return '<li class="pc' + pci(g, r2.pid) + '"><span class="rk">' + ordinal(r2.rank) + '</span><span>' + esc(r2.name) + esc(you(r2.pid)) + '</span><span>' + fmt1(r2.total) + '</span></li>'; }).join('') + '</ol>' : '');
-      run = function () { rvAfter(calm ? 0 : 3300, function () { rvConfetti(g); }); };
+      run = function () { rvAfter(calm ? 0 : 1300, function () { rvConfetti(g); }); };
     }
     html = '<div class="rv-in">' + html + '</div>' + bar;
     $('reveal').innerHTML = html;
@@ -4622,6 +4652,46 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
     store('roster.name', n);
     return n;
   }
+  /* Room links: #r-CODE, plus the day for a past-day room (#r-CODE-20261028) so the invite shows the right topic straight away. */
+  function roomHash(g) { return '#r-' + g.code + (g.past && /^\d{4}-\d\d-\d\d$/.test(g.dateKey || '') ? '-' + g.dateKey.replace(/-/g, '') : ''); }
+  function inviteSpec() {
+    var inv = S.invite; if (!inv) return null;
+    if (inv.room && TOPICS[inv.room.topicId]) return { topicId: inv.room.topicId, subs: Array.isArray(inv.room.subs) && inv.room.subs.length ? inv.room.subs.map(String) : TOPICS[inv.room.topicId].subs.slice(0, SUBS_PER_DAY), dateKey: inv.room.dateKey, past: !!inv.room.past };
+    var today = dateKey(new Date()), d = inv.day && inv.day < today ? inv.day : null, sp = dailySpec(d || today);
+    return { topicId: sp.topicId, subs: sp.subs, dateKey: sp.dateKey, past: !!d };
+  }
+  function inviteFetch() {
+    var inv = S.invite; if (!inv || inv.fetching || inv.room || !(S.env.db && S.env.uid)) return;
+    inv.fetching = true;
+    S.env.db.doc('rooms/' + inv.code).get().then(function (snap) {
+      if (S.invite !== inv) return;
+      if (snap.exists) inv.room = snap.data(); else inv.missing = true;
+      render();
+    }).catch(function () {}).then(function () { inv.fetching = false; });
+  }
+  function renderInvite() {
+    var box = $('invite-box'), inv = S.invite, show = !!inv && !S.game && !S.fast && S.mode === 'room';
+    box.hidden = !show;
+    if (show) document.querySelector('#scr-modes .namebar').hidden = true;
+    if (show && document.activeElement !== $('inv-name')) $('inv-name').value = $('player-name').value;
+    $('mode-room').hidden = show || S.mode !== 'room';
+    if (!show) return;
+    inviteFetch();
+    var sp = inviteSpec(), t = TOPICS[sp.topicId];
+    $('inv-code').textContent = inv.code;
+    var started = inv.room && inv.room.status && inv.room.status !== 'lobby';
+    $('inv-topic').textContent = inv.missing ? 'Can’t find room ' + inv.code + ' yet. Make sure your friend still has the room open, then tap Join room.'
+      : (sp.past ? 'Topic from ' + fmtDay(sp.dateKey, true) + ': ' : 'Today’s topic: ') + t.name + '.' + (started ? ' The draft has already started, so you can watch.' : ' Type your name, then join.');
+    var online = !!(S.env.db && S.env.uid), jb = $('invite-join');
+    jb.disabled = !online; jb.textContent = online ? (started ? 'Watch the draft' : 'Join room') : 'Connecting…';
+  }
+  function inviteJoin() {
+    var inv = S.invite; if (!inv) return;
+    $('player-name').value = $('inv-name').value;
+    if (!myName()) { setMsg('Enter your name first.', true); $('inv-name').focus(); return; }
+    if (!requireName()) return;
+    joinRoom(inv.code).then(function () { if (S.game && S.game.code === inv.code) S.invite = null; });
+  }
   function newCode() { var s = ''; for (var i = 0; i < CODE_LEN; i++) s += CODE_CHARS.charAt(Math.floor(Math.random() * CODE_CHARS.length)); return s; }
   async function createRoom(isPublic, fixedCode, day) {
     if (S.creating) return null;
@@ -4703,6 +4773,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
   }
   function enterRoom(code) {
     leaveGame(true);
+    S.invite = null;
     var db = S.env.db;
     S.me = S.env.uid; S.autoDone = {}; S.scoreWaitSince = 0; S.waitShown = false;
     S.scoring = { state: 'idle', msg: '', forGame: '' };
@@ -6367,6 +6438,8 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
     else if (act === 'intro-close') { if (S.game) S.introClosed = gameId(S.game); hideIntro(); }
     else if (act === 'privacy') { store('roster.privacy', t.getAttribute('data-privacy')); renderPrivacy(); }
     else if (act === 'join-room') joinRoom($('room-code').value);
+    else if (act === 'invite-join') inviteJoin();
+    else if (act === 'invite-other') { S.invite = null; try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} render(); }
     else if (act === 'find-match') findMatch();
     else if (act === 'start') startDraft();
     else if (act === 'kick') {
@@ -6483,6 +6556,8 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
   $('account').addEventListener('click', function (ev) { if (ev.target === $('account')) closeAccount(); });
   $('room-code').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); joinRoom($('room-code').value); } });
   $('player-name').addEventListener('change', function () { store('roster.name', myName()); });
+  $('inv-name').addEventListener('input', function () { $('player-name').value = $('inv-name').value; });
+  $('inv-name').addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && !$('invite-join').disabled) { ev.preventDefault(); inviteJoin(); } });
 
   var ain = $('answer-in');
   ain.addEventListener('input', function () { S.ui.chosen = null; $('lock-btn').hidden = true; openList(); if (S.game) renderBrowse(derive(S.game, now()), true); });
@@ -6532,7 +6607,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-10-23-20';
+  var BUILD_ID = '2026-11-01-02';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -6961,7 +7036,7 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
   function fastAutoSpec(key, daily) {
     if (key >= '2026-10-14') {
       /* Its own rotation (offset from the draft's), so a topic doesn't come back for months. */
-      var seg = key >= ROTATION2_START ? segmentFor(key) : null, fids = seg ? seg.ids : LEGACY_ORDER;
+      var seg = key >= ROTATION2_START ? segmentFor(key, 'fast') : null, fids = seg ? seg.ids : LEGACY_ORDER;
       var di = dayIndex(key) - (seg ? dayIndex(seg.start) : 0), n = fids.length, c = Math.floor(di / n), pos = di - c * n;
       var fo = function (cc) { return shuffled(fids, rng(hashStr(seg ? 'fastcycle2:' + seg.start + ':' + cc : 'fastcycle:' + cc))); };
       var order = fo(c), prevOrder = fo(c - 1);
@@ -6969,6 +7044,8 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
       var pick = order[pos], realDaily = dailySpec(key).topicId;
       if (pick === daily || pick === realDaily) pick = order[(pos + Math.floor(n / 2)) % n];
       if (pick === daily || pick === realDaily) pick = order[(pos + Math.floor(n / 4)) % n];
+      /* First day of a new segment: don't repeat yesterday's Fast Money. */
+      if (seg && di === 0 && key > '2026-11-03') { var yf = fastSpec(keyBefore(key)).topicId; for (var k2 = 1; k2 < n && (pick === yf || pick === daily || pick === realDaily); k2++) pick = order[(pos + k2) % n]; }
       return { dateKey: key, topicId: pick, subs: shuffled(TOPICS[pick].subs, rng(hashStr('fastsubs:' + key + ':' + pick))).slice(0, SUBS_PER_DAY) };
     }
     var ids = LEGACY_ORDER.slice().sort();
@@ -7309,8 +7386,12 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
   /* ---------- boot ---------- */
   async function boot() {
     var saved = store('roster.name'); if (saved) $('player-name').value = clean(saved);
-    var m = /^#r-([A-Z]{5})$/i.exec(location.hash || '');
-    if (m) { $('room-code').value = m[1].toUpperCase(); S.view = 'play'; S.mode = 'room'; }
+    var m = /^#r-([A-Z]{5})(?:-(\d{4})(\d\d)(\d\d))?$/i.exec(location.hash || '');
+    if (m) {
+      $('room-code').value = m[1].toUpperCase(); S.view = 'play'; S.mode = 'room';
+      var invDay = m[2] ? m[2] + '-' + m[3] + '-' + m[4] : null;
+      S.invite = { code: m[1].toUpperCase(), day: invDay && invDay >= ARCHIVE_START ? invDay : null };
+    }
     var lm = /^#league-([A-Z]{6})$/i.exec(location.hash || '');
     if (/^#past$/i.test(location.hash || '')) { S.view = 'play'; S.mode = 'past'; }
     if (lm) { S.view = 'play'; S.mode = 'league'; S.leagueOpenCode = lm[1].toUpperCase(); }
@@ -7354,7 +7435,9 @@ F("classic-cars","Classic Cars","classic car","Which classics make the ultimate 
       S.env.uid = webUid();
       S.env.db = makeWebDb(S.env.uid);
       S.env.orgHash = /^#organizer$/i.test(location.hash || '');
-      var nd = document.getElementById('net-diag'); if (nd) { nd.hidden = false; nd.textContent = 'Relay check · version ' + BUILD_ID + ' · not connected yet (connects when you create or join a room)'; }
+      /* The relay check is a troubleshooting readout: players never see it. Add #debug to the URL to show it. */
+      S.env.showRelay = /debug/i.test(location.hash || '') || !!TEST.showRelay;
+      var nd = document.getElementById('net-diag'); if (nd) { nd.hidden = !S.env.showRelay; nd.textContent = 'Relay check · version ' + BUILD_ID + ' · not connected yet (connects when you create or join a room)'; }
       checkForUpdate();
       applyWebCopy();
     }
