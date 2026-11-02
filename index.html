@@ -268,6 +268,12 @@ select.field { padding-right: 8px; }
 
 /* Results */
 .winner { display: grid; gap: 8px; padding: 18px; border-radius: 14px; background: var(--hi); color: var(--hi-ink); }
+.irr-cta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 18px; border: 3px solid var(--edge); border-radius: 20px; background: var(--tint); box-shadow: 6px 6px 0 var(--accent); }
+.irr-cta-text { display: grid; gap: 6px; min-width: 0; }
+.irr-cta h3 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 2rem; line-height: 1; color: var(--accent); }
+.irr-cta .note { margin: 0; }
+.irr-cta .btn { min-width: 220px; }
+@media (max-width: 640px) { .irr-cta { grid-template-columns: minmax(0, 1fr); } .irr-cta .btn { min-width: 0; } }
 /* Online results reveal: a waiting-room style intro, then each place from last up, the winner, then a podium. */
 .reveal { display: grid; gap: 18px; }
 .rv-lobby { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
@@ -1327,6 +1333,14 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
           <div style="display:grid;gap:20px" id="results-main">
             <div class="t10-focus" id="t10-focus" hidden=""></div>
             <div class="winner" id="winner" hidden=""></div>
+            <div class="irr-cta" id="irr-cta" hidden="">
+              <div class="irr-cta-text">
+                <span class="mono">Bonus round · unlocked</span>
+                <h3>Mr. Irrelevant</h3>
+                <p class="note" id="irr-note">You’ve seen the lists. Now score as <strong>low</strong> as you can: pick the least valuable answer for each subtopic. No timer, your draft board stays in view. Stay under 20.0 to win. One try per draft.</p>
+              </div>
+              <button class="btn primary block" type="button" id="irr-btn" data-act="irr-start">Play Mr. Irrelevant</button>
+            </div>
             <div class="awards" id="awards" hidden=""></div>
             <div class="scorebox" id="scorebox"></div>
             <div class="results-grid">
@@ -1337,12 +1351,10 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                   <button class="btn primary" type="button" id="share-btn" data-act="share">Share my score</button>
                   <button class="btn" type="button" id="save-btn" data-act="save">Save my result</button>
                   <button class="btn" type="button" id="again-btn" data-act="again">Play again</button>
-                  <button class="btn" type="button" id="irr-btn" data-act="irr-start" hidden="">Play Mr. Irrelevant</button>
                   <button class="btn" type="button" id="home-btn" data-act="go-home">← Back to homepage</button>
                 </div>
                 <p class="note" id="save-note"></p>
                 <p class="note" id="league-note" hidden=""></p>
-                <p class="note" id="irr-note" hidden="">Mr. Irrelevant: you’ve seen the lists, now try to score as <strong>low</strong> as you can. No timer: pick a subtopic, then its least valuable answer, like a normal draft, with your draft board in view. Stay under 20.0 to win. Solo, one try per draft.</p>
                 <div class="share-box" id="share-box" hidden="">
                   <span class="mono">Your score card</span>
                   <textarea class="field share-text" id="share-text" readonly="" rows="9" aria-label="Score to share"></textarea>
@@ -3526,10 +3538,13 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
      top few available shortlist answers (usually the best, never off the shortlist). */
   var BOT_WEIGHTS = [0.5, 0.27, 0.15, 0.08];
   /* AI difficulty: how far down the available list a bot may reach, and how smartly it picks a subtopic. */
+  /* depth[r]: on its (r+1)th pick a bot takes one of the top depth[r] answers still available, so every level
+     grabs the best answers first and only reaches deeper later in the draft. Tuned so the average total is about
+     40 for Easy, 45 for Medium and 47.5 for Hard. */
   var BOT_LEVELS = {
-    easy: { weights: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], smartSub: false },
-    medium: { weights: [0.3, 0.24, 0.18, 0.13, 0.09, 0.06], smartSub: true },
-    hard: { weights: [0.92, 0.08], smartSub: true }
+    easy: { weights: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], depth: [2,16,30,42,52], smartSub: true },
+    medium: { weights: [0.3, 0.24, 0.18, 0.13, 0.09, 0.06], depth: [1,7,13,19,25], smartSub: true },
+    hard: { weights: [0.92, 0.08], depth: [1,2,4,6,8], smartSub: true }
   };
   function weightedIndex(n, rand, weights) {
     var w = (weights || BOT_WEIGHTS).slice(0, n), sum = w.reduce(function (a, b) { return a + b; }, 0), x = rand() * sum;
@@ -3551,6 +3566,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
       var top = options;
       if (L.smartSub) { var bestIdx = Math.min.apply(null, options.map(function (o) { return o.idx; })); top = options.filter(function (o) { return o.idx === bestIdx; }); }
       var pick = top[Math.floor(rand() * top.length)];
+      if (L.depth) { var r0 = g.subs.length - open.length, dep = Math.max(1, Math.min(pick.avail.length, L.depth[Math.min(r0, L.depth.length - 1)])); return { sub: pick.sub, key: pick.avail[Math.floor(rand() * dep)] }; }
       return { sub: pick.sub, key: pick.avail[weightedIndex(Math.min(pick.avail.length, W.length), rand, W)] };
     }
     var comp = t.composite.filter(function (k) { return !d.taken[k]; });
@@ -4184,7 +4200,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     /* Moves on by itself after ms (the Next button fills up meanwhile); Next works at any moment. */
     function autoNext(ms) { var b = $('reveal-next'); if (!b) return; b.style.setProperty('--rv-auto', ms + 'ms'); b.classList.add('counting'); rvAfter(ms, function () { revealStep(step + 1); }); }
     var html, run = null;
-    var bar = '<div class="rv-bar">' + (step >= plan.last ? '<button class="rv-go" type="button" data-act="reveal-done" id="reveal-done">See full results</button>' :
+    var bar = '<div class="rv-bar">' + (step >= plan.last ? '<button class="rv-go" type="button" data-act="reveal-done" id="reveal-done">See full results</button>' + (g.players[S.me] && g.results ? '<button class="rv-skip" type="button" data-act="irr-start" id="rv-irr">Play Mr. Irrelevant »</button>' : '') :
       '<button class="rv-go" type="button" data-act="reveal-next" id="reveal-next"><span>' + (step === 0 ? 'Start now' : 'Next') + ' ›</span><i class="fill"></i></button><button class="rv-skip" type="button" data-act="reveal-skip">Skip to results »</button>') + '</div>';
     if (step === 0) {
       html = '<span class="mono">The results are in</span><h2 class="intro-topic">' + esc(t.name) + '</h2><p class="intro-q">' + n + ' players. Places are revealed from last to first, then the podium.</p><p class="rv-hint">It plays by itself. Tap Next any time to jump ahead.</p>' +
@@ -4275,8 +4291,10 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     if (res && inGame && !saved) autoSaveResult(g);
     if (res && inGame) recordDay(g);
     if (res && inGame && !g.past) irrSaveSrc(g);
-    var irrDone = loadIrr(gameId(g)), irrOk = !!(res && inGame && irrUnlocked());
-    $('irr-btn').hidden = !irrOk; $('irr-note').hidden = !irrOk || !!irrDone;
+    /* Mr. Irrelevant: offered after every finished draft you played in (today's or a past day's), near the top. */
+    var irrDone = loadIrr(gameId(g)), irrOk = !!(res && inGame);
+    $('irr-cta').hidden = !irrOk;
+    $('irr-cta').querySelector('.mono').textContent = irrDone && irrDone.done ? 'Bonus round · done' : 'Bonus round · unlocked';
     $('irr-btn').textContent = irrDone && irrDone.done ? 'See your Mr. Irrelevant' : irrDone ? 'Back to Mr. Irrelevant' : 'Play Mr. Irrelevant';
     $('share-btn').hidden = !(res && inGame);
     if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; }
@@ -4588,7 +4606,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
   }
 
   /* ---------- offline ---------- */
-  var LEVEL_NOTES = { easy: 'Easy: the AI often settles for decent answers and doesn’t plan ahead.', medium: 'Medium: the AI picks strong answers, usually but not always the best one left.', hard: 'Hard: the AI almost always takes the best answer left, in the subtopic where it matters most.' };
+  var LEVEL_NOTES = { easy: 'Easy: the AI grabs a top answer first, then often settles for decent ones. It usually scores around 40.', medium: 'Medium: the AI takes the best answer first, then strong but not always the best ones. It usually scores around 45.', hard: 'Hard: the AI takes the best answers first and rarely slips after that. It usually scores around 47 to 48.' };
   var LEVEL_NAMES = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
   /* Whether players can see the full answer list during the draft. Offline and practice: the player's own
      choice, remembered on this device. Rooms: the host's choice, saved on the room. */
@@ -6419,7 +6437,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     else if (act === 'home') { ev.preventDefault(); if (S.fast) { if (S.fast.done) leaveGame(false); else window.scrollTo(0, 0); } else if (!S.game) showView('home'); else if (screenFor() === 'results') leaveGame(false); else window.scrollTo(0, 0); }
     else if (act === 'share') { ev.preventDefault(); shareScore(); }
     else if (act === 'fast-start') startFast();
-    else if (act === 'irr-start') startIrr();
+    else if (act === 'irr-start') { if (S.game && S.reveal) { var rg = S.game; var a0 = revealedList().filter(function (x) { return x !== gameId(rg); }); a0.push(gameId(rg)); store('roster.revealed', JSON.stringify(a0.slice(-30))); rvClear(); S.reveal = null; document.documentElement.classList.remove('rv-on'); } startIrr(); }
     else if (act === 'reveal-next') { if (S.reveal) revealStep(S.reveal.step + 1); }
     else if (act === 'reveal-skip' || act === 'reveal-done') { if (S.game) revealFinish(S.game); }
     else if (act === 'irr-home') { var isrc = irrTodaySrc(); if (isrc && !S.game) startIrr(isrc); }
@@ -6607,7 +6625,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-01-02';
+  var BUILD_ID = '2026-11-02-02';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
