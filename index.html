@@ -1048,65 +1048,17 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   .stats-me input:hover { outline: 2px solid #000000; outline-offset: 2px; }
 }
 
-/* ---------- Creator mode: a 9:16 view for filming the draft (camera on top, or green space at the bottom) ---------- */
+/* ---------- Streamer mode: blur the room code and link ---------- */
 .creator-opt { display: grid; gap: 8px; padding: 12px; border: 2px dashed var(--line); border-radius: 14px; }
 .creator-check { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.92rem; min-height: 36px; }
 .creator-check input { width: 20px; height: 20px; accent-color: var(--pop); }
 html.streamer #lobby-code, html.streamer #share-link { filter: blur(10px); user-select: none; }
-html.creator-on, html.creator-on body { background: #000000; }
-html.creator-on body { overflow: hidden; }
-html.creator-on header.nav, html.creator-on footer, html.creator-on #band-hero, html.creator-on #chat, html.creator-on #net-diag, html.creator-on .console-top, html.creator-on #how, html.creator-on #organizer { display: none !important; }
-html.creator-on #play, html.creator-on main { padding: 0 !important; margin: 0 !important; }
-html.creator-on #play > .wrap { padding: 0; width: 100%; }
-html.creator-on #console { width: min(100vw, calc(100dvh * 9 / 16)); height: 100dvh; margin: 0 auto; padding: 0; gap: 0; border: 0; border-radius: 0; box-shadow: none; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
-html.creator-on #topic-banner { order: 2; margin: 8px 10px 0; padding: 6px 12px; border-radius: 14px; gap: 0; }
-html.creator-on #topic-banner #tb-q, html.creator-on #topic-banner #tb-subs { display: none; }
-html.creator-on #topic-banner h2 { font-size: 1.5rem; line-height: 1; }
-html.creator-on #scr-draft { order: 3; flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 10px 10px; }
-html.creator-on #scr-draft > div { gap: 8px !important; }
-html.creator-on .draft-grid { display: flex; flex-direction: column; gap: 8px; }
-html.creator-on #order, html.creator-on #browse, html.creator-on #scr-draft .actions { display: none !important; }
-html.creator-on .draft-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-html.creator-on #play-msg { order: 3; margin: 4px 10px 0; }
-html.creator-on #play-msg:empty { display: none; }
-html.creator-on .draft-head h3 { font-size: 1.15rem; }
-html.creator-on #draft-meta { font-size: 0.62rem; }
-html.creator-on .clock { display: flex; align-items: baseline; gap: 6px; }
-html.creator-on .clock > .mono { display: none; }
-html.creator-on .clock .t { font-size: 1.9rem; }
-html.creator-on #bar { height: 6px; }
-html.creator-on .pickbox { padding: 8px 10px; gap: 6px; }
-html.creator-on .pickbox > .mono { display: none; }
-html.creator-on .chips { gap: 5px; }
-html.creator-on .chip { min-height: 32px; padding: 0 10px; font-size: 0.8rem; }
-html.creator-on .waitbox { padding: 6px 10px; font-size: 0.85rem; }
-html.creator-on .board th, html.creator-on .board td { padding: 5px 6px; }
-html.creator-on .board thead th { font-size: 0.72rem; white-space: normal; line-height: 1.1; }
-html.creator-on .board thead th.corner { width: 94px; font-size: 0.55rem; }
-html.creator-on .board tbody th { font-family: var(--font-body); text-transform: none; font-weight: 800; font-size: 0.7rem; hyphens: none; overflow-wrap: normal; word-break: normal; letter-spacing: -0.01em; }
-html.creator-on .board td { font-size: 0.74rem; line-height: 1.15; }
-html.creator-on .board { font-size: 0.78rem; }
-html.creator-on .lastpick { margin: 0; font-weight: 700; }
-.creator-cam { position: relative; order: 1; flex: 0 0 30%; background: #161616; overflow: hidden; border-bottom: 4px solid var(--hi); }
-.creator-cam video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
-.creator-cam .cc-msg { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; text-align: center; color: #ffffff; font-weight: 700; }
-.creator-cam .cc-msg[hidden] { display: none; }
-.cc-live { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: 10px; background: var(--pop); color: #ffffff; font-weight: 800; font-size: 0.7rem; letter-spacing: 0.12em; padding: 4px 8px; border-radius: 6px; }
-.cc-exit { position: absolute; top: calc(8px + env(safe-area-inset-top, 0px)); right: 10px; font: inherit; font-size: 0.75rem; font-weight: 800; background: rgba(0,0,0,0.55); color: #ffffff; border: 1.5px solid rgba(255,255,255,0.6); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
-.cc-url { position: absolute; right: 10px; bottom: 10px; background: #000000; color: var(--hi); font-weight: 800; font-size: 0.78rem; padding: 4px 10px; border-radius: 999px; }
-.creator-green { position: relative; order: 4; flex: 0 0 30%; background: #00b140; border-top: 4px solid #000000; }
-html.creator-on.creator-camera #reveal.rv-full, html.creator-on.creator-green #reveal.rv-full { left: max(0px, calc(50% - 100dvh * 9 / 32)); right: max(0px, calc(50% - 100dvh * 9 / 32)); }
-html.creator-on.creator-camera #reveal.rv-full { top: 30dvh; }
-html.creator-on #intro { left: max(0px, calc(50% - 100dvh * 9 / 32)); right: max(0px, calc(50% - 100dvh * 9 / 32)); }
-html.creator-on.creator-camera #intro { top: 30dvh; }
-html.creator-on.creator-green #intro { bottom: 30dvh; }
-html.creator-on.creator-camera #reveal.rv-full .rv-bar, html.creator-on.creator-green #reveal.rv-full .rv-bar { left: max(0px, calc(50% - 100dvh * 9 / 32)); right: max(0px, calc(50% - 100dvh * 9 / 32)); }
-html.creator-on.creator-green #reveal.rv-full { bottom: 30dvh; }
-html.creator-on.creator-green #reveal.rv-full .rv-bar { bottom: 30dvh; }
 
-/* ---------- Draft video: a downloadable 9:16 replay of the draft ---------- */
+/* ---------- Draft video: the whole draft board in real time, as a 9:16 video ---------- */
+#dv-slot-home { padding-block: 0 28px; }
+.dv-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .dv-box { display: grid; gap: 14px; padding: 18px; border: 3px solid var(--edge); border-radius: 20px; background: var(--surface); }
-.dv-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.dv-head { display: grid; gap: 12px; }
 .dv-head h3 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 2rem; line-height: 1; color: var(--accent); }
 .dv-head .note { margin: 4px 0 0; }
 .dv-editor { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start; }
@@ -1116,7 +1068,7 @@ html.creator-on.creator-green #reveal.rv-full .rv-bar { bottom: 30dvh; }
 .dv-stage canvas:active { cursor: grabbing; }
 .dv-controls { display: grid; gap: 8px; align-content: start; min-width: 0; }
 .dv-controls input[type="range"] { width: 100%; accent-color: var(--pop); }
-@media (max-width: 640px) { .dv-head, .dv-editor { grid-template-columns: minmax(0, 1fr); } .dv-stage { justify-self: center; } }
+@media (max-width: 640px) { .dv-editor { grid-template-columns: minmax(0, 1fr); } .dv-stage { justify-self: center; } .dv-actions .btn { flex: 1 1 100%; } }
 </style>
 <template id="shell">
 <div class="band">
@@ -1171,19 +1123,50 @@ html.creator-on.creator-green #reveal.rv-full .rv-bar { bottom: 30dvh; }
     </div>
   </section>
 
+  <section class="wrap" id="dv-slot-home" hidden="">
+      <div class="dv-box" id="dv-box" hidden="">
+        <div class="dv-head">
+          <div>
+            <span class="mono" id="dv-kicker">For your TikTok or Reels</span>
+            <h3>Draft video</h3>
+            <p class="note" id="dv-note"></p>
+          </div>
+          <div class="dv-actions">
+            <button class="btn primary" type="button" id="dv-rec" data-act="dv-rec">Download full draft video</button>
+            <button class="btn" type="button" id="dv-open" data-act="dv-open">Adjust the look</button>
+            <button class="btn" type="button" id="dv-share" data-act="dv-share" hidden="">Share or save to Photos</button>
+            <button class="btn small" type="button" id="dv-dismiss" data-act="dv-dismiss" hidden="">Hide</button>
+          </div>
+          <p class="note" id="dv-msg" role="status" aria-live="polite"></p>
+        </div>
+        <div class="dv-editor" id="dv-editor" hidden="">
+          <div class="dv-stage"><canvas id="dv-canvas" width="540" height="960" aria-label="Draft video preview, sped up. Drag the board to move it."></canvas></div>
+          <div class="dv-controls">
+            <span class="mono label" id="dv-bg-label">Background</span>
+            <div class="seg" role="radiogroup" aria-labelledby="dv-bg-label">
+              <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="dv-bg" data-bg="green">Green screen</button>
+              <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="dv-bg" data-bg="black">Black</button>
+              <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="dv-bg" data-bg="white">White</button>
+            </div>
+            <label class="mono label" for="dv-size">Board size</label>
+            <input type="range" id="dv-size" min="50" max="100" step="1" value="92">
+            <span class="mono label" id="dv-pos-label">Quick spots</span>
+            <div class="seg" role="group" aria-labelledby="dv-pos-label">
+              <button type="button" class="seg-btn" data-act="dv-pos" data-pos="top">Top</button>
+              <button type="button" class="seg-btn" data-act="dv-pos" data-pos="middle">Middle</button>
+              <button type="button" class="seg-btn" data-act="dv-pos" data-pos="bottom">Bottom</button>
+            </div>
+            <p class="note">The preview plays the whole draft sped up; the download runs at real speed. Drag the board on the preview to put it anywhere. Green screen lets TikTok or CapCut cut the background out so the board sits over your own video.</p>
+          </div>
+        </div>
+      </div>
+  </section>
+
   <!-- GAME -->
   <section class="play-view" id="play" hidden="">
     <div class="wrap">
 
       <div class="console" id="console">
-        <div class="creator-green" id="creator-green" hidden=""><span class="cc-url">playtheroster.com</span></div>
-        <div class="creator-cam" id="creator-cam" hidden="">
-          <video id="creator-video" autoplay="" playsinline="" muted=""></video>
-          <p class="cc-msg" id="creator-cam-msg" hidden=""></p>
-          <span class="cc-live">● LIVE</span>
-          <button class="cc-exit" type="button" data-act="creator-exit" aria-label="Turn off creator mode">Exit</button>
-          <span class="cc-url">playtheroster.com</span>
-        </div>
         <div class="console-top">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <button class="btn small" type="button" id="back-btn" data-act="home">← Back</button>
@@ -1283,16 +1266,6 @@ html.creator-on.creator-green #reveal.rv-full .rv-bar { bottom: 30dvh; }
                   </div>
                 </div>
                 <p class="note list-note"></p>
-                <div class="creator-opt">
-                  <span class="mono label" id="creator-label-offline">Creator mode (for filming)</span>
-                  <div class="seg" role="radiogroup" aria-labelledby="creator-label-offline" data-seg="creator">
-                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="creator" data-creator="off">Off</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="camera">Camera + draft</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="green">Green screen</button>
-                  </div>
-                  <label class="creator-check"><input type="checkbox" class="streamer-cb" data-act="streamer"> Streamer mode: hide the room code and link</label>
-                  <p class="note creator-note"></p>
-                </div>
                 <button class="btn primary block" type="button" data-act="play-offline">Play offline</button>
               </div>
 
@@ -1358,15 +1331,8 @@ html.creator-on.creator-green #reveal.rv-full .rv-bar { bottom: 30dvh; }
                 <p class="note" id="lobby-list-note"></p>
               </div>
               <div class="creator-opt">
-                  <span class="mono label" id="creator-label-room">Creator mode (for filming)</span>
-                  <div class="seg" role="radiogroup" aria-labelledby="creator-label-room" data-seg="creator">
-                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="creator" data-creator="off">Off</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="camera">Camera + draft</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="green">Green screen</button>
-                  </div>
-                  <label class="creator-check"><input type="checkbox" class="streamer-cb" data-act="streamer"> Streamer mode: hide the room code and link</label>
-                  <p class="note creator-note"></p>
-                </div>
+                <label class="creator-check"><input type="checkbox" class="streamer-cb" data-act="streamer"> Streamer mode: hide the room code and link</label>
+              </div>
               <div class="actions">
                 <button class="btn primary" type="button" id="start-btn" data-act="start">Start draft</button>
                 <button class="btn" type="button" data-act="leave">Leave room</button>
@@ -1439,38 +1405,7 @@ html.creator-on.creator-green #reveal.rv-full .rv-bar { bottom: 30dvh; }
               </div>
               <button class="btn primary block" type="button" id="irr-btn" data-act="irr-start">Play Mr. Irrelevant</button>
             </div>
-            <div class="dv-box" id="dv-box" hidden="">
-              <div class="dv-head">
-                <div>
-                  <span class="mono">For your TikTok or Reels</span>
-                  <h3>Draft video</h3>
-                  <p class="note">A vertical replay of this draft, pick by pick. Drag the board where you want it and set its size, then download it and drop it into your own video.</p>
-                </div>
-                <button class="btn" type="button" id="dv-open" data-act="dv-open">Make a draft video</button>
-              </div>
-              <div class="dv-editor" id="dv-editor" hidden="">
-                <div class="dv-stage"><canvas id="dv-canvas" width="540" height="960" aria-label="Draft video preview. Drag the board to move it."></canvas></div>
-                <div class="dv-controls">
-                  <span class="mono label" id="dv-bg-label">Background</span>
-                  <div class="seg" role="radiogroup" aria-labelledby="dv-bg-label">
-                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="dv-bg" data-bg="green">Green screen</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="dv-bg" data-bg="black">Black</button>
-                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="dv-bg" data-bg="white">White</button>
-                  </div>
-                  <label class="mono label" for="dv-size">Board size</label>
-                  <input type="range" id="dv-size" min="50" max="100" step="1" value="92">
-                  <span class="mono label" id="dv-pos-label">Quick spots</span>
-                  <div class="seg" role="group" aria-labelledby="dv-pos-label">
-                    <button type="button" class="seg-btn" data-act="dv-pos" data-pos="top">Top</button>
-                    <button type="button" class="seg-btn" data-act="dv-pos" data-pos="middle">Middle</button>
-                    <button type="button" class="seg-btn" data-act="dv-pos" data-pos="bottom">Bottom</button>
-                  </div>
-                  <p class="note">Tip: drag the board on the preview to put it anywhere. Green screen lets TikTok or CapCut cut the background out so the board sits over your own video.</p>
-                  <button class="btn primary block" type="button" id="dv-rec" data-act="dv-rec">Download video</button>
-                  <p class="note" id="dv-msg" role="status" aria-live="polite"></p>
-                </div>
-              </div>
-            </div>
+            <div id="dv-slot-results"></div>
             <div class="awards" id="awards" hidden=""></div>
             <div class="scorebox" id="scorebox"></div>
             <div class="results-grid">
@@ -3950,7 +3885,8 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     $('back-btn').hidden = !!S.game && !atResults;
     $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
     renderBanner();
-    renderCreatorOpts(); renderCreator(scr);
+    renderStreamer();
+    recSample(); renderDv(scr);
     var fastOn = !!S.fast && !S.game;
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
     if (S.game && !fastOn && (scr === 'draft' || scr === 'results')) { markPlayed(S.game); statGame(S.game, 'start'); if (scr === 'results') statGame(S.game, 'done'); }
@@ -4424,8 +4360,6 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     /* Mr. Irrelevant: offered after every finished draft you played in (today's or a past day's), near the top. */
     var irrDone = loadIrr(gameId(g)), irrOk = !!(res && inGame);
     $('irr-cta').hidden = !irrOk;
-    $('dv-box').hidden = !irrOk; if (!irrOk && !$('dv-editor').hidden) { $('dv-editor').hidden = true; $('dv-open').textContent = 'Make a draft video'; }
-    if (S.ui.dvFor !== gameId(g)) { S.ui.dvFor = gameId(g); $('dv-editor').hidden = true; $('dv-open').textContent = 'Make a draft video'; $('dv-msg').textContent = ''; }
     $('irr-cta').querySelector('.mono').textContent = irrDone && irrDone.done ? 'Bonus round · done' : 'Bonus round · unlocked';
     $('irr-btn').textContent = irrDone && irrDone.done ? 'See your Mr. Irrelevant' : irrDone ? 'Back to Mr. Irrelevant' : 'Play Mr. Irrelevant';
     $('share-btn').hidden = !(res && inGame);
@@ -4770,123 +4704,190 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     document.querySelectorAll('.level-note').forEach(function (n) { n.textContent = LEVEL_NOTES[lv]; });
   }
 
-  /* ---------- Creator mode ---------- */
-  function creatorPref() { var o = null; try { o = JSON.parse(store('roster.creator') || 'null'); } catch (e) {} o = o && typeof o === 'object' ? o : {}; return { layout: o.layout === 'camera' || o.layout === 'green' ? o.layout : 'off', streamer: !!o.streamer }; }
-  function setCreatorPref(p) { store('roster.creator', JSON.stringify(p)); }
-  var CREATOR_NOTES = { off: 'Filming for TikTok or Reels? Turn on a creator view before the draft starts.', camera: 'Your front camera shows on top and the draft below, so one screen recording catches you and the game. The camera stays on your phone and is never uploaded.', green: 'The game fills the top and the bottom is green, ready for TikTok’s green-screen effect.' };
-  function renderCreatorOpts() {
-    var p = creatorPref();
-    document.querySelectorAll('.seg-btn[data-creator]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-creator') === p.layout)); });
-    document.querySelectorAll('.streamer-cb').forEach(function (c) { c.checked = p.streamer; });
-    document.querySelectorAll('.creator-note').forEach(function (n) { n.textContent = CREATOR_NOTES[p.layout]; });
-    document.documentElement.classList.toggle('streamer', p.streamer);
-  }
-  function creatorActive(scr) {
-    var p = creatorPref(), g = S.game;
-    if (p.layout === 'off' || S.view !== 'play' || !g || S.fast) return null;
-    if (scr === 'draft') return p.layout;
-    if (scr === 'results' && revealOn(g) && !revealDone(g)) return p.layout;
-    return null;
-  }
-  var CAM = { stream: null, starting: false };
-  function camStop() { if (CAM.stream) { CAM.stream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); } CAM.stream = null; var v = $('creator-video'); if (v) v.srcObject = null; }
-  function camStart() {
-    if (CAM.stream || CAM.starting) return;
-    var msg = $('creator-cam-msg');
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { msg.hidden = false; msg.textContent = 'This browser can’t show your camera here. Try Green screen instead.'; return; }
-    CAM.starting = true;
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }).then(function (st) {
-      CAM.starting = false;
-      if (!document.documentElement.classList.contains('creator-camera')) { st.getTracks().forEach(function (t) { t.stop(); }); return; }
-      CAM.stream = st; msg.hidden = true; var v = $('creator-video'); v.srcObject = st; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
-    }).catch(function () { CAM.starting = false; msg.hidden = false; msg.textContent = 'Camera blocked. Allow camera access for playtheroster.com in your browser settings, or switch to Green screen.'; });
-  }
-  function renderCreator(scr) {
-    var lay = creatorActive(scr), h = document.documentElement;
-    h.classList.toggle('creator-on', !!lay); h.classList.toggle('creator-camera', lay === 'camera'); h.classList.toggle('creator-green', lay === 'green');
-    $('creator-cam').hidden = lay !== 'camera'; $('creator-green').hidden = lay !== 'green';
-    if (lay === 'camera') camStart(); else camStop();
+  /* ---------- Streamer mode: blur the room code and link while streaming ---------- */
+  function streamerOn() { var o = null; try { o = JSON.parse(store('roster.creator') || 'null'); } catch (e) {} return !!(o && o.streamer); }
+  function setStreamer(v) { store('roster.creator', JSON.stringify({ streamer: !!v })); }
+  function renderStreamer() {
+    var on = streamerOn();
+    document.querySelectorAll('.streamer-cb').forEach(function (c) { c.checked = on; });
+    document.documentElement.classList.toggle('streamer', on);
   }
 
-  /* ---------- Draft video ---------- */
+  /* ---------- Draft recording: what was on the board and when, from opening the room until leaving it ---------- */
+  var REC = null, REC_G = null, REC_SAVED = 0;
+  function recKey(g) { if (g.mode === 'local') return 'L' + g.startedAt; var h = 7; String(g.code).split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 1000003; }); return 'R' + h; }
+  function recStart(g) {
+    var k = recKey(g), old = null;
+    try { old = JSON.parse(sessionStorage.getItem('roster.rec') || 'null'); } catch (e) {}
+    REC = old && old.k === k && Array.isArray(old.ev) && old.seen && now() - old.t0 < 6 * 3600000 ? old : { k: k, t0: now(), ev: [], seen: {}, start: 0, resAt: 0 };
+    REC_G = g; REC_SAVED = 0;
+  }
+  function recSample() {
+    var g = S.game; if (!g) return;
+    if (g !== REC_G) { if (REC && REC_G) recFinish(REC_G); recStart(g); }
+    var t = now(), ph = g.status === 'lobby' ? 'lobby' : 'draft';
+    if (ph === 'draft' && g.order && g.order.length && derive(g, t).complete) ph = g.results ? 'results' : 'scoring';
+    var pl = ph === 'lobby' ? sortedPlayers(g).map(function (p) { return String(p.name || 'Player').replace(/ \(AI\)$/, ''); }) : null;
+    var last = REC.ev[REC.ev.length - 1];
+    if (!last || last.ph !== ph || (pl && (last.pl || []).join('\n') !== pl.join('\n'))) REC.ev.push(pl ? { t: t, ph: ph, pl: pl } : { t: t, ph: ph });
+    if (g.status !== 'lobby' && g.startedAt) REC.start = g.startedAt;
+    (g.picks || []).forEach(function (p) { if (REC.seen[p.n] == null) REC.seen[p.n] = t; });
+    if (g.results && !REC.resAt) REC.resAt = t;
+    if (t - REC_SAVED > 2000) { REC_SAVED = t; try { sessionStorage.setItem('roster.rec', JSON.stringify(REC)); } catch (e) {} }
+  }
+  /* A copy of the recording up to now, with the board's names and scores. Only once the draft has started. */
+  function recSnap(g) {
+    if (!g || !REC || REC_G !== g) return null;
+    if (S.game === g) recSample();
+    if (!g.order || !g.order.length || !REC.ev.some(function (e) { return e.ph !== 'lobby'; })) return null;
+    var r = JSON.parse(JSON.stringify(REC)); r.end = now(); r.D = dvData(g); return r;
+  }
+  function recFinish(g) {
+    if (!REC) return;
+    var r = recSnap(g);
+    if (r) { S.lastRec = r; S.ui.dvHome = true; store('roster.lastRec', JSON.stringify(r)); }
+    REC = null; REC_G = null; try { sessionStorage.removeItem('roster.rec'); } catch (e) {}
+  }
+  function lastRec() {
+    if (S.lastRec === undefined) {
+      var r = null; try { r = JSON.parse(store('roster.lastRec') || 'null'); } catch (e) {}
+      S.lastRec = r && r.D && Array.isArray(r.ev) && r.seen && r.end > r.t0 ? r : null;
+    }
+    return S.lastRec;
+  }
+  function recLen(r) { return Math.max(1, ((r.end || now()) - r.t0) / 1000); }
+  function fmtLen(sec) { var s = Math.round(sec); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  /* What the board showed T seconds into the recording. */
+  function recAt(r, T) {
+    var D = r.D, tt = r.t0 + T * 1000, ev = r.ev, e = ev[0] || { ph: 'draft' }, i;
+    for (i = 0; i < ev.length; i++) { if (ev[i].t <= tt) e = ev[i]; else break; }
+    var st = { ph: e.ph, pl: e.pl || [], shown: 0, fresh: 99 };
+    if (st.ph === 'lobby') return st;
+    var n = D.ps.length, total = n * D.subs.length, last = 0;
+    for (i = 0; i < D.picks.length; i++) {
+      var s = r.seen[D.picks[i].n]; s = Math.max(s == null ? r.end : s, last);
+      if (s <= tt) { st.shown = i + 1; last = s; } else break;
+    }
+    st.fresh = st.shown ? (tt - last) / 1000 : 99;
+    if (!st.shown && r.start && tt < r.start) { st.ph = 'countdown'; st.cd = Math.ceil((r.start - tt) / 1000); return st; }
+    if (st.shown >= total) { st.ph = D.win && (st.ph === 'results' || (r.resAt && tt >= r.resAt)) ? 'results' : 'scoring'; return st; }
+    st.ph = 'draft';
+    st.cur = D.ps[snakeIndex(st.shown, n)];
+    st.round = Math.floor(st.shown / n) + 1;
+    st.rem = PICK_SECONDS * 1000 - (tt - (st.shown ? last : (r.start || r.t0)));
+    return st;
+  }
+
+  /* ---------- Draft video: the whole board in real time, as a 9:16 video ---------- */
   var DV_COLORS = ['#ca2430', '#000000', '#ffb612', '#1f4fbf', '#f07a1a', '#7b2cbf', '#0c7c7c', '#d2386f'];
-  var DV_INK = ['#ffffff', '#ffb612', '#000000', '#ffffff', '#000000', '#ffffff', '#ffffff', '#ffffff'];
   function dvPref() { var o = null; try { o = JSON.parse(store('roster.dv') || 'null'); } catch (e) {} o = o && typeof o === 'object' ? o : {}; return { bg: ['green', 'black', 'white'].indexOf(o.bg) >= 0 ? o.bg : 'green', x: isFinite(o.x) ? Math.max(0, Math.min(1, o.x)) : 0.5, y: isFinite(o.y) ? Math.max(0, Math.min(1, o.y)) : 0.4, size: isFinite(o.size) ? Math.max(50, Math.min(100, o.size)) : 92 }; }
   function dvSave(p) { store('roster.dv', JSON.stringify(p)); }
   function dvData(g) {
     var res = g.results, scores = res && res.scores ? res.scores : null;
     var ps = g.order.map(function (pid) { return { pid: pid, name: playerName(g, pid).replace(/ \(AI\)$/, ''), c: pci(g, pid) }; });
-    var picks = g.picks.slice().sort(function (a, b) { return a.n - b.n; }).map(function (p) { return { pid: p.pid, sub: p.sub, name: p.name, sc: scores && scores['p' + p.n] ? Number(scores['p' + p.n].score) || 0 : null }; });
+    var picks = g.picks.slice().sort(function (a, b) { return a.n - b.n; }).map(function (p) { return { n: p.n, pid: p.pid, sub: p.sub, name: p.name, sc: scores && scores['p' + p.n] ? Number(scores['p' + p.n].score) || 0 : null }; });
     var rows = scores ? standings(g, scores) : [];
-    return { topic: TOPICS[g.topicId].name, date: g.past ? fmtDay(g.dateKey) : fmtDay(g.dateKey || dateKey(new Date())), subs: g.subs.slice(), ps: ps, picks: picks, win: rows[0] ? { name: rows[0].name.replace(/ \(AI\)$/, ''), total: rows[0].total } : null, totals: rows.reduce(function (o, r) { o[r.pid] = r.total; return o; }, {}) };
+    return { tid: g.topicId, dk: g.dateKey || dateKey(new Date()), topic: TOPICS[g.topicId].name, date: fmtDay(g.dateKey || dateKey(new Date())), subs: g.subs.slice(), ps: ps, picks: picks, win: rows[0] ? { name: rows[0].name.replace(/ \(AI\)$/, ''), total: rows[0].total } : null, totals: rows.reduce(function (o, r) { o[r.pid] = r.total; return o; }, {}) };
   }
-  function dvLength(D) { return 1.4 + D.picks.length * 0.55 + 3.2; }
   function dvRound(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
   function dvFit(ctx, text, maxW, font) { ctx.font = font; if (ctx.measureText(text).width <= maxW) return text; var t = text; while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1); return t + '…'; }
   function dvWrap(ctx, text, maxW) { var words = String(text).split(' '), lines = [''], i; for (i = 0; i < words.length; i++) { var test = lines[lines.length - 1] ? lines[lines.length - 1] + ' ' + words[i] : words[i]; if (ctx.measureText(test).width <= maxW || !lines[lines.length - 1]) lines[lines.length - 1] = test; else lines.push(words[i]); } return lines.slice(0, 2); }
-  /* The board card's size at scale 1 (1080x1920 frame). */
-  function dvCard(D) { var n = D.subs.length; return { w: 1000, h: 190 + 84 + n * 118 + 120 }; }
+  /* The board card's size at scale 1 (1080x1920 frame). The waiting room uses the same card, so the board stays where it was placed. */
+  function dvCard(D) { var n = D.subs.length; return { w: 1000, h: 190 + 84 + n * 118 + 130 }; }
   function dvRect(D, p) { var c = dvCard(D), sc = p.size / 100, w = c.w * sc, h = c.h * sc; return { x: (1080 - w) * p.x, y: (1920 - 120 - h) * p.y + 20, w: w, h: h, sc: sc }; }
-  function dvDraw(ctx, D, p, t) {
+  function dvDraw(ctx, D, p, st) {
     var bgc = { green: '#00b140', black: '#000000', white: '#ffffff' }[p.bg];
     ctx.save(); ctx.fillStyle = bgc; ctx.fillRect(0, 0, 1080, 1920);
-    var R = dvRect(D, p), shown = Math.max(0, Math.min(D.picks.length, Math.floor((t - 1.4) / 0.55) + 1)), done = t >= 1.4 + D.picks.length * 0.55 + 0.5;
-    var appear = Math.min(1, t / 0.35);
+    var R = dvRect(D, p), done = st.ph === 'results', c = dvCard(D), W = c.w, H = c.h;
     ctx.translate(R.x, R.y); ctx.scale(R.sc, R.sc);
-    ctx.globalAlpha = appear;
-    var c = dvCard(D), W = c.w, H = c.h;
     ctx.fillStyle = '#ca2430'; dvRound(ctx, 14, 14, W, H, 34); ctx.fill();
     ctx.fillStyle = '#ffffff'; dvRound(ctx, 0, 0, W, H, 34); ctx.fill(); ctx.lineWidth = 7; ctx.strokeStyle = '#000000'; ctx.stroke();
     ctx.save(); dvRound(ctx, 0, 0, W, H, 34); ctx.clip();
     ctx.fillStyle = '#ffb612'; ctx.fillRect(0, 0, W, 190); ctx.fillStyle = '#000000'; ctx.fillRect(0, 186, W, 6);
     ctx.fillStyle = '#000000'; ctx.font = '800 28px Rubik, sans-serif'; ctx.textBaseline = 'alphabetic';
     ctx.fillText('THE ROSTER · ' + D.date.toUpperCase(), 40, 62);
-    ctx.fillText(done ? 'FINAL' : 'ROUND ' + Math.min(D.subs.length, Math.floor(Math.max(0, shown - 1) / D.ps.length) + 1) + ' OF ' + D.subs.length, W - 40 - ctx.measureText(done ? 'FINAL' : 'ROUND 0 OF 0').width, 62);
+    var tag = { lobby: 'WAITING ROOM', countdown: 'GET READY', draft: 'ROUND ' + Math.min(D.subs.length, st.round || 1) + ' OF ' + D.subs.length, scoring: 'SCORING', results: 'FINAL' }[st.ph];
+    ctx.fillText(tag, W - 40 - ctx.measureText(tag).width, 62);
     ctx.fillText(dvFit(ctx, D.topic.toUpperCase(), W - 80, '96px "Lilita One", sans-serif'), 40, 160);
-    var top = 192, sw = 230, cw = (W - sw) / D.ps.length, rh = 118;
-    ctx.fillStyle = '#000000'; ctx.fillRect(0, top, W, 84);
-    D.ps.forEach(function (pl, i) {
-      var x = sw + i * cw; ctx.fillStyle = DV_COLORS[pl.c]; ctx.fillRect(x, top + 76, cw, 8);
-      ctx.fillStyle = pl.c === 1 ? '#ffb612' : '#ffffff'; ctx.font = '800 30px Rubik, sans-serif';
-      var label = done && D.totals[pl.pid] != null ? pl.name + ' ' + fmt1(D.totals[pl.pid]) : pl.name;
-      ctx.fillText(dvFit(ctx, label, cw - 20, '800 30px Rubik, sans-serif'), x + 12, top + 52);
-    });
-    ctx.fillStyle = '#ffb612'; ctx.font = '800 22px Rubik, sans-serif'; ctx.fillText('PICK FOR', 24, top + 52);
-    D.subs.forEach(function (sub, r) {
-      var y = top + 84 + r * rh;
-      ctx.fillStyle = '#fff6df'; ctx.fillRect(0, y, sw, rh); ctx.fillStyle = '#000000'; ctx.fillRect(0, y, W, 3);
-      ctx.font = '800 32px Rubik, sans-serif'; var sl = dvWrap(ctx, sub, sw - 36); sl.forEach(function (ln, k) { ctx.fillText(ln, 22, y + rh / 2 + 12 - (sl.length - 1) * 18 + k * 36); });
-      D.ps.forEach(function (pl, i) { var x = sw + i * cw; ctx.fillStyle = '#000000'; ctx.fillRect(x, y, 3, rh); });
-    });
-    for (var k = 0; k < shown; k++) {
-      var pk = D.picks[k], r2 = D.subs.indexOf(pk.sub), i2 = -1; D.ps.forEach(function (pl, ii) { if (pl.pid === pk.pid) i2 = ii; });
-      if (r2 < 0 || i2 < 0) continue;
-      var x2 = sw + i2 * cw, y2 = top + 84 + r2 * rh, fresh = !done && k === shown - 1;
-      var pop = fresh ? Math.min(1, (t - (1.4 + k * 0.55)) / 0.18) : 1;
-      ctx.fillStyle = fresh ? '#ffb612' : '#ffffff'; ctx.fillRect(x2 + 3, y2 + 3, cw - 3, rh - 3);
-      ctx.fillStyle = DV_COLORS[D.ps[i2].c]; ctx.fillRect(x2 + 3, y2 + 3, 10, rh - 3);
-      ctx.save(); ctx.globalAlpha = appear * pop; ctx.fillStyle = '#000000'; ctx.font = '700 30px Rubik, sans-serif';
-      var nw = cw - 40, ny0 = done && pk.sc != null ? y2 + 16 : y2; var nl = dvWrap(ctx, pk.name, nw); nl.forEach(function (ln, kk) { ctx.fillText(dvFit(ctx, ln, nw + 4, '700 30px Rubik, sans-serif'), x2 + 24, ny0 + rh / 2 + 10 - (nl.length - 1) * 17 + kk * 34); });
-      if (done && pk.sc != null) { ctx.font = '800 22px Rubik, sans-serif'; var st = fmt1(pk.sc); var tw = ctx.measureText(st).width + 16; ctx.fillStyle = '#000000'; dvRound(ctx, x2 + 22, y2 + 10, tw, 30, 8); ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.fillText(st, x2 + 30, y2 + 33); }
-      ctx.restore();
+    var top = 192, fy = H - 130;
+    if (st.ph === 'lobby') {
+      ctx.fillStyle = '#000000'; ctx.fillRect(0, top, W, 84);
+      ctx.fillStyle = '#ffb612'; ctx.font = '800 30px Rubik, sans-serif'; ctx.fillText('IN THE ROOM · ' + st.pl.length + (st.pl.length === 1 ? ' PLAYER' : ' PLAYERS'), 40, top + 54);
+      var cols = 2, gw = (W - 80 - 24) / cols, gh = 92;
+      st.pl.slice(0, 2 * Math.floor((fy - top - 120) / (gh + 18))).forEach(function (nm, i) {
+        var x = 40 + (i % cols) * (gw + 24), y = top + 84 + 36 + Math.floor(i / cols) * (gh + 18);
+        ctx.fillStyle = DV_COLORS[i % 8]; dvRound(ctx, x, y, gw, gh, 20); ctx.fill();
+        ctx.fillStyle = '#ffffff'; dvRound(ctx, x + 12, y + 3, gw - 15, gh - 6, 17); ctx.fill();
+        ctx.fillStyle = '#000000'; ctx.fillText(dvFit(ctx, nm, gw - 60, '800 38px Rubik, sans-serif'), x + 36, y + gh / 2 + 13);
+      });
+    } else {
+      var sw = 230, cw = (W - sw) / D.ps.length, rh = 118;
+      ctx.fillStyle = '#000000'; ctx.fillRect(0, top, W, 84);
+      D.ps.forEach(function (pl, i) {
+        var x = sw + i * cw, on = st.ph === 'draft' && st.cur && st.cur.pid === pl.pid;
+        if (on) { ctx.fillStyle = '#ffb612'; ctx.fillRect(x, top, cw, 84); }
+        ctx.fillStyle = DV_COLORS[pl.c]; ctx.fillRect(x, top + 76, cw, 8);
+        ctx.fillStyle = on ? '#000000' : pl.c === 1 ? '#ffb612' : '#ffffff';
+        var label = done && D.totals[pl.pid] != null ? pl.name + ' ' + fmt1(D.totals[pl.pid]) : pl.name;
+        ctx.fillText(dvFit(ctx, label, cw - 20, '800 30px Rubik, sans-serif'), x + 12, top + 52);
+      });
+      ctx.fillStyle = '#ffb612'; ctx.font = '800 22px Rubik, sans-serif'; ctx.fillText('PICK FOR', 24, top + 52);
+      D.subs.forEach(function (sub, r) {
+        var y = top + 84 + r * rh;
+        ctx.fillStyle = '#fff6df'; ctx.fillRect(0, y, sw, rh); ctx.fillStyle = '#000000'; ctx.fillRect(0, y, W, 3);
+        ctx.font = '800 32px Rubik, sans-serif'; var sl = dvWrap(ctx, sub, sw - 36); sl.forEach(function (ln, k) { ctx.fillText(ln, 22, y + rh / 2 + 12 - (sl.length - 1) * 18 + k * 36); });
+        D.ps.forEach(function (pl, i) { ctx.fillStyle = '#000000'; ctx.fillRect(sw + i * cw, y, 3, rh); });
+      });
+      for (var k = 0; k < st.shown; k++) {
+        var pk = D.picks[k], r2 = D.subs.indexOf(pk.sub), i2 = -1; D.ps.forEach(function (pl, ii) { if (pl.pid === pk.pid) i2 = ii; });
+        if (r2 < 0 || i2 < 0) continue;
+        var x2 = sw + i2 * cw, y2 = top + 84 + r2 * rh, fresh = !done && k === st.shown - 1 && st.fresh < 4;
+        var pop = fresh ? Math.min(1, st.fresh / 0.2) : 1;
+        ctx.fillStyle = fresh ? '#ffb612' : '#ffffff'; ctx.fillRect(x2 + 3, y2 + 3, cw - 3, rh - 3);
+        ctx.fillStyle = DV_COLORS[D.ps[i2].c]; ctx.fillRect(x2 + 3, y2 + 3, 10, rh - 3);
+        ctx.save(); ctx.globalAlpha = pop; ctx.fillStyle = '#000000'; ctx.font = '700 30px Rubik, sans-serif';
+        var nw = cw - 40, ny0 = done && pk.sc != null ? y2 + 16 : y2; var nl = dvWrap(ctx, pk.name, nw); nl.forEach(function (ln, kk) { ctx.fillText(dvFit(ctx, ln, nw + 4, '700 30px Rubik, sans-serif'), x2 + 24, ny0 + rh / 2 + 10 - (nl.length - 1) * 17 + kk * 34); });
+        if (done && pk.sc != null) { ctx.font = '800 22px Rubik, sans-serif'; var sct = fmt1(pk.sc); var tw = ctx.measureText(sct).width + 16; ctx.fillStyle = '#000000'; dvRound(ctx, x2 + 22, y2 + 10, tw, 30, 8); ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.fillText(sct, x2 + 30, y2 + 33); }
+        ctx.restore();
+      }
+      if (st.ph === 'countdown') {
+        ctx.fillStyle = 'rgba(255,255,255,0.82)'; ctx.fillRect(0, top + 84, W, fy - top - 84);
+        ctx.fillStyle = '#ca2430'; ctx.font = '300px "Lilita One", sans-serif'; var cdt = String(Math.max(1, st.cd)); ctx.fillText(cdt, (W - ctx.measureText(cdt).width) / 2, top + 84 + (fy - top - 84) / 2 + 105);
+      }
     }
-    var fy = top + 84 + D.subs.length * rh;
     ctx.fillStyle = '#000000'; ctx.fillRect(0, fy, W, 4);
-    ctx.font = '800 36px Rubik, sans-serif'; ctx.fillStyle = '#000000';
-    var line = done ? (D.win ? 'WINNER: ' + D.win.name + ' · ' + fmt1(D.win.total) : 'Draft complete') : shown ? D.ps.filter(function (pl) { return pl.pid === D.picks[shown - 1].pid; })[0].name + ' takes ' + D.picks[shown - 1].name : 'The draft is on';
-    if (done) { ctx.fillStyle = '#ca2430'; ctx.fillRect(0, fy + 4, W, 116); ctx.fillStyle = '#ffffff'; ctx.font = '60px "Lilita One", sans-serif'; ctx.fillText(dvFit(ctx, line, W - 80, '60px "Lilita One", sans-serif'), 40, fy + 84); }
-    else ctx.fillText(dvFit(ctx, line, W - 80, '800 36px Rubik, sans-serif'), 40, fy + 74);
+    if (done) {
+      ctx.fillStyle = '#ca2430'; ctx.fillRect(0, fy + 4, W, 126); ctx.fillStyle = '#ffffff';
+      ctx.fillText(dvFit(ctx, D.win ? 'WINNER: ' + D.win.name + ' · ' + fmt1(D.win.total) : 'Draft complete', W - 80, '60px "Lilita One", sans-serif'), 40, fy + 88);
+    } else if (st.ph === 'draft') {
+      var lp = st.shown ? D.picks[st.shown - 1] : null, lpn = lp ? D.ps.filter(function (q) { return q.pid === lp.pid; })[0] : null;
+      ctx.fillStyle = '#555555'; ctx.fillText(dvFit(ctx, lp && lpn ? lpn.name + ' took ' + lp.name + ' · ' + lp.sub : 'First pick of the draft', W - 300, '700 26px Rubik, sans-serif'), 40, fy + 46);
+      ctx.fillStyle = '#000000'; ctx.fillText(dvFit(ctx, (st.cur ? st.cur.name : 'Next') + ' is on the clock', W - 300, '800 40px Rubik, sans-serif'), 40, fy + 100);
+      var low = st.rem <= 10000, ct = fmtClock(st.rem);
+      ctx.font = '72px "Lilita One", sans-serif'; var cwid = ctx.measureText(ct).width + 48;
+      ctx.fillStyle = low ? '#ca2430' : '#000000'; dvRound(ctx, W - 36 - cwid, fy + 20, cwid, 92, 22); ctx.fill();
+      ctx.fillStyle = low ? '#ffffff' : '#ffb612'; ctx.fillText(ct, W - 36 - cwid + 24, fy + 92);
+    } else {
+      var msg = { lobby: 'Waiting for the host to start the draft', countdown: 'The draft starts in ' + Math.max(1, st.cd || 1) + '…', scoring: 'Draft complete · scoring the picks…' }[st.ph] || '';
+      ctx.fillStyle = '#000000'; ctx.fillText(dvFit(ctx, msg, W - 80, '800 40px Rubik, sans-serif'), 40, fy + 80);
+    }
     ctx.restore(); ctx.restore();
     ctx.save(); ctx.font = '800 34px Rubik, sans-serif'; var u = 'playtheroster.com', uw = ctx.measureText(u).width + 48;
     ctx.fillStyle = '#000000'; dvRound(ctx, 1080 - uw - 36, 1920 - 96, uw, 64, 32); ctx.fill(); ctx.fillStyle = '#ffb612'; ctx.fillText(u, 1080 - uw - 12, 1920 - 52); ctx.restore();
   }
-  var DV = { raf: 0, t0: 0, drag: null, rec: false };
+  /* A key for what a frame shows, so unchanged frames aren't drawn again. */
+  function dvKey(st) { return st.ph + '|' + st.shown + '|' + (st.cd || 0) + '|' + (st.ph === 'draft' ? Math.ceil(st.rem / 1000) : 0) + '|' + (st.fresh < 0.2 ? Math.round(st.fresh * 30) : st.fresh < 4 ? 'f' : '') + '|' + st.pl.join(','); }
+  var DV = { raf: 0, t0: 0, drag: null, busy: false, rec: null, recAt: 0, blob: null };
+  /* The recording the video is made from: the game in progress (up to now), or the last game after leaving it. */
+  function dvSource() { var g = S.game; return g ? recSnap(g) : lastRec(); }
+  function dvCur() { var t = performance.now(); if (!DV.rec || t - DV.recAt > 1000) { DV.rec = dvSource(); DV.recAt = t; } return DV.rec; }
   function dvPreview() {
-    var cv = $('dv-canvas'), g = S.game; if (!cv || !g || $('dv-editor').hidden) { DV.raf = 0; return; }
-    var D = DV.data || (DV.data = dvData(g)), ctx = cv.getContext('2d'), len = dvLength(D);
+    var cv = $('dv-canvas'); if (!cv || $('dv-box').hidden || $('dv-editor').hidden) { DV.raf = 0; return; }
+    var r = dvCur(); if (!r) { DV.raf = 0; return; }
+    var len = recLen(r), loop = Math.min(len, 12);
     if (!DV.t0) DV.t0 = performance.now();
-    var t = ((performance.now() - DV.t0) / 1000) % len;
-    ctx.setTransform(0.5, 0, 0, 0.5, 0, 0); dvDraw(ctx, D, dvPref(), t);
+    var T = ((performance.now() - DV.t0) / 1000 % loop) / loop * len;
+    var ctx = cv.getContext('2d'); ctx.setTransform(0.5, 0, 0, 0.5, 0, 0); dvDraw(ctx, r.D, dvPref(), recAt(r, T));
     DV.raf = requestAnimationFrame(dvPreview);
   }
   function dvRenderControls() {
@@ -4895,46 +4896,131 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     var sz = $('dv-size'); if (sz && document.activeElement !== sz) sz.value = p.size;
   }
   function dvOpen() {
-    var ed = $('dv-editor'), g = S.game; if (!g) return;
-    ed.hidden = !ed.hidden; $('dv-open').textContent = ed.hidden ? 'Make a draft video' : 'Close';
-    DV.data = dvData(g); DV.t0 = 0; dvRenderControls();
+    var ed = $('dv-editor'); if (!dvSource()) return;
+    ed.hidden = !ed.hidden; $('dv-open').textContent = ed.hidden ? 'Adjust the look' : 'Close';
+    DV.rec = null; DV.t0 = 0; dvRenderControls();
     if (!ed.hidden && !DV.raf) DV.raf = requestAnimationFrame(dvPreview);
   }
-  function dvRecord() {
-    if (DV.rec) return; var g = S.game; if (!g) return;
-    var msg = $('dv-msg'), btn = $('dv-rec');
-    if (typeof MediaRecorder === 'undefined' || !HTMLCanvasElement.prototype.captureStream) { msg.textContent = 'This browser can’t make videos. Try Chrome or Safari on your phone or computer.'; return; }
-    var types = ['video/mp4;codecs=avc1.42E01E', 'video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'], type = '';
-    for (var i = 0; i < types.length; i++) if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(types[i])) { type = types[i]; break; }
-    var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1920;
-    var ctx = cv.getContext('2d'), D = dvData(g), p = dvPref(), len = dvLength(D), chunks = [];
-    var stream = cv.captureStream(30), rec;
-    try { rec = new MediaRecorder(stream, type ? { mimeType: type, videoBitsPerSecond: 6000000 } : { videoBitsPerSecond: 6000000 }); } catch (e) { msg.textContent = 'Couldn’t start the video. Try again.'; return; }
-    DV.rec = true; btn.disabled = true; msg.textContent = 'Making your video… keep this page open (about ' + Math.ceil(len) + ' seconds).';
-    rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
-    rec.onstop = function () {
-      DV.rec = false; btn.disabled = false;
-      var mt = (rec.mimeType || type || 'video/webm').split(';')[0], ext = mt.indexOf('mp4') >= 0 ? 'mp4' : 'webm';
-      var blob = new Blob(chunks, { type: mt }), url = URL.createObjectURL(blob), a = document.createElement('a');
-      a.href = url; a.download = 'the-roster-' + (g.topicId || 'draft') + '-' + (g.dateKey || dateKey(new Date())) + '.' + ext; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-      msg.textContent = 'Downloaded (' + ext.toUpperCase() + ').' + (ext === 'webm' ? ' If your phone won’t open it, try Chrome, or make it on a computer.' : '');
-      statBump(function (r) { r.dv = (r.dv || 0) + 1; });
-    };
-    var t0 = performance.now(); dvDraw(ctx, D, p, 0); rec.start(500);
-    (function frame() {
-      var t = (performance.now() - t0) / 1000;
-      dvDraw(ctx, D, p, Math.min(t, len));
-      if (t < len) { setTimeout(frame, 1000 / 30); msg.textContent = 'Making your video… ' + Math.max(0, Math.ceil(len - t)) + ' s left. Keep this page open.'; }
-      else setTimeout(function () { try { rec.stop(); } catch (e) {} stream.getTracks().forEach(function (tr) { tr.stop(); }); }, 200);
+  /* Where the card sits: on the results after a draft, or on the homepage after leaving with a recorded draft. */
+  function renderDv(scr) {
+    var box = $('dv-box'), inGame = !!S.game, lr = !inGame ? lastRec() : null;
+    var atResults = inGame && scr === 'results' && !S.fast, atHome = !inGame && !$('hero').hidden && !!lr && S.ui.dvHome !== false;
+    var slot = atResults ? $('dv-slot-results') : $('dv-slot-home');
+    if (box.parentNode !== slot) slot.appendChild(box);
+    $('dv-slot-home').hidden = !atHome;
+    var key = atResults ? 'g:' + gameId(S.game) : atHome ? 'h:' + lr.t0 : '';
+    if (S.ui.dvFor !== key) { S.ui.dvFor = key; $('dv-editor').hidden = true; $('dv-open').textContent = 'Adjust the look'; if (!DV.busy) $('dv-msg').textContent = ''; DV.rec = null; DV.blob = null; $('dv-share').hidden = true; }
+    box.hidden = !(atResults || atHome);
+    $('dv-dismiss').hidden = !atHome;
+    $('dv-kicker').textContent = atHome ? 'Your last draft · ' + lr.D.topic : 'For your TikTok or Reels';
+    dvTick();
+  }
+  function dvTick() {
+    var box = $('dv-box'); if (!box || box.hidden) return;
+    var r = S.game ? (REC && REC_G === S.game ? { t0: REC.t0 } : null) : lastRec(); if (!r) return;
+    var len = fmtLen(recLen(r)), t;
+    if (S.game) t = 'The whole draft board in real time, from opening the room until you leave it. So far: ' + len + '. It’s also on the homepage after you leave.';
+    else t = 'The whole draft board in real time, from opening the room to leaving it: ' + len + ' long. Drop it into your own video with green screen, or pick a black or white background.';
+    if ($('dv-note').textContent !== t) $('dv-note').textContent = t;
+    var bt = DV.busy ? 'Making your video…' : 'Download draft video (' + len + ')';
+    if ($('dv-rec').textContent !== bt) $('dv-rec').textContent = bt;
+  }
+  var MUX = null;
+  function mp4Muxer() {
+    if (!MUX) MUX = (function () {
+/* mp4-muxer 5.1.3 by Vanilagy (github.com/Vanilagy/mp4-muxer), MIT License. Copyright (c) 2023 Vanilagy. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction, subject to including this notice. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. */
+"use strict";var Mp4Muxer=(()=>{var Re=Object.defineProperty;var pt=Object.getOwnPropertyDescriptor;var ct=Object.getOwnPropertyNames;var bt=Object.prototype.hasOwnProperty;var Tt=(t,e)=>{for(var i in e)Re(t,i,{get:e[i],enumerable:!0})},gt=(t,e,i,s)=>{if(e&&typeof e=="object"||typeof e=="function")for(let n of ct(e))!bt.call(t,n)&&n!==i&&Re(t,n,{get:()=>e[n],enumerable:!(s=pt(e,n))||s.enumerable});return t};var wt=t=>gt(Re({},"__esModule",{value:!0}),t);var Le=(t,e,i)=>{if(!e.has(t))throw TypeError("Cannot "+i)};var r=(t,e,i)=>(Le(t,e,"read from private field"),i?i.call(t):e.get(t)),f=(t,e,i)=>{if(e.has(t))throw TypeError("Cannot add the same private member more than once");e instanceof WeakSet?e.add(t):e.set(t,i)},w=(t,e,i,s)=>(Le(t,e,"write to private field"),s?s.call(t,i):e.set(t,i),i),Je=(t,e,i,s)=>({set _(n){w(t,e,n,i)},get _(){return r(t,e,s)}}),p=(t,e,i)=>(Le(t,e,"access private method"),i);var pi={};Tt(pi,{ArrayBufferTarget:()=>Y,FileSystemWritableFileStreamTarget:()=>J,Muxer:()=>Ue,StreamTarget:()=>N});var c=new Uint8Array(8),D=new DataView(c.buffer),y=t=>[(t%256+256)%256],T=t=>(D.setUint16(0,t,!1),[c[0],c[1]]),et=t=>(D.setInt16(0,t,!1),[c[0],c[1]]),je=t=>(D.setUint32(0,t,!1),[c[1],c[2],c[3]]),u=t=>(D.setUint32(0,t,!1),[c[0],c[1],c[2],c[3]]),tt=t=>(D.setInt32(0,t,!1),[c[0],c[1],c[2],c[3]]),V=t=>(D.setUint32(0,Math.floor(t/2**32),!1),D.setUint32(4,t,!1),[c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7]]),Ce=t=>(D.setInt16(0,2**8*t,!1),[c[0],c[1]]),O=t=>(D.setInt32(0,2**16*t,!1),[c[0],c[1],c[2],c[3]]),Pe=t=>(D.setInt32(0,2**30*t,!1),[c[0],c[1],c[2],c[3]]),E=(t,e=!1)=>{let i=Array(t.length).fill(null).map((s,n)=>t.charCodeAt(n));return e&&i.push(0),i},Q=t=>t&&t[t.length-1],Se=t=>{let e;for(let i of t)(!e||i.presentationTimestamp>e.presentationTimestamp)&&(e=i);return e},B=(t,e,i=!0)=>{let s=t*e;return i?Math.round(s):s},$e=t=>{let e=t*(Math.PI/180),i=Math.cos(e),s=Math.sin(e);return[i,s,0,-s,i,0,0,0,1]},He=$e(0),We=t=>[O(t[0]),O(t[1]),Pe(t[2]),O(t[3]),O(t[4]),Pe(t[5]),O(t[6]),O(t[7]),Pe(t[8])],K=t=>!t||typeof t!="object"?t:Array.isArray(t)?t.map(K):Object.fromEntries(Object.entries(t).map(([e,i])=>[e,K(i)])),H=t=>t>=0&&t<2**32;var C=(t,e,i)=>({type:t,contents:e&&new Uint8Array(e.flat(10)),children:i}),g=(t,e,i,s,n)=>C(t,[y(e),je(i),s??[]],n),it=t=>{let e=512;return t.fragmented?C("ftyp",[E("iso5"),u(e),E("iso5"),E("iso6"),E("mp41")]):C("ftyp",[E("isom"),u(e),E("isom"),t.holdsAvc?E("avc1"):[],E("mp41")])},ve=t=>({type:"mdat",largeSize:t}),rt=t=>({type:"free",size:t}),oe=(t,e,i=!1)=>C("moov",null,[yt(e,t),...t.map(s=>Ct(s,e)),i?Gt(t):null]),yt=(t,e)=>{let i=B(Math.max(0,...e.filter(a=>a.samples.length>0).map(a=>{let l=Se(a.samples);return l.presentationTimestamp+l.duration})),xe),s=Math.max(...e.map(a=>a.id))+1,n=!H(t)||!H(i),o=n?V:u;return g("mvhd",+n,0,[o(t),o(t),u(xe),o(i),O(1),Ce(1),Array(10).fill(0),We(He),Array(24).fill(0),u(s)])},Ct=(t,e)=>C("trak",null,[St(t,e),xt(t,e)]),St=(t,e)=>{let i=Se(t.samples),s=B(i?i.presentationTimestamp+i.duration:0,xe),n=!H(e)||!H(s),o=n?V:u,a;return t.info.type==="video"?a=typeof t.info.rotation=="number"?$e(t.info.rotation):t.info.rotation:a=He,g("tkhd",+n,3,[o(e),o(e),u(t.id),u(0),o(s),Array(8).fill(0),T(0),T(0),Ce(t.info.type==="audio"?1:0),T(0),We(a),O(t.info.type==="video"?t.info.width:0),O(t.info.type==="video"?t.info.height:0)])},xt=(t,e)=>C("mdia",null,[vt(t,e),kt(t.info.type==="video"?"vide":"soun"),At(t)]),vt=(t,e)=>{let i=Se(t.samples),s=B(i?i.presentationTimestamp+i.duration:0,t.timescale),n=!H(e)||!H(s),o=n?V:u;return g("mdhd",+n,0,[o(e),o(e),u(t.timescale),o(s),T(21956),T(0)])},kt=t=>g("hdlr",0,0,[E("mhlr"),E(t),u(0),u(0),u(0),E("mp4-muxer-hdlr",!0)]),At=t=>C("minf",null,[t.info.type==="video"?Et():Bt(),zt(),Dt(t)]),Et=()=>g("vmhd",0,1,[T(0),T(0),T(0),T(0)]),Bt=()=>g("smhd",0,0,[T(0),T(0)]),zt=()=>C("dinf",null,[Ot()]),Ot=()=>g("dref",0,0,[u(1)],[Ut()]),Ut=()=>g("url ",0,1),Dt=t=>{let e=t.compositionTimeOffsetTable.length>1||t.compositionTimeOffsetTable.some(i=>i.sampleCompositionTimeOffset!==0);return C("stbl",null,[It(t),jt(t),$t(t),Ht(t),Wt(t),qt(t),e?Xt(t):null])},It=t=>g("stsd",0,0,[u(1)],[t.info.type==="video"?Mt(ri[t.info.codec],t):Rt(ni[t.info.codec],t)]),Mt=(t,e)=>C(t,[Array(6).fill(0),T(1),T(0),T(0),Array(12).fill(0),T(e.info.width),T(e.info.height),u(4718592),u(4718592),u(0),T(1),Array(32).fill(0),T(24),et(65535)],[si[e.info.codec](e)]),Vt=t=>t.info.decoderConfig&&C("avcC",[...new Uint8Array(t.info.decoderConfig.description)]),Nt=t=>t.info.decoderConfig&&C("hvcC",[...new Uint8Array(t.info.decoderConfig.description)]),_t=t=>{if(!t.info.decoderConfig)return null;let e=t.info.decoderConfig;if(!e.colorSpace)throw new Error("'colorSpace' is required in the decoder config for VP9.");let i=e.codec.split("."),s=Number(i[1]),n=Number(i[2]),o=Number(i[3]),a=0,l=(o<<4)+(a<<1)+Number(e.colorSpace.fullRange),m=2,b=2,v=2;return g("vpcC",1,0,[y(s),y(n),y(l),y(m),y(b),y(v),T(0)])},Ft=()=>{let t=1,e=1,i=(t<<7)+e;return C("av1C",[i,0,0,0])},Rt=(t,e)=>C(t,[Array(6).fill(0),T(1),T(0),T(0),u(0),T(e.info.numberOfChannels),T(16),T(0),T(0),O(e.info.sampleRate)],[oi[e.info.codec](e)]),Lt=t=>{let e=new Uint8Array(t.info.decoderConfig.description);return g("esds",0,0,[u(58753152),y(32+e.byteLength),T(1),y(0),u(75530368),y(18+e.byteLength),y(64),y(21),je(0),u(130071),u(130071),u(92307584),y(e.byteLength),...e,u(109084800),y(1),y(2)])},Pt=t=>{let e=3840,i=0,s=t.info.decoderConfig?.description;if(s){if(s.byteLength<18)throw new TypeError("Invalid decoder description provided for Opus; must be at least 18 bytes long.");let n=ArrayBuffer.isView(s)?new DataView(s.buffer,s.byteOffset,s.byteLength):new DataView(s);e=n.getUint16(10,!0),i=n.getInt16(14,!0)}return C("dOps",[y(0),y(t.info.numberOfChannels),T(e),u(t.info.sampleRate),Ce(i),y(0)])},jt=t=>g("stts",0,0,[u(t.timeToSampleTable.length),t.timeToSampleTable.map(e=>[u(e.sampleCount),u(e.sampleDelta)])]),$t=t=>{if(t.samples.every(i=>i.type==="key"))return null;let e=[...t.samples.entries()].filter(([,i])=>i.type==="key");return g("stss",0,0,[u(e.length),e.map(([i])=>u(i+1))])},Ht=t=>g("stsc",0,0,[u(t.compactlyCodedChunkTable.length),t.compactlyCodedChunkTable.map(e=>[u(e.firstChunk),u(e.samplesPerChunk),u(1)])]),Wt=t=>g("stsz",0,0,[u(0),u(t.samples.length),t.samples.map(e=>u(e.size))]),qt=t=>t.finalizedChunks.length>0&&Q(t.finalizedChunks).offset>=2**32?g("co64",0,0,[u(t.finalizedChunks.length),t.finalizedChunks.map(e=>V(e.offset))]):g("stco",0,0,[u(t.finalizedChunks.length),t.finalizedChunks.map(e=>u(e.offset))]),Xt=t=>g("ctts",0,0,[u(t.compositionTimeOffsetTable.length),t.compositionTimeOffsetTable.map(e=>[u(e.sampleCount),u(e.sampleCompositionTimeOffset)])]),Gt=t=>C("mvex",null,t.map(Zt)),Zt=t=>g("trex",0,0,[u(t.id),u(1),u(0),u(0),u(0)]),qe=(t,e)=>C("moof",null,[Kt(t),...e.map(Qt)]),Kt=t=>g("mfhd",0,0,[u(t)]),st=t=>{let e=0,i=0,s=0,n=0,o=t.type==="delta";return i|=+o,o?e|=1:e|=2,e<<24|i<<16|s<<8|n},Qt=t=>C("traf",null,[Yt(t),Jt(t),ei(t)]),Yt=t=>{let e=0;e|=8,e|=16,e|=32,e|=131072;let i=t.currentChunk.samples[1]??t.currentChunk.samples[0],s={duration:i.timescaleUnitsToNextSample,size:i.size,flags:st(i)};return g("tfhd",0,e,[u(t.id),u(s.duration),u(s.size),u(s.flags)])},Jt=t=>g("tfdt",1,0,[V(B(t.currentChunk.startTimestamp,t.timescale))]),ei=t=>{let e=t.currentChunk.samples.map(I=>I.timescaleUnitsToNextSample),i=t.currentChunk.samples.map(I=>I.size),s=t.currentChunk.samples.map(st),n=t.currentChunk.samples.map(I=>B(I.presentationTimestamp-I.decodeTimestamp,t.timescale)),o=new Set(e),a=new Set(i),l=new Set(s),m=new Set(n),b=l.size===2&&s[0]!==s[1],v=o.size>1,j=a.size>1,ne=!b&&l.size>1,Ye=m.size>1||[...m].some(I=>I!==0),$=0;return $|=1,$|=4*+b,$|=256*+v,$|=512*+j,$|=1024*+ne,$|=2048*+Ye,g("trun",1,$,[u(t.currentChunk.samples.length),u(t.currentChunk.offset-t.currentChunk.moofOffset||0),b?u(s[0]):[],t.currentChunk.samples.map((I,ye)=>[v?u(e[ye]):[],j?u(i[ye]):[],ne?u(s[ye]):[],Ye?tt(n[ye]):[]])])},nt=t=>C("mfra",null,[...t.map(ti),ii()]),ti=(t,e)=>g("tfra",1,0,[u(t.id),u(63),u(t.finalizedChunks.length),t.finalizedChunks.map(s=>[V(B(s.startTimestamp,t.timescale)),V(s.moofOffset),u(e+1),u(1),u(1)])]),ii=()=>g("mfro",0,0,[u(0)]),ri={avc:"avc1",hevc:"hvc1",vp9:"vp09",av1:"av01"},si={avc:Vt,hevc:Nt,vp9:_t,av1:Ft},ni={aac:"mp4a",opus:"Opus"},oi={aac:Lt,opus:Pt};var ai=Symbol("isTarget"),W=class{};ai;var Y=class extends W{constructor(){super(...arguments);this.buffer=null}},N=class extends W{constructor(i){super();this.options=i;if(typeof i!="object")throw new TypeError("StreamTarget requires an options object to be passed to its constructor.");if(i.onData){if(typeof i.onData!="function")throw new TypeError("options.onData, when provided, must be a function.");if(i.onData.length<2)throw new TypeError("options.onData, when provided, must be a function that takes in at least two arguments (data and position). Ignoring the position argument, which specifies the byte offset at which the data is to be written, can lead to broken outputs.")}if(i.chunked!==void 0&&typeof i.chunked!="boolean")throw new TypeError("options.chunked, when provided, must be a boolean.");if(i.chunkSize!==void 0&&(!Number.isInteger(i.chunkSize)||i.chunkSize<=0))throw new TypeError("options.chunkSize, when provided, must be a positive integer.")}},J=class extends W{constructor(i,s){super();this.stream=i;this.options=s;if(!(i instanceof FileSystemWritableFileStream))throw new TypeError("FileSystemWritableFileStreamTarget requires a FileSystemWritableFileStream instance.");if(s!==void 0&&typeof s!="object")throw new TypeError("FileSystemWritableFileStreamTarget's options, when provided, must be an object.");if(s&&s.chunkSize!==void 0&&(!Number.isInteger(s.chunkSize)||s.chunkSize<=0))throw new TypeError("options.chunkSize, when provided, must be a positive integer")}};var _,q,ae=class{constructor(){this.pos=0;f(this,_,new Uint8Array(8));f(this,q,new DataView(r(this,_).buffer));this.offsets=new WeakMap}seek(e){this.pos=e}writeU32(e){r(this,q).setUint32(0,e,!1),this.write(r(this,_).subarray(0,4))}writeU64(e){r(this,q).setUint32(0,Math.floor(e/2**32),!1),r(this,q).setUint32(4,e,!1),this.write(r(this,_).subarray(0,8))}writeAscii(e){for(let i=0;i<e.length;i++)r(this,q).setUint8(i%8,e.charCodeAt(i)),i%8===7&&this.write(r(this,_));e.length%8!==0&&this.write(r(this,_).subarray(0,e.length%8))}writeBox(e){if(this.offsets.set(e,this.pos),e.contents&&!e.children)this.writeBoxHeader(e,e.size??e.contents.byteLength+8),this.write(e.contents);else{let i=this.pos;if(this.writeBoxHeader(e,0),e.contents&&this.write(e.contents),e.children)for(let o of e.children)o&&this.writeBox(o);let s=this.pos,n=e.size??s-i;this.seek(i),this.writeBoxHeader(e,n),this.seek(s)}}writeBoxHeader(e,i){this.writeU32(e.largeSize?1:i),this.writeAscii(e.type),e.largeSize&&this.writeU64(i)}measureBoxHeader(e){return 8+(e.largeSize?8:0)}patchBox(e){let i=this.pos;this.seek(this.offsets.get(e)),this.writeBox(e),this.seek(i)}measureBox(e){if(e.contents&&!e.children)return this.measureBoxHeader(e)+e.contents.byteLength;{let i=this.measureBoxHeader(e);if(e.contents&&(i+=e.contents.byteLength),e.children)for(let s of e.children)s&&(i+=this.measureBox(s));return i}}};_=new WeakMap,q=new WeakMap;var he,F,ee,te,de,Xe,Ae=class extends ae{constructor(i){super();f(this,de);f(this,he,void 0);f(this,F,new ArrayBuffer(2**16));f(this,ee,new Uint8Array(r(this,F)));f(this,te,0);w(this,he,i)}write(i){p(this,de,Xe).call(this,this.pos+i.byteLength),r(this,ee).set(i,this.pos),this.pos+=i.byteLength,w(this,te,Math.max(r(this,te),this.pos))}finalize(){p(this,de,Xe).call(this,this.pos),r(this,he).buffer=r(this,F).slice(0,Math.max(r(this,te),this.pos))}};he=new WeakMap,F=new WeakMap,ee=new WeakMap,te=new WeakMap,de=new WeakSet,Xe=function(i){let s=r(this,F).byteLength;for(;s<i;)s*=2;if(s===r(this,F).byteLength)return;let n=new ArrayBuffer(s),o=new Uint8Array(n);o.set(r(this,ee),0),w(this,F,n),w(this,ee,o)};var fe,R,ue=class extends ae{constructor(i){super();f(this,fe,void 0);f(this,R,[]);w(this,fe,i)}write(i){r(this,R).push({data:i.slice(),start:this.pos}),this.pos+=i.byteLength}flush(){if(r(this,R).length===0)return;let i=[],s=[...r(this,R)].sort((n,o)=>n.start-o.start);i.push({start:s[0].start,size:s[0].data.byteLength});for(let n=1;n<s.length;n++){let o=i[i.length-1],a=s[n];a.start<=o.start+o.size?o.size=Math.max(o.size,a.start+a.data.byteLength-o.start):i.push({start:a.start,size:a.data.byteLength})}for(let n of i){n.data=new Uint8Array(n.size);for(let o of r(this,R))n.start<=o.start&&o.start<n.start+n.size&&n.data.set(o.data,o.start-n.start);r(this,fe).options.onData?.(n.data,n.start)}r(this,R).length=0}finalize(){}};fe=new WeakMap,R=new WeakMap;var ui=2**24,li=2,me,z,k,pe,Ge,Be,ot,ze,at,ie,ke,le=class extends ae{constructor(i){super();f(this,pe);f(this,Be);f(this,ze);f(this,ie);f(this,me,void 0);f(this,z,void 0);f(this,k,[]);if(w(this,me,i),w(this,z,i.options?.chunkSize??ui),!Number.isInteger(r(this,z))||r(this,z)<2**10)throw new Error("Invalid StreamTarget options: chunkSize must be an integer not smaller than 1024.")}write(i){p(this,pe,Ge).call(this,i,this.pos),p(this,ie,ke).call(this),this.pos+=i.byteLength}finalize(){p(this,ie,ke).call(this,!0)}};me=new WeakMap,z=new WeakMap,k=new WeakMap,pe=new WeakSet,Ge=function(i,s){let n=r(this,k).findIndex(b=>b.start<=s&&s<b.start+r(this,z));n===-1&&(n=p(this,ze,at).call(this,s));let o=r(this,k)[n],a=s-o.start,l=i.subarray(0,Math.min(r(this,z)-a,i.byteLength));o.data.set(l,a);let m={start:a,end:a+l.byteLength};if(p(this,Be,ot).call(this,o,m),o.written[0].start===0&&o.written[0].end===r(this,z)&&(o.shouldFlush=!0),r(this,k).length>li){for(let b=0;b<r(this,k).length-1;b++)r(this,k)[b].shouldFlush=!0;p(this,ie,ke).call(this)}l.byteLength<i.byteLength&&p(this,pe,Ge).call(this,i.subarray(l.byteLength),s+l.byteLength)},Be=new WeakSet,ot=function(i,s){let n=0,o=i.written.length-1,a=-1;for(;n<=o;){let l=Math.floor(n+(o-n+1)/2);i.written[l].start<=s.start?(n=l+1,a=l):o=l-1}for(i.written.splice(a+1,0,s),(a===-1||i.written[a].end<s.start)&&a++;a<i.written.length-1&&i.written[a].end>=i.written[a+1].start;)i.written[a].end=Math.max(i.written[a].end,i.written[a+1].end),i.written.splice(a+1,1)},ze=new WeakSet,at=function(i){let n={start:Math.floor(i/r(this,z))*r(this,z),data:new Uint8Array(r(this,z)),written:[],shouldFlush:!1};return r(this,k).push(n),r(this,k).sort((o,a)=>o.start-a.start),r(this,k).indexOf(n)},ie=new WeakSet,ke=function(i=!1){for(let s=0;s<r(this,k).length;s++){let n=r(this,k)[s];if(!(!n.shouldFlush&&!i)){for(let o of n.written)r(this,me).options.onData?.(n.data.subarray(o.start,o.end),n.start+o.start);r(this,k).splice(s--,1)}}};var Ee=class extends le{constructor(e){super(new N({onData:(i,s)=>e.stream.write({type:"write",data:i,position:s}),chunkSize:e.options?.chunkSize}))}};var xe=1e3,hi=["avc","hevc","vp9","av1"],di=["aac","opus"],fi=2082844800,mi=["strict","offset","cross-track-offset"],h,d,be,A,x,S,X,G,De,L,P,re,Ie,ut,Me,lt,Ve,ht,Ne,dt,_e,ft,Te,Ze,U,M,Fe,mt,se,Oe,ge,Ke,Z,ce,we,Qe,Ue=class{constructor(e){f(this,Ie);f(this,Me);f(this,Ve);f(this,Ne);f(this,_e);f(this,Te);f(this,U);f(this,Fe);f(this,se);f(this,ge);f(this,Z);f(this,we);f(this,h,void 0);f(this,d,void 0);f(this,be,void 0);f(this,A,void 0);f(this,x,null);f(this,S,null);f(this,X,Math.floor(Date.now()/1e3)+fi);f(this,G,[]);f(this,De,1);f(this,L,[]);f(this,P,[]);f(this,re,!1);if(p(this,Ie,ut).call(this,e),e.video=K(e.video),e.audio=K(e.audio),e.fastStart=K(e.fastStart),this.target=e.target,w(this,h,{firstTimestampBehavior:"strict",...e}),e.target instanceof Y)w(this,d,new Ae(e.target));else if(e.target instanceof N)w(this,d,e.target.options?.chunked?new le(e.target):new ue(e.target));else if(e.target instanceof J)w(this,d,new Ee(e.target));else throw new Error(`Invalid target: ${e.target}`);p(this,Ne,dt).call(this),p(this,Me,lt).call(this)}addVideoChunk(e,i,s,n){if(!(e instanceof EncodedVideoChunk))throw new TypeError("addVideoChunk's first argument (sample) must be of type EncodedVideoChunk.");if(i&&typeof i!="object")throw new TypeError("addVideoChunk's second argument (meta), when provided, must be an object.");if(s!==void 0&&(!Number.isFinite(s)||s<0))throw new TypeError("addVideoChunk's third argument (timestamp), when provided, must be a non-negative real number.");if(n!==void 0&&!Number.isFinite(n))throw new TypeError("addVideoChunk's fourth argument (compositionTimeOffset), when provided, must be a real number.");let o=new Uint8Array(e.byteLength);e.copyTo(o),this.addVideoChunkRaw(o,e.type,s??e.timestamp,e.duration,i,n)}addVideoChunkRaw(e,i,s,n,o,a){if(!(e instanceof Uint8Array))throw new TypeError("addVideoChunkRaw's first argument (data) must be an instance of Uint8Array.");if(i!=="key"&&i!=="delta")throw new TypeError("addVideoChunkRaw's second argument (type) must be either 'key' or 'delta'.");if(!Number.isFinite(s)||s<0)throw new TypeError("addVideoChunkRaw's third argument (timestamp) must be a non-negative real number.");if(!Number.isFinite(n)||n<0)throw new TypeError("addVideoChunkRaw's fourth argument (duration) must be a non-negative real number.");if(o&&typeof o!="object")throw new TypeError("addVideoChunkRaw's fifth argument (meta), when provided, must be an object.");if(a!==void 0&&!Number.isFinite(a))throw new TypeError("addVideoChunkRaw's sixth argument (compositionTimeOffset), when provided, must be a real number.");if(p(this,we,Qe).call(this),!r(this,h).video)throw new Error("No video track declared.");if(typeof r(this,h).fastStart=="object"&&r(this,x).samples.length===r(this,h).fastStart.expectedVideoChunks)throw new Error(`Cannot add more video chunks than specified in 'fastStart' (${r(this,h).fastStart.expectedVideoChunks}).`);let l=p(this,Te,Ze).call(this,r(this,x),e,i,s,n,o,a);if(r(this,h).fastStart==="fragmented"&&r(this,S)){for(;r(this,P).length>0&&r(this,P)[0].decodeTimestamp<=l.decodeTimestamp;){let m=r(this,P).shift();p(this,U,M).call(this,r(this,S),m)}l.decodeTimestamp<=r(this,S).lastDecodeTimestamp?p(this,U,M).call(this,r(this,x),l):r(this,L).push(l)}else p(this,U,M).call(this,r(this,x),l)}addAudioChunk(e,i,s){if(!(e instanceof EncodedAudioChunk))throw new TypeError("addAudioChunk's first argument (sample) must be of type EncodedAudioChunk.");if(i&&typeof i!="object")throw new TypeError("addAudioChunk's second argument (meta), when provided, must be an object.");if(s!==void 0&&(!Number.isFinite(s)||s<0))throw new TypeError("addAudioChunk's third argument (timestamp), when provided, must be a non-negative real number.");let n=new Uint8Array(e.byteLength);e.copyTo(n),this.addAudioChunkRaw(n,e.type,s??e.timestamp,e.duration,i)}addAudioChunkRaw(e,i,s,n,o){if(!(e instanceof Uint8Array))throw new TypeError("addAudioChunkRaw's first argument (data) must be an instance of Uint8Array.");if(i!=="key"&&i!=="delta")throw new TypeError("addAudioChunkRaw's second argument (type) must be either 'key' or 'delta'.");if(!Number.isFinite(s)||s<0)throw new TypeError("addAudioChunkRaw's third argument (timestamp) must be a non-negative real number.");if(!Number.isFinite(n)||n<0)throw new TypeError("addAudioChunkRaw's fourth argument (duration) must be a non-negative real number.");if(o&&typeof o!="object")throw new TypeError("addAudioChunkRaw's fifth argument (meta), when provided, must be an object.");if(p(this,we,Qe).call(this),!r(this,h).audio)throw new Error("No audio track declared.");if(typeof r(this,h).fastStart=="object"&&r(this,S).samples.length===r(this,h).fastStart.expectedAudioChunks)throw new Error(`Cannot add more audio chunks than specified in 'fastStart' (${r(this,h).fastStart.expectedAudioChunks}).`);let a=p(this,Te,Ze).call(this,r(this,S),e,i,s,n,o);if(r(this,h).fastStart==="fragmented"&&r(this,x)){for(;r(this,L).length>0&&r(this,L)[0].decodeTimestamp<=a.decodeTimestamp;){let l=r(this,L).shift();p(this,U,M).call(this,r(this,x),l)}a.decodeTimestamp<=r(this,x).lastDecodeTimestamp?p(this,U,M).call(this,r(this,S),a):r(this,P).push(a)}else p(this,U,M).call(this,r(this,S),a)}finalize(){if(r(this,re))throw new Error("Cannot finalize a muxer more than once.");if(r(this,h).fastStart==="fragmented"){for(let i of r(this,L))p(this,U,M).call(this,r(this,x),i);for(let i of r(this,P))p(this,U,M).call(this,r(this,S),i);p(this,ge,Ke).call(this,!1)}else r(this,x)&&p(this,se,Oe).call(this,r(this,x)),r(this,S)&&p(this,se,Oe).call(this,r(this,S));let e=[r(this,x),r(this,S)].filter(Boolean);if(r(this,h).fastStart==="in-memory"){let i;for(let n=0;n<2;n++){let o=oe(e,r(this,X)),a=r(this,d).measureBox(o);i=r(this,d).measureBox(r(this,A));let l=r(this,d).pos+a+i;for(let m of r(this,G)){m.offset=l;for(let{data:b}of m.samples)l+=b.byteLength,i+=b.byteLength}if(l<2**32)break;i>=2**32&&(r(this,A).largeSize=!0)}let s=oe(e,r(this,X));r(this,d).writeBox(s),r(this,A).size=i,r(this,d).writeBox(r(this,A));for(let n of r(this,G))for(let o of n.samples)r(this,d).write(o.data),o.data=null}else if(r(this,h).fastStart==="fragmented"){let i=r(this,d).pos,s=nt(e);r(this,d).writeBox(s);let n=r(this,d).pos-i;r(this,d).seek(r(this,d).pos-4),r(this,d).writeU32(n)}else{let i=r(this,d).offsets.get(r(this,A)),s=r(this,d).pos-i;r(this,A).size=s,r(this,A).largeSize=s>=2**32,r(this,d).patchBox(r(this,A));let n=oe(e,r(this,X));if(typeof r(this,h).fastStart=="object"){r(this,d).seek(r(this,be)),r(this,d).writeBox(n);let o=i-r(this,d).pos;r(this,d).writeBox(rt(o))}else r(this,d).writeBox(n)}p(this,Z,ce).call(this),r(this,d).finalize(),w(this,re,!0)}};h=new WeakMap,d=new WeakMap,be=new WeakMap,A=new WeakMap,x=new WeakMap,S=new WeakMap,X=new WeakMap,G=new WeakMap,De=new WeakMap,L=new WeakMap,P=new WeakMap,re=new WeakMap,Ie=new WeakSet,ut=function(e){if(typeof e!="object")throw new TypeError("The muxer requires an options object to be passed to its constructor.");if(!(e.target instanceof W))throw new TypeError("The target must be provided and an instance of Target.");if(e.video){if(!hi.includes(e.video.codec))throw new TypeError(`Unsupported video codec: ${e.video.codec}`);if(!Number.isInteger(e.video.width)||e.video.width<=0)throw new TypeError(`Invalid video width: ${e.video.width}. Must be a positive integer.`);if(!Number.isInteger(e.video.height)||e.video.height<=0)throw new TypeError(`Invalid video height: ${e.video.height}. Must be a positive integer.`);let i=e.video.rotation;if(typeof i=="number"&&![0,90,180,270].includes(i))throw new TypeError(`Invalid video rotation: ${i}. Has to be 0, 90, 180 or 270.`);if(Array.isArray(i)&&(i.length!==9||i.some(s=>typeof s!="number")))throw new TypeError(`Invalid video transformation matrix: ${i.join()}`);if(e.video.frameRate!==void 0&&(!Number.isInteger(e.video.frameRate)||e.video.frameRate<=0))throw new TypeError(`Invalid video frame rate: ${e.video.frameRate}. Must be a positive integer.`)}if(e.audio){if(!di.includes(e.audio.codec))throw new TypeError(`Unsupported audio codec: ${e.audio.codec}`);if(!Number.isInteger(e.audio.numberOfChannels)||e.audio.numberOfChannels<=0)throw new TypeError(`Invalid number of audio channels: ${e.audio.numberOfChannels}. Must be a positive integer.`);if(!Number.isInteger(e.audio.sampleRate)||e.audio.sampleRate<=0)throw new TypeError(`Invalid audio sample rate: ${e.audio.sampleRate}. Must be a positive integer.`)}if(e.firstTimestampBehavior&&!mi.includes(e.firstTimestampBehavior))throw new TypeError(`Invalid first timestamp behavior: ${e.firstTimestampBehavior}`);if(typeof e.fastStart=="object"){if(e.video){if(e.fastStart.expectedVideoChunks===void 0)throw new TypeError("'fastStart' is an object but is missing property 'expectedVideoChunks'.");if(!Number.isInteger(e.fastStart.expectedVideoChunks)||e.fastStart.expectedVideoChunks<0)throw new TypeError("'expectedVideoChunks' must be a non-negative integer.")}if(e.audio){if(e.fastStart.expectedAudioChunks===void 0)throw new TypeError("'fastStart' is an object but is missing property 'expectedAudioChunks'.");if(!Number.isInteger(e.fastStart.expectedAudioChunks)||e.fastStart.expectedAudioChunks<0)throw new TypeError("'expectedAudioChunks' must be a non-negative integer.")}}else if(![!1,"in-memory","fragmented"].includes(e.fastStart))throw new TypeError("'fastStart' option must be false, 'in-memory', 'fragmented' or an object.")},Me=new WeakSet,lt=function(){if(r(this,d).writeBox(it({holdsAvc:r(this,h).video?.codec==="avc",fragmented:r(this,h).fastStart==="fragmented"})),w(this,be,r(this,d).pos),r(this,h).fastStart==="in-memory")w(this,A,ve(!1));else if(r(this,h).fastStart!=="fragmented"){if(typeof r(this,h).fastStart=="object"){let e=p(this,Ve,ht).call(this);r(this,d).seek(r(this,d).pos+e)}w(this,A,ve(!0)),r(this,d).writeBox(r(this,A))}p(this,Z,ce).call(this)},Ve=new WeakSet,ht=function(){if(typeof r(this,h).fastStart!="object")return;let e=0,i=[r(this,h).fastStart.expectedVideoChunks,r(this,h).fastStart.expectedAudioChunks];for(let s of i)s&&(e+=(4+4)*Math.ceil(2/3*s),e+=4*s,e+=(4+4+4)*Math.ceil(2/3*s),e+=4*s,e+=8*s);return e+=4096,e},Ne=new WeakSet,dt=function(){if(r(this,h).video&&w(this,x,{id:1,info:{type:"video",codec:r(this,h).video.codec,width:r(this,h).video.width,height:r(this,h).video.height,rotation:r(this,h).video.rotation??0,decoderConfig:null},timescale:r(this,h).video.frameRate??57600,samples:[],finalizedChunks:[],currentChunk:null,firstDecodeTimestamp:void 0,lastDecodeTimestamp:-1,timeToSampleTable:[],compositionTimeOffsetTable:[],lastTimescaleUnits:null,lastSample:null,compactlyCodedChunkTable:[]}),r(this,h).audio&&(w(this,S,{id:r(this,h).video?2:1,info:{type:"audio",codec:r(this,h).audio.codec,numberOfChannels:r(this,h).audio.numberOfChannels,sampleRate:r(this,h).audio.sampleRate,decoderConfig:null},timescale:r(this,h).audio.sampleRate,samples:[],finalizedChunks:[],currentChunk:null,firstDecodeTimestamp:void 0,lastDecodeTimestamp:-1,timeToSampleTable:[],compositionTimeOffsetTable:[],lastTimescaleUnits:null,lastSample:null,compactlyCodedChunkTable:[]}),r(this,h).audio.codec==="aac")){let e=p(this,_e,ft).call(this,2,r(this,h).audio.sampleRate,r(this,h).audio.numberOfChannels);r(this,S).info.decoderConfig={codec:r(this,h).audio.codec,description:e,numberOfChannels:r(this,h).audio.numberOfChannels,sampleRate:r(this,h).audio.sampleRate}}},_e=new WeakSet,ft=function(e,i,s){let o=[96e3,88200,64e3,48e3,44100,32e3,24e3,22050,16e3,12e3,11025,8e3,7350].indexOf(i),a=s,l="";l+=e.toString(2).padStart(5,"0"),l+=o.toString(2).padStart(4,"0"),o===15&&(l+=i.toString(2).padStart(24,"0")),l+=a.toString(2).padStart(4,"0");let m=Math.ceil(l.length/8)*8;l=l.padEnd(m,"0");let b=new Uint8Array(l.length/8);for(let v=0;v<l.length;v+=8)b[v/8]=parseInt(l.slice(v,v+8),2);return b},Te=new WeakSet,Ze=function(e,i,s,n,o,a,l){let m=n/1e6,b=(n-(l??0))/1e6,v=o/1e6,j=p(this,Fe,mt).call(this,m,b,e);return m=j.presentationTimestamp,b=j.decodeTimestamp,a?.decoderConfig&&(e.info.decoderConfig===null?e.info.decoderConfig=a.decoderConfig:Object.assign(e.info.decoderConfig,a.decoderConfig)),{presentationTimestamp:m,decodeTimestamp:b,duration:v,data:i,size:i.byteLength,type:s,timescaleUnitsToNextSample:B(v,e.timescale)}},U=new WeakSet,M=function(e,i){r(this,h).fastStart!=="fragmented"&&e.samples.push(i);let s=B(i.presentationTimestamp-i.decodeTimestamp,e.timescale);if(e.lastTimescaleUnits!==null){let o=B(i.decodeTimestamp,e.timescale,!1),a=Math.round(o-e.lastTimescaleUnits);if(e.lastTimescaleUnits+=a,e.lastSample.timescaleUnitsToNextSample=a,r(this,h).fastStart!=="fragmented"){let l=Q(e.timeToSampleTable);l.sampleCount===1?(l.sampleDelta=a,l.sampleCount++):l.sampleDelta===a?l.sampleCount++:(l.sampleCount--,e.timeToSampleTable.push({sampleCount:2,sampleDelta:a}));let m=Q(e.compositionTimeOffsetTable);m.sampleCompositionTimeOffset===s?m.sampleCount++:e.compositionTimeOffsetTable.push({sampleCount:1,sampleCompositionTimeOffset:s})}}else e.lastTimescaleUnits=0,r(this,h).fastStart!=="fragmented"&&(e.timeToSampleTable.push({sampleCount:1,sampleDelta:B(i.duration,e.timescale)}),e.compositionTimeOffsetTable.push({sampleCount:1,sampleCompositionTimeOffset:s}));e.lastSample=i;let n=!1;if(!e.currentChunk)n=!0;else{let o=i.presentationTimestamp-e.currentChunk.startTimestamp;if(r(this,h).fastStart==="fragmented"){let a=r(this,x)??r(this,S);e===a&&i.type==="key"&&o>=1&&(n=!0,p(this,ge,Ke).call(this))}else n=o>=.5}n&&(e.currentChunk&&p(this,se,Oe).call(this,e),e.currentChunk={startTimestamp:i.presentationTimestamp,samples:[]}),e.currentChunk.samples.push(i)},Fe=new WeakSet,mt=function(e,i,s){let n=r(this,h).firstTimestampBehavior==="strict",o=s.lastDecodeTimestamp===-1;if(n&&o&&i!==0)throw new Error(`The first chunk for your media track must have a timestamp of 0 (received DTS=${i}).Non-zero first timestamps are often caused by directly piping frames or audio data from a MediaStreamTrack into the encoder. Their timestamps are typically relative to the age of thedocument, which is probably what you want.
+
+If you want to offset all timestamps of a track such that the first one is zero, set firstTimestampBehavior: 'offset' in the options.
+`);if(r(this,h).firstTimestampBehavior==="offset"||r(this,h).firstTimestampBehavior==="cross-track-offset"){s.firstDecodeTimestamp===void 0&&(s.firstDecodeTimestamp=i);let l;r(this,h).firstTimestampBehavior==="offset"?l=s.firstDecodeTimestamp:l=Math.min(r(this,x)?.firstDecodeTimestamp??1/0,r(this,S)?.firstDecodeTimestamp??1/0),i-=l,e-=l}if(i<s.lastDecodeTimestamp)throw new Error(`Timestamps must be monotonically increasing (DTS went from ${s.lastDecodeTimestamp*1e6} to ${i*1e6}).`);return s.lastDecodeTimestamp=i,{presentationTimestamp:e,decodeTimestamp:i}},se=new WeakSet,Oe=function(e){if(r(this,h).fastStart==="fragmented")throw new Error("Can't finalize individual chunks if 'fastStart' is set to 'fragmented'.");if(e.currentChunk){if(e.finalizedChunks.push(e.currentChunk),r(this,G).push(e.currentChunk),(e.compactlyCodedChunkTable.length===0||Q(e.compactlyCodedChunkTable).samplesPerChunk!==e.currentChunk.samples.length)&&e.compactlyCodedChunkTable.push({firstChunk:e.finalizedChunks.length,samplesPerChunk:e.currentChunk.samples.length}),r(this,h).fastStart==="in-memory"){e.currentChunk.offset=0;return}e.currentChunk.offset=r(this,d).pos;for(let i of e.currentChunk.samples)r(this,d).write(i.data),i.data=null;p(this,Z,ce).call(this)}},ge=new WeakSet,Ke=function(e=!0){if(r(this,h).fastStart!=="fragmented")throw new Error("Can't finalize a fragment unless 'fastStart' is set to 'fragmented'.");let i=[r(this,x),r(this,S)].filter(m=>m&&m.currentChunk);if(i.length===0)return;let s=Je(this,De)._++;if(s===1){let m=oe(i,r(this,X),!0);r(this,d).writeBox(m)}let n=r(this,d).pos,o=qe(s,i);r(this,d).writeBox(o);{let m=ve(!1),b=0;for(let j of i)for(let ne of j.currentChunk.samples)b+=ne.size;let v=r(this,d).measureBox(m)+b;v>=2**32&&(m.largeSize=!0,v=r(this,d).measureBox(m)+b),m.size=v,r(this,d).writeBox(m)}for(let m of i){m.currentChunk.offset=r(this,d).pos,m.currentChunk.moofOffset=n;for(let b of m.currentChunk.samples)r(this,d).write(b.data),b.data=null}let a=r(this,d).pos;r(this,d).seek(r(this,d).offsets.get(o));let l=qe(s,i);r(this,d).writeBox(l),r(this,d).seek(a);for(let m of i)m.finalizedChunks.push(m.currentChunk),r(this,G).push(m.currentChunk),m.currentChunk=null;e&&p(this,Z,ce).call(this)},Z=new WeakSet,ce=function(){r(this,d)instanceof ue&&r(this,d).flush()},we=new WeakSet,Qe=function(){if(r(this,re))throw new Error("Cannot add new video or audio chunks after the file has been finalized.")};return wt(pi);})();
+      return Mp4Muxer;
     })();
+    return MUX;
+  }
+  async function dvCodec(w, h, fps) {
+    if (typeof VideoEncoder === 'undefined' || typeof VideoFrame === 'undefined') return null;
+    var opts = [['avc1.640028', 'avc'], ['avc1.4d0028', 'avc'], ['avc1.42003e', 'avc'], ['avc1.640033', 'avc'], ['vp09.00.40.08', 'vp9'], ['vp09.00.10.08', 'vp9']];
+    for (var i = 0; i < opts.length; i++) {
+      var cfg = { codec: opts[i][0], width: w, height: h, bitrate: 3000000, framerate: fps };
+      if (opts[i][1] === 'avc') cfg.avc = { format: 'avc' };
+      try { var s = await VideoEncoder.isConfigSupported(cfg); if (s && s.supported) return { cfg: cfg, kind: opts[i][1] }; } catch (e) {}
+    }
+    return null;
+  }
+  function dvWait(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
+  /* Fast path: draw every frame of the recording and encode it straight to an MP4 (much faster than real time). */
+  async function dvEncode(r, p, onProg) {
+    var FPS = 30, W = 1080, H = 1920, frames = Math.max(1, Math.round(recLen(r) * FPS));
+    var pick = await dvCodec(W, H, FPS); if (!pick) return null;
+    var M = mp4Muxer(), target = new M.ArrayBufferTarget();
+    var muxer = new M.Muxer({ target: target, video: { codec: pick.kind, width: W, height: H, frameRate: FPS }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' });
+    var err = null, enc = new VideoEncoder({ output: function (ch, meta) { muxer.addVideoChunk(ch, meta); }, error: function (e) { err = e; } });
+    enc.configure(pick.cfg);
+    var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var ctx = cv.getContext('2d'), lastKey = '', step = Math.round(1e6 / FPS);
+    for (var i = 0; i < frames; i++) {
+      if (err) throw err;
+      var st = recAt(r, i / FPS), k = dvKey(st);
+      if (k !== lastKey) { ctx.setTransform(1, 0, 0, 1, 0, 0); dvDraw(ctx, r.D, p, st); lastKey = k; }
+      var vf = new VideoFrame(cv, { timestamp: i * step, duration: step });
+      enc.encode(vf, { keyFrame: i % (FPS * 2) === 0 }); vf.close();
+      while (enc.encodeQueueSize > 6) await dvWait(2);
+      if (i % 15 === 0) { onProg(i / frames); await dvWait(0); }
+    }
+    await enc.flush(); if (err) throw err; enc.close(); muxer.finalize();
+    return { blob: new Blob([target.buffer], { type: 'video/mp4' }), ext: 'mp4' };
+  }
+  /* Fallback for browsers without a video encoder: record the canvas in real time (takes as long as the video). */
+  function dvRealtime(r, p, onProg) {
+    return new Promise(function (resolve, reject) {
+      if (typeof MediaRecorder === 'undefined' || !HTMLCanvasElement.prototype.captureStream) { reject(new Error('unsupported')); return; }
+      var types = ['video/mp4;codecs=avc1.42E01E', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'], type = '';
+      for (var i = 0; i < types.length; i++) if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(types[i])) { type = types[i]; break; }
+      var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1920;
+      var ctx = cv.getContext('2d'), len = recLen(r), chunks = [], stream = cv.captureStream(30), rec;
+      try { rec = new MediaRecorder(stream, type ? { mimeType: type, videoBitsPerSecond: 4000000 } : { videoBitsPerSecond: 4000000 }); } catch (e) { reject(e); return; }
+      rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
+      rec.onstop = function () { var mt = (rec.mimeType || type || 'video/webm').split(';')[0]; resolve({ blob: new Blob(chunks, { type: mt }), ext: mt.indexOf('mp4') >= 0 ? 'mp4' : 'webm' }); };
+      var t0 = performance.now(); dvDraw(ctx, r.D, p, recAt(r, 0)); rec.start(1000);
+      (function frame() {
+        var t = (performance.now() - t0) / 1000;
+        dvDraw(ctx, r.D, p, recAt(r, Math.min(t, len))); onProg(Math.min(1, t / len), true);
+        if (t < len) setTimeout(frame, 1000 / 30);
+        else setTimeout(function () { try { rec.stop(); } catch (e) {} stream.getTracks().forEach(function (tr) { tr.stop(); }); }, 100);
+      })();
+    });
+  }
+  async function dvRecord() {
+    if (DV.busy) return;
+    var r = dvSource(), msg = $('dv-msg'), btn = $('dv-rec');
+    if (!r) { msg.textContent = 'The video starts once the draft does.'; return; }
+    var p = dvPref(), len = fmtLen(recLen(r));
+    DV.busy = true; btn.disabled = true; $('dv-share').hidden = true; dvTick();
+    var prog = function (f, live) { msg.textContent = live ? 'Recording in real time (this browser can’t make it faster): ' + Math.round(f * 100) + '% of ' + len + '. Keep this page open.' : 'Making your ' + len + ' video… ' + Math.round(f * 100) + '%. Keep this page open.'; };
+    var out = null;
+    try { out = await dvEncode(r, p, prog); } catch (e) { out = null; }
+    if (!out) { try { out = await dvRealtime(r, p, prog); } catch (e2) { out = null; } }
+    DV.busy = false; btn.disabled = false; dvTick();
+    if (!out) { msg.textContent = 'This browser can’t make videos. Try Chrome or Safari on your phone or computer.'; return; }
+    var name = 'the-roster-' + (r.D.tid || 'draft') + '-' + r.D.dk + '.' + out.ext;
+    DV.blob = out.blob; DV.name = name;
+    var url = URL.createObjectURL(out.blob), a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 120000);
+    msg.textContent = 'Downloaded your ' + len + ' video (' + out.ext.toUpperCase() + ').' + (out.ext === 'webm' ? ' If your phone won’t open it, try Chrome, or make it on a computer.' : '');
+    try { var f = new File([out.blob], name, { type: out.blob.type }); $('dv-share').hidden = !(navigator.canShare && navigator.canShare({ files: [f] })); } catch (e3) {}
+    statBump(function (s) { s.dv = (s.dv || 0) + 1; });
+  }
+  function dvShare() {
+    if (!DV.blob) return;
+    try { navigator.share({ files: [new File([DV.blob], DV.name, { type: DV.blob.type })] }).catch(function () {}); } catch (e) {}
   }
   function dvPointer(ev) {
-    var cv = $('dv-canvas'); if (!cv || !DV.data) return;
+    var cv = $('dv-canvas'), r = DV.rec; if (!cv || !r) return;
     var b = cv.getBoundingClientRect(), fx = (ev.clientX - b.left) / b.width * 1080, fy = (ev.clientY - b.top) / b.height * 1920, p = dvPref();
-    if (ev.type === 'pointerdown') { var R = dvRect(DV.data, p); if (fx >= R.x && fx <= R.x + R.w && fy >= R.y && fy <= R.y + R.h) { DV.drag = { dx: fx - R.x, dy: fy - R.y }; try { cv.setPointerCapture(ev.pointerId); } catch (e) {} ev.preventDefault(); } return; }
+    if (ev.type === 'pointerdown') { var R = dvRect(r.D, p); if (fx >= R.x && fx <= R.x + R.w && fy >= R.y && fy <= R.y + R.h) { DV.drag = { dx: fx - R.x, dy: fy - R.y }; try { cv.setPointerCapture(ev.pointerId); } catch (e) {} ev.preventDefault(); } return; }
     if (ev.type === 'pointermove' && DV.drag) {
-      var R2 = dvRect(DV.data, p), nx = fx - DV.drag.dx, ny = fy - DV.drag.dy;
+      var R2 = dvRect(r.D, p), nx = fx - DV.drag.dx, ny = fy - DV.drag.dy;
       p.x = R2.w >= 1080 ? 0.5 : Math.max(0, Math.min(1, nx / (1080 - R2.w))); p.y = Math.max(0, Math.min(1, (ny - 20) / Math.max(1, 1920 - 120 - R2.h))); dvSave(p); ev.preventDefault(); return;
     }
     if (ev.type === 'pointerup' || ev.type === 'pointercancel') DV.drag = null;
@@ -5140,7 +5226,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
       afterChange();
       if (g.results) leagueRecord(g);
     }, onErr));
-    try { if (!creatorPref().streamer) history.replaceState(null, '', '#r-' + code); } catch (e) {}
+    try { if (!streamerOn()) history.replaceState(null, '', '#r-' + code); } catch (e) {}
     S.view = 'play';
     render();
     window.scrollTo(0, 0);
@@ -5176,6 +5262,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
   function leaveGame(silent) {
     if (S.fast) { saveFast(); S.fast = null; }
     var g = S.game;
+    if (g) recFinish(g);
     S.unsub.forEach(function (u) { try { u(); } catch (e) {} });
     S.unsub = [];
     clearTimeout(S.botTimer);
@@ -6757,18 +6844,13 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
     else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
-    else if (act === 'creator') {
-      var cp = creatorPref(); cp.layout = t.getAttribute('data-creator'); setCreatorPref(cp);
-      /* Ask for the camera now, while the tap counts as permission; the view turns it on when the draft starts. */
-      if (cp.layout === 'camera' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false }).then(function (st) { st.getTracks().forEach(function (x) { x.stop(); }); }).catch(function () {});
-      render();
-    }
-    else if (act === 'streamer') { var sp = creatorPref(); sp.streamer = !!t.checked; setCreatorPref(sp); if (sp.streamer) { try { if (/^#r-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } render(); }
+    else if (act === 'streamer') { setStreamer(!!t.checked); var sp = { streamer: !!t.checked }; if (sp.streamer) { try { if (/^#r-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } render(); }
     else if (act === 'dv-open') dvOpen();
     else if (act === 'dv-rec') dvRecord();
     else if (act === 'dv-bg') { var bp = dvPref(); bp.bg = t.getAttribute('data-bg'); dvSave(bp); dvRenderControls(); }
     else if (act === 'dv-pos') { var pp = dvPref(); pp.y = { top: 0.04, middle: 0.5, bottom: 0.96 }[t.getAttribute('data-pos')]; pp.x = 0.5; dvSave(pp); }
-    else if (act === 'creator-exit') { var ep = creatorPref(); ep.layout = 'off'; setCreatorPref(ep); render(); }
+    else if (act === 'dv-share') dvShare();
+    else if (act === 'dv-dismiss') { S.ui.dvHome = false; render(); }
     else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
     else if (act === 'list') { store('roster.list', t.getAttribute('data-list')); renderListPref(); }
     else if (act === 'room-list') setRoomList(t.getAttribute('data-list') === 'show');
@@ -6944,7 +7026,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-06';
+  var BUILD_ID = '2026-11-02-07';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7752,11 +7834,17 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     renderLevels(); renderPrivacy(); renderListPref();
     render();
     setInterval(function () {
-      tick(); fastTick();
+      tick(); fastTick(); recSample(); dvTick();
       var g = S.game;
       if (g && !g.results && g.mode === 'shared' && !S.waitShown && S.scoreWaitSince && now() - S.scoreWaitSince > 20000 && screenFor() === 'results') { S.waitShown = true; renderResults(); }
     }, 250);
     setInterval(renderToday, 60000);
+    /* Closing the tab mid-game still keeps the draft video up to that moment. */
+    window.addEventListener('pagehide', function () {
+      var g = S.game; if (!g || !REC || REC_G !== g) return;
+      var r = recSnap(g); if (r) store('roster.lastRec', JSON.stringify(r));
+      try { sessionStorage.setItem('roster.rec', JSON.stringify(REC)); } catch (e) {}
+    });
     var cl = window.claude;
     if (cl && cl.use) {
       try {
