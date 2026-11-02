@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-11-02",
- "updatedAt": 1793658060675,
+ "updatedAt": 1793658134357,
  "days": {
   "2026-11-03": {
    "topicId": "board-games",
@@ -84,13 +84,13 @@
    ]
   },
   "2026-11-08": {
-   "topicId": "draft-busts",
+   "topicId": "fighters",
    "subs": [
-    "Infamy",
-    "Pre-draft hype",
-    "Disappointment",
-    "Highest pick",
-    "Fame"
+    "Legacy",
+    "Defense",
+    "Power",
+    "Speed",
+    "Chin"
    ]
   }
  },
