@@ -192,6 +192,19 @@ select.field { padding-right: 8px; }
 .draft-grid.wide-board { grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr); }
 .draft-grid.wide-board.huge { grid-template-columns: minmax(0, 0.5fr) minmax(0, 1.5fr); }
 .pickbox { display: grid; gap: 14px; padding: 16px; background: var(--tint); border-radius: 14px; }
+/* Your turn: a gold glow around the screen, and a countdown bubble whenever the clock is scrolled out of view. */
+.turn-glow { position: fixed; inset: 0; z-index: 70; pointer-events: none; box-shadow: inset 0 0 0 7px #ffb612, inset 0 0 36px 12px rgba(255, 182, 18, 0.7); animation: turnGlow 1.6s ease-in-out infinite; }
+.turn-glow.low { box-shadow: inset 0 0 0 7px #ca2430, inset 0 0 36px 12px rgba(202, 36, 48, 0.55); animation-duration: 0.7s; }
+@keyframes turnGlow { 50% { opacity: 0.55; } }
+.turn-bubble { position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 71; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; box-shadow: 4px 4px 0 #000000; border: 0; padding: 0; cursor: pointer; font: inherit; }
+.turn-bubble > span { width: 76px; height: 76px; border-radius: 50%; background: #000000; color: #ffb612; display: grid; place-content: center; text-align: center; line-height: 1; }
+.turn-bubble small { display: block; font-size: 0.55rem; font-weight: 800; letter-spacing: 0.08em; color: #ffffff; margin-bottom: 3px; }
+.turn-bubble b { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; font-variant-numeric: tabular-nums; }
+.turn-bubble.low > span { color: #ffffff; background: #ca2430; }
+@media (prefers-reduced-motion: reduce) { .turn-glow, .turn-glow.low { animation: none; } }
+.wait-chips { margin-top: 10px; }
+.wait-chips .chip { cursor: default; }
+.wait-chips .chip.done { opacity: 0.5; }
 .waitbox { padding: 18px 16px; border: 2px dashed var(--line); border-radius: 14px; color: var(--muted); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--edge); background: var(--surface); font-weight: 700; }
@@ -263,6 +276,12 @@ select.field { padding-right: 8px; }
 .board thead th[class*="pc"] { box-shadow: inset 0 -5px 0 var(--pc); }
 .board thead th.turn[class*="pc"] { background: var(--pc); color: var(--pi, var(--p-ink)); }
 .board td.has { box-shadow: inset 4px 0 0 var(--pc); }
+.board td.irr, .board td.irr.mine { background: repeating-linear-gradient(-45deg, #ffb612 0 12px, #000000 12px 24px); }
+.board td .irr-tape { display: inline-block; max-width: 100%; background: #ffffff; color: #000000; border: 2px solid #000000; border-radius: 8px; padding: 3px 8px; }
+.board td .irr-tape strong { color: #000000; }
+.board td .irr-tape small { display: block; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #ca2430; line-height: 1.3; }
+.board td .irr-tape small { overflow-wrap: normal; word-break: normal; hyphens: none; }
+.board.stack td .irr-tape small, .board.tp td .irr-tape small, .board.many td .irr-tape small { font-size: 0.56rem; letter-spacing: 0.02em; }
 .board td .auto { color: var(--muted); font-size: 0.78rem; margin-left: 4px; white-space: nowrap; }
 .board td .sc { display: inline-block; min-width: 2.8em; margin-right: 6px; padding: 1px 6px; border-radius: 6px; background: var(--ink); color: var(--bg); font-family: var(--font-mono); font-size: 0.78rem; text-align: center; font-variant-numeric: tabular-nums; }
 
@@ -1368,6 +1387,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                   <button class="btn primary" type="button" id="lock-btn" data-act="lock" hidden="">Lock in</button>
                 </div>
                 <div class="waitbox" id="waitbox"></div>
+                <div class="turn-glow" id="turn-glow" hidden=""></div>
+                <button class="turn-bubble" id="turn-bubble" type="button" data-act="turn-bubble" aria-label="Your pick: time left" hidden=""><span><small>YOUR PICK</small><b id="turn-bubble-t">1:00</b></span></button>
                 <div class="browse" id="browse" hidden="">
                   <label class="mono label" for="browse-in" id="browse-label">Browse the answers while you wait</label>
                   <input class="field" id="browse-in" type="search" autocomplete="off" spellcheck="false" placeholder="Search the list">
@@ -3809,6 +3830,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   var TIER_NAMES = { 5: 'Elite', 4: 'Strong', 3: 'Solid', 2: 'Reach', 1: 'Miss' };
   var TIER_RANGES = { 5: '9.0–10.0', 4: '7.5–8.9', 3: '6.0–7.4', 2: '4.0–5.9', 1: '1.0–3.9' };
   function tier(x) { var v = Math.round((Number(x) || 0) * 10) / 10; return v >= 9 ? 5 : v >= 7.5 ? 4 : v >= 6 ? 3 : v >= 4 ? 2 : 1; }
+  /* Mr. Irrelevant pick: the last-ranked answer for its subtopic. Only marked once scores are out. */
+  function isIrrPick(g, p) { var t = TOPICS[g.topicId], r = t && t.ranks ? t.ranks[p.sub] : null; return !!(r && r.length > 1 && r[r.length - 1] === p.key); }
+  function irrTape(html) { return '<span class="irr-tape"><small>Mr. Irrelevant</small>' + html + '</span>'; }
   function scoreBadge(x, extra) { var t = tier(x); return '<span class="sc tier t' + t + (extra ? ' ' + extra : '') + '" title="' + TIER_NAMES[t] + '">' + fmt1(x) + '</span>'; }
   function pci(g, pid) { var ps = sortedPlayers(g); for (var i = 0; i < ps.length; i++) if (ps[i].id === pid) return i % 8; return 0; }
   function pdot(g, pid) { return '<span class="pdot pc' + pci(g, pid) + '" aria-hidden="true"></span>'; }
@@ -3889,7 +3913,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('back-btn').hidden = !!S.game && !atResults;
     $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
     renderBanner();
-    recSample(); renderDv(scr);
+    recSample(); renderDv(scr); turnAlert();
     var fastOn = !!S.fast && !S.game;
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
     if (S.game && !fastOn && (scr === 'draft' || scr === 'results')) { markPlayed(S.game); statGame(S.game, 'start'); if (scr === 'results') statGame(S.game, 'done'); }
@@ -4036,7 +4060,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       }).join('');
       $('lastpick').innerHTML = '<span class="mono">Draft order shuffled</span>';
       $('pickbox').hidden = true; $('waitbox').hidden = false;
-      $('waitbox').textContent = 'Today’s subtopics: ' + g.subs.join(', ') + '. Plan your picks.';
+      $('waitbox').innerHTML = '<p>Today’s subtopics. Plan your picks.</p>' + (g.players[S.me] ? waitChips(g) : '');
       renderBrowse(d, true);
       renderBoard($('board'), g, null, null);
       tick();
@@ -4072,6 +4096,33 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     }).join('');
     $('browse-list').innerHTML = head + (html || '<li class="bopt">No match. Only answers on the list count.</li>');
   }
+  /* Your subtopics while you wait: open ones bright, filled ones faded with what you took. */
+  function waitChips(g) {
+    return '<div class="chips wait-chips" aria-label="Your subtopics">' + g.subs.map(function (s) {
+      var f = filled(g, S.me, s);
+      return f ? '<span class="chip done" title="' + esc(f.name) + '">' + LOCK_SVG + esc(s) + ': ' + esc(f.name) + '</span>' : '<span class="chip">' + esc(s) + '</span>';
+    }).join('') + '</div>';
+  }
+  /* Your turn: glow around the screen; the bubble shows the time left when the clock isn't on screen. */
+  function turnAlert() {
+    var g = S.game, on = false, rem = 0;
+    if (g && g.status === 'drafting' && !S.fast && S.view === 'play' && screenFor() === 'draft' && g.players[S.me]) {
+      var d = derive(g, now());
+      if (!(d.countdownMs > 0) && !d.complete && d.current === S.me) { on = true; rem = d.remainingMs; }
+    }
+    var glow = $('turn-glow'), bub = $('turn-bubble'); if (!glow || !bub) return;
+    var low = on && rem <= 10000;
+    glow.hidden = !on; glow.classList.toggle('low', low);
+    var clockSeen = false;
+    if (on) { var r = $('clock').getBoundingClientRect(); clockSeen = r.height > 0 && r.bottom > 0 && r.top < window.innerHeight; }
+    bub.hidden = !on || clockSeen;
+    if (on && !clockSeen) {
+      var frac = Math.max(0, Math.min(1, rem / (PICK_SECONDS * 1000))), col = low ? '#ca2430' : '#ffb612';
+      bub.style.background = 'conic-gradient(' + col + ' 0 ' + (frac * 100).toFixed(1) + '%, #444444 ' + (frac * 100).toFixed(1) + '% 100%)';
+      bub.classList.toggle('low', low);
+      var tt = fmtClock(rem); if ($('turn-bubble-t').textContent !== tt) $('turn-bubble-t').textContent = tt;
+    }
+  }
   function renderPickBox(d) {
     var g = S.game, mine = d.current === S.me;
     if (S.ui.turnN !== d.done) { S.ui.turnN = d.done; S.ui.sub = null; S.ui.chosen = null; $('answer-in').value = ''; closeList(); }
@@ -4079,8 +4130,8 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('waitbox').hidden = mine;
     if (!mine) {
       var myOpen = S.me && g.players[S.me] ? g.subs.filter(function (s) { return !filled(g, S.me, s); }).length : 0;
-      $('waitbox').textContent = g.players[S.me]
-        ? 'Waiting for ' + playerName(g, d.current) + '. You have ' + myOpen + ' subtopic' + (myOpen === 1 ? '' : 's') + ' left to fill.'
+      $('waitbox').innerHTML = g.players[S.me]
+        ? '<p>Waiting for ' + esc(playerName(g, d.current)) + '. You have ' + myOpen + ' subtopic' + (myOpen === 1 ? '' : 's') + ' left to fill.</p>' + waitChips(g)
         : 'You’re watching this draft.';
       closeList();
       renderBrowse(d, true);
@@ -4110,7 +4161,8 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       var up = d && pid === d.current;
       h += '<tr class="pc' + pci(g, pid) + (up ? ' turn' : '') + (pid === S.me ? ' mine' : '') + '"><th scope="row">' + esc(playerName(g, pid)) + (pid === S.me ? '<small>you</small>' : '') + (up ? '<small class="up">on the clock</small>' : '') + '</th>' + g.subs.map(function (sub) {
         var p = filled(g, pid, sub), sc = p && scores ? scores['p' + p.n] : null;
-        return '<td class="' + (p ? 'has' : '') + '">' + (p ? '<strong>' + esc(p.name) + '</strong>' + (sc ? scoreBadge(sc.score) : '') : '<span class="empty">—</span>') + '</td>';
+        var irr = !!(p && sc && isIrrPick(g, p)), cell = p ? '<strong>' + esc(p.name) + '</strong>' + (sc ? scoreBadge(sc.score) : '') : '<span class="empty">—</span>';
+        return '<td class="' + (p ? 'has' : '') + (irr ? ' irr' : '') + '">' + (irr ? irrTape(cell) : cell) + '</td>';
       }).join('') + '</tr>';
     });
     table.innerHTML = h + '</tbody>';
@@ -4132,8 +4184,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         var p = filled(g, pid, sub);
         var s = p && scores ? scores['p' + p.n] : null;
         var inner = p ? (s ? scoreBadge(s.score) : '') + '<strong>' + esc(p.name) + '</strong>' + (p.auto ? '<span class="auto">auto</span>' : '') : '<span class="empty">—</span>';
+        var irr = !!(p && s && isIrrPick(g, p)); if (irr) inner = irrTape(inner);
         var up = d && pid === d.current;
-        return '<td class="pc' + pci(g, pid) + (p ? ' has' : '') + (pid === S.me ? ' mine' : '') + (up ? ' turn' : '') + '" data-p="' + esc(playerName(g, pid) + (pid === S.me ? ' · you' : '') + (up ? ' · up' : '')) + '">' + inner + '</td>';
+        return '<td class="pc' + pci(g, pid) + (p ? ' has' : '') + (irr ? ' irr' : '') + (pid === S.me ? ' mine' : '') + (up ? ' turn' : '') + '" data-p="' + esc(playerName(g, pid) + (pid === S.me ? ' · you' : '') + (up ? ' · up' : '')) + '">' + inner + '</td>';
       }).join('') + '</tr>';
     });
     table.innerHTML = h + '</tbody>';
@@ -6143,7 +6196,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       tile(all.winPct + '%', 'Win %', 'of games played') +
       tile(fmt1(all.avg), 'Avg score', 'out of 50') +
       tile(fmt1(all.best), 'Best score', 'out of 50') +
-      tile(placeLabel(all), 'Avg finish', '1.0 = always first') + '</div>';
+      tile(placeLabel(all), 'Weighted avg finish', '1.0 = always first') + '</div>';
     html += '<div class="me-sec"><span class="mono">By game mode</span><div class="me-modes">' + ME_MODES.map(function (m) {
       var list = gs.filter(function (x) { return meModeOf(x) === m.k; });
       if (!list.length && m.k === 'irr') return '<div class="me-mode empty"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">0 games</span></div><p class="note" style="margin:0">Finish any draft, then tap “Play Mr. Irrelevant” on the results screen. Lowest score wins.</p></div>';
@@ -6165,13 +6218,13 @@ If you want to offset all timestamps of a track such that the first one is zero,
       return '<div class="me-mode"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">' + o.n + ' game' + (o.n === 1 ? '' : 's') + '</span></div>' +
         '<div class="me-avg"><div class="me-avg-top"><span class="note">Average score</span><b>' + fmt1(o.avg) + ' <small>/ 50</small></b></div><div class="me-bar" aria-hidden="true"><i style="width:' + Math.max(0, Math.min(100, o.avg / 50 * 100)).toFixed(1) + '%"></i></div></div>' +
         '<dl class="me-kv">' + kv(fast ? 'Beat ' + fmt1(FAST_TARGET) : 'Wins', o.wins) + kv('Win %', o.winPct + '%') + kv('Best score', fmt1(o.best)) +
-        (fast ? kv('Days played', Object.keys(o.days).length) : kv('Avg finish', placeLabel(o))) + '</dl>' + levels + '</div>';
+        (fast ? kv('Days played', Object.keys(o.days).length) : kv('Weighted avg finish', placeLabel(o))) + '</dl>' + levels + '</div>';
     }).join('') + '</div></div>';
     html += '<div class="me-sec"><span class="mono">Recent games</span><ul class="history me-recent">' + gs.slice(0, 10).map(function (x) {
       var m = ME_MODES.filter(function (q) { return q.k === meModeOf(x); })[0];
       return '<li><span>' + esc(meDate(x.dateKey)) + ' · ' + esc(m ? m.name.replace(' ⚡', '') : '') + ' · ' + esc(x.topic || '') + ' · ' + meResult(x) + '</span><strong>' + fmt1(x.score) + '/' + (x.max || 50) + '</strong></li>';
     }).join('') + '</ul></div>';
-    html += '<p class="note">Every game you finish while signed in saves here automatically. Mr. Irrelevant has its own card (lower is better) and isn’t mixed into the totals above. Win % for Fast Money counts the days you beat ' + fmt1(FAST_TARGET) + '. Avg finish is your average place in games against other players or the AI (lower is better, 1.0 means first every time). In games of up to 4 it’s simply your place, so 2nd of 3 is 2.0. Bigger games are scaled onto 1 to 4, so beating more people counts for more: 2nd of 7 counts as 1.5.' + (S.myStats.partial ? ' Showing your most recent games only.' : '') + '</p>';
+    html += '<p class="note">Every game you finish while signed in saves here automatically. Mr. Irrelevant has its own card (lower is better) and isn’t mixed into the totals above. Win % for Fast Money counts the days you beat ' + fmt1(FAST_TARGET) + '. Weighted avg finish is your average place in games against other players or the AI (lower is better, 1.0 means first every time). In games of up to 4 it’s simply your place, so 2nd of 3 is 2.0. Bigger games are scaled onto 1 to 4, so beating more people counts for more: 2nd of 7 counts as 1.5.' + (S.myStats.partial ? ' Showing your most recent games only.' : '') + '</p>';
     body.innerHTML = html;
   }
   function memberStatsHtml(L, uid) {
@@ -6182,7 +6235,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     var tile = function (v, lbl, sub) { return '<div class="stat-tile"><b>' + v + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; };
     var a = st.all || {};
     out += '<div class="stat-tiles me-tiles">' + tile(a.n || 0, 'Games', 'drafts and Fast Money') + tile(a.wins || 0, 'Wins', 'first place or beat the target') + tile((a.winPct || 0) + '%', 'Win %', 'of games played') +
-      tile(a.n ? fmt1(a.avg) : '—', 'Avg score', 'out of 50') + tile(a.n ? fmt1(a.best) : '—', 'Best score', 'out of 50') + tile(placeLabel(a), 'Avg finish', '1.0 = always first') + '</div>';
+      tile(a.n ? fmt1(a.avg) : '—', 'Avg score', 'out of 50') + tile(a.n ? fmt1(a.best) : '—', 'Best score', 'out of 50') + tile(placeLabel(a), 'Weighted avg finish', '1.0 = always first') + '</div>';
     out += '<div class="me-modes">' + ME_MODES.map(function (m) {
       var o = (st.modes || {})[m.k] || { n: 0 }, irr = m.k === 'irr', fast = m.k === 'fast';
       if (!o.n) return '<div class="me-mode empty"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">0 games</span></div></div>';
@@ -6190,7 +6243,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       return '<div class="me-mode"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">' + o.n + ' game' + (o.n === 1 ? '' : 's') + '</span></div>' +
         '<div class="me-avg"><div class="me-avg-top"><span class="note">Average score' + (irr ? ' (lower is better)' : '') + '</span><b>' + fmt1(o.avg) + ' <small>/ 50</small></b></div><div class="me-bar" aria-hidden="true"><i style="width:' + Math.max(0, Math.min(100, o.avg / 50 * 100)).toFixed(1) + '%"></i></div></div>' +
         '<dl class="me-kv">' + (irr ? kv('Under ' + fmt1(IRR_TARGET), o.wins) + kv('Win %', o.winPct + '%') + kv('Best (lowest)', o.low == null ? '—' : fmt1(o.low)) + kv('Days played', o.days || 0)
-          : kv(fast ? 'Beat ' + fmt1(FAST_TARGET) : 'Wins', o.wins) + kv('Win %', o.winPct + '%') + kv('Best score', fmt1(o.best)) + (fast ? kv('Days played', o.days || 0) : kv('Avg finish', placeLabel(o)))) + '</dl></div>';
+          : kv(fast ? 'Beat ' + fmt1(FAST_TARGET) : 'Wins', o.wins) + kv('Win %', o.winPct + '%') + kv('Best score', fmt1(o.best)) + (fast ? kv('Days played', o.days || 0) : kv('Weighted avg finish', placeLabel(o)))) + '</dl></div>';
     }).join('') + '</div>';
     var rec = Array.isArray(st.recent) ? st.recent : [];
     if (rec.length) out += '<span class="mono">Recent games</span><ul class="history me-recent">' + rec.map(function (x) {
@@ -6242,7 +6295,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     } else {
       var T = leagueTable(L), lbl = { all: 'All time', '30': 'Last 30 days', '7': 'Last 7 days' };
       html += '<div class="seg" role="radiogroup" aria-label="Time period">' + ['all', '30', '7'].map(function (r) { return '<button type="button" class="seg-btn" role="radio" aria-checked="' + (L.range === r) + '" data-act="league-range" data-range="' + r + '">' + lbl[r] + '</button>'; }).join('') + '</div>' +
-        '<div class="org-glance-wrap"><table class="org-glance-table lg-table"><thead><tr><th class="num">#</th><th class="pl">Player</th><th class="num">Games</th><th class="num">Wins</th><th class="num">Win %</th><th class="num">Avg score</th><th class="num">Best</th><th class="num">Avg finish</th></tr></thead><tbody>' +
+        '<div class="org-glance-wrap"><table class="org-glance-table lg-table"><thead><tr><th class="num">#</th><th class="pl">Player</th><th class="num">Games</th><th class="num">Wins</th><th class="num">Win %</th><th class="num">Avg score</th><th class="num">Best</th><th class="num">Weighted avg finish</th></tr></thead><tbody>' +
         T.list.map(function (r, i) {
           var g = r.games;
           return '<tr' + (r.uid === me ? ' class="me"' : '') + '><td class="rk">' + (g ? i + 1 : '–') + '</td><td class="pl"><button class="linkish lg-who" type="button" data-act="lg-member" data-uid="' + esc(r.uid) + '">' + esc(r.name) + '</button>' + (r.uid === me ? ' (you)' : '') + '</td><td>' + g + '</td><td>' + r.wins + '</td><td>' + (g ? Math.round(100 * r.wins / g) + '%' : '–') + '</td><td>' + (g ? fmt1(r.sum / g) : '–') + '</td><td>' + (g ? fmt1(r.best) : '–') + '</td><td>' + (g ? (r.place / g).toFixed(1) : '–') + '</td></tr>';
@@ -6257,7 +6310,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
           }).join('') + '</span></li>';
         }).join('') + '</ul>' : '<p class="note">No league games yet. Play an online room together: once 2 or more members finish a draft in the same room (signed in), it shows up here.</p>') + '</div>' +
         '<p class="note">Every online room game counts automatically when 2 or more league members finish it together while signed in. Players are ranked only against the other league members in that game; offline and practice games don’t count.</p>' +
-        '<p class="note"><strong>Avg finish</strong> is your average place among the league members in each game (lower is better, 1.0 means first every game). In games of up to 4 it’s simply your place, so 2nd of 3 is 2.0. Bigger games are scaled onto 1 to 4, so beating more people counts for more: 2nd of 7 counts as 1.5. The table is ranked by Avg finish, then wins, then average score.</p>';
+        '<p class="note"><strong>Weighted avg finish</strong> is your average place among the league members in each game (lower is better, 1.0 means first every game). In games of up to 4 it’s simply your place, so 2nd of 3 is 2.0. Bigger games are scaled onto 1 to 4, so beating more people counts for more: 2nd of 7 counts as 1.5. The table is ranked by weighted avg finish, then wins, then average score.</p>';
     }
     html += '<div class="lg-actions"><button class="btn small" type="button" data-act="league-back">← Leagues</button>' +
       (member && !owner ? '<button class="btn small ghost" type="button" data-act="league-leave">' + (arm('league-leave:') ? 'Tap again to leave' : 'Leave league') + '</button>' : '') + '</div>';
@@ -6842,6 +6895,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'dv-rec') dvRecord();
     else if (act === 'dv-bg') { var bp = dvPref(); bp.bg = t.getAttribute('data-bg'); dvSave(bp); dvRenderControls(); }
     else if (act === 'dv-pos') { var pp = dvPref(); pp.y = { top: 0.04, middle: 0.5, bottom: 0.96 }[t.getAttribute('data-pos')]; pp.x = 0.5; dvSave(pp); }
+    else if (act === 'turn-bubble') { var pb = $('pickbox'); if (pb) pb.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     else if (act === 'dv-share') dvShare();
     else if (act === 'dv-dismiss') { S.ui.dvHome = false; render(); }
     else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
@@ -7019,7 +7073,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-11';
+  var BUILD_ID = '2026-11-02-12';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7827,11 +7881,12 @@ If you want to offset all timestamps of a track such that the first one is zero,
     renderLevels(); renderPrivacy(); renderListPref();
     render();
     setInterval(function () {
-      tick(); fastTick(); recSample(); dvTick();
+      tick(); fastTick(); recSample(); dvTick(); turnAlert();
       var g = S.game;
       if (g && !g.results && g.mode === 'shared' && !S.waitShown && S.scoreWaitSince && now() - S.scoreWaitSince > 20000 && screenFor() === 'results') { S.waitShown = true; renderResults(); }
     }, 250);
     setInterval(renderToday, 60000);
+    window.addEventListener('scroll', turnAlert, { passive: true });
     /* Closing the tab mid-game still keeps the draft video up to that moment. */
     window.addEventListener('pagehide', function () {
       var g = S.game; if (!g || !REC || REC_G !== g) return;
