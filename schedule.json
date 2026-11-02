@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-23",
- "updatedAt": 1792782934020,
+ "updatedAt": 1793622115134,
  "days": {
   "2026-10-23": {
    "topicId": "pop-stars",
@@ -111,6 +111,16 @@
     "Fame",
     "Longevity",
     "Humor"
+   ]
+  },
+  "2026-11-09": {
+   "topicId": "video-games",
+   "subs": [
+    "Gameplay",
+    "Story",
+    "Graphics",
+    "Replayability",
+    "Multiplayer"
    ]
   }
  },
