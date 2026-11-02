@@ -203,6 +203,8 @@ select.field { padding-right: 8px; }
 .turn-bubble.low > span { color: #ffffff; background: #ca2430; }
 @media (prefers-reduced-motion: reduce) { .turn-glow, .turn-glow.low { animation: none; } }
 .wait-chips { margin-top: 10px; }
+.pick-alerts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.pick-alerts .note { margin: 0; }
 .wait-chips .chip { cursor: default; }
 .wait-chips .chip.done { opacity: 0.5; }
 .waitbox { padding: 18px 16px; border: 2px dashed var(--line); border-radius: 14px; color: var(--muted); }
@@ -1343,6 +1345,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note" id="lobby-list-note"></p>
               </div>
+              <div class="pick-alerts" id="lobby-alerts"></div>
               <div class="actions">
                 <button class="btn primary" type="button" id="start-btn" data-act="start">Start draft</button>
                 <button class="btn" type="button" data-act="leave">Leave room</button>
@@ -4002,6 +4005,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       .sort(function (a, b) { return (a.joinedAt - b.joinedAt) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0); });
   }
   function renderLobby() {
+    if ($('lobby-alerts')) $('lobby-alerts').innerHTML = alertsHtml();
     var g = S.game, ps = sortedPlayers(g), t = TOPICS[g.topicId];
     lgCheckRoom(g); renderLeagueBadge();
     $('lobby-kind').textContent = g.isPublic ? 'Public room · anyone can join' : 'Private room · code only';
@@ -4103,6 +4107,65 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       return f ? '<span class="chip done" title="' + esc(f.name) + '">' + LOCK_SVG + esc(s) + ': ' + esc(f.name) + '</span>' : '<span class="chip">' + esc(s) + '</span>';
     }).join('') + '</div>';
   }
+  /* Pick alerts: when your turn starts, a short chime, a buzz on phones, and a computer notification if this tab
+     is in the background (once allowed). While you're on the clock the tab title and icon flash. */
+  function alertsOn() { return store('roster.alerts') !== 'off'; }
+  function notifyState() { try { return typeof Notification === 'undefined' ? 'none' : Notification.permission; } catch (e) { return 'none'; } }
+  function alertsHtml() {
+    var on = alertsOn(), ns = notifyState();
+    return '<button class="btn small" type="button" data-act="alerts" aria-pressed="' + on + '">' + (on ? '🔔 Pick alerts on' : '🔕 Pick alerts off') + '</button>' +
+      (on && ns === 'default' ? '<button class="btn small" type="button" data-act="alerts-notify">Also notify me on this computer</button>' : '') +
+      (on && ns === 'denied' ? '<span class="note">Computer notifications are blocked in your browser settings.</span>' : '') +
+      (on && ns === 'granted' ? '<span class="note">You’ll get a notification when it’s your pick, even in another tab.</span>' : '');
+  }
+  var ALERT = { audio: null, title: '', icons: null, flash: 0, turnKey: '' };
+  function alertAudio() { try { if (!ALERT.audio) { var A = window.AudioContext || window.webkitAudioContext; if (A) ALERT.audio = new A(); } if (ALERT.audio && ALERT.audio.state === 'suspended') ALERT.audio.resume(); } catch (e) {} return ALERT.audio; }
+  function chime() {
+    var a = alertAudio(); if (!a || a.state !== 'running') return;
+    try {
+      [[880, 0], [1320, 0.16]].forEach(function (n) {
+        var o = a.createOscillator(), gn = a.createGain(), t0 = a.currentTime + n[1];
+        o.type = 'sine'; o.frequency.value = n[0]; o.connect(gn); gn.connect(a.destination);
+        gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(0.18, t0 + 0.02); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.32);
+        o.start(t0); o.stop(t0 + 0.35);
+      });
+    } catch (e) {}
+  }
+  function alertIcon() {
+    if (ALERT.iconUrl) return ALERT.iconUrl;
+    try {
+      var c = document.createElement('canvas'); c.width = c.height = 64; var x = c.getContext('2d');
+      x.fillStyle = '#ca2430'; x.beginPath(); x.arc(32, 32, 30, 0, Math.PI * 2); x.fill();
+      x.lineWidth = 5; x.strokeStyle = '#ffb612'; x.stroke();
+      x.fillStyle = '#ffffff'; x.font = 'bold 44px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('!', 32, 35);
+      ALERT.iconUrl = c.toDataURL('image/png');
+    } catch (e) { ALERT.iconUrl = ''; }
+    return ALERT.iconUrl;
+  }
+  function tabFlash(on, rem) {
+    var links = document.querySelectorAll('link[rel="icon"]');
+    if (on && !links.length) { var nl = document.createElement('link'); nl.rel = 'icon'; nl.setAttribute('data-turn', '1'); document.head.appendChild(nl); links = [nl]; }
+    if (on) {
+      if (!ALERT.icons) { ALERT.title = document.title; ALERT.icons = Array.prototype.map.call(links, function (l) { return l.href; }); }
+      ALERT.flash = (ALERT.flash + 1) % 4;
+      var t = ALERT.flash < 2 ? '⏰ YOUR PICK · ' + fmtClock(rem) : ALERT.title;
+      if (document.title !== t) document.title = t;
+      var url = alertIcon(), want = ALERT.flash < 2 && url ? url : null;
+      Array.prototype.forEach.call(links, function (l, i) { var h = want || ALERT.icons[i]; if (h && l.href !== h) l.href = h; });
+    } else if (ALERT.icons) {
+      document.title = ALERT.title;
+      Array.prototype.forEach.call(links, function (l, i) { if (l.getAttribute('data-turn')) l.remove(); else if (ALERT.icons[i]) l.href = ALERT.icons[i]; });
+      ALERT.icons = null;
+    }
+  }
+  function turnStarted(g, rem) {
+    if (!alertsOn()) return;
+    chime();
+    try { if (navigator.vibrate) navigator.vibrate([180, 90, 180]); } catch (e) {}
+    if (document.hidden && notifyState() === 'granted') {
+      try { var n = new Notification('You’re on the clock!', { body: 'Your pick in ' + TOPICS[g.topicId].name + ' · ' + fmtClock(rem) + ' left', tag: 'roster-turn', renotify: true, icon: 'https://playtheroster.com/jersey3-192.png' }); n.onclick = function () { try { window.focus(); } catch (e) {} n.close(); }; } catch (e) {}
+    }
+  }
   /* Your turn: glow around the screen; the bubble shows the time left when the clock isn't on screen. */
   function turnAlert() {
     var g = S.game, on = false, rem = 0;
@@ -4110,6 +4173,10 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       var d = derive(g, now());
       if (!(d.countdownMs > 0) && !d.complete && d.current === S.me) { on = true; rem = d.remainingMs; }
     }
+    var tk = on ? gameId(g) + ':' + g.picks.length : '';
+    if (on && ALERT.turnKey !== tk) { ALERT.turnKey = tk; turnStarted(g, rem); }
+    if (!on) ALERT.turnKey = '';
+    tabFlash(on, rem);
     var glow = $('turn-glow'), bub = $('turn-bubble'); if (!glow || !bub) return;
     var low = on && rem <= 10000;
     glow.hidden = !on; glow.classList.toggle('low', low);
@@ -4131,7 +4198,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     if (!mine) {
       var myOpen = S.me && g.players[S.me] ? g.subs.filter(function (s) { return !filled(g, S.me, s); }).length : 0;
       $('waitbox').innerHTML = g.players[S.me]
-        ? '<p>Waiting for ' + esc(playerName(g, d.current)) + '. You have ' + myOpen + ' subtopic' + (myOpen === 1 ? '' : 's') + ' left to fill.</p>' + waitChips(g)
+        ? '<p>Waiting for ' + esc(playerName(g, d.current)) + '. You have ' + myOpen + ' subtopic' + (myOpen === 1 ? '' : 's') + ' left to fill.</p>' + waitChips(g) + (g.mode === 'shared' ? '<div class="pick-alerts">' + alertsHtml() + '</div>' : '')
         : 'You’re watching this draft.';
       closeList();
       renderBrowse(d, true);
@@ -6895,6 +6962,8 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'dv-rec') dvRecord();
     else if (act === 'dv-bg') { var bp = dvPref(); bp.bg = t.getAttribute('data-bg'); dvSave(bp); dvRenderControls(); }
     else if (act === 'dv-pos') { var pp = dvPref(); pp.y = { top: 0.04, middle: 0.5, bottom: 0.96 }[t.getAttribute('data-pos')]; pp.x = 0.5; dvSave(pp); }
+    else if (act === 'alerts') { store('roster.alerts', alertsOn() ? 'off' : 'on'); if (alertsOn()) { alertAudio(); chime(); } render(); }
+    else if (act === 'alerts-notify') { alertAudio(); try { var pr = Notification.requestPermission(function () { render(); }); if (pr && pr.then) pr.then(function () { render(); }); } catch (e) {} }
     else if (act === 'turn-bubble') { var pb = $('pickbox'); if (pb) pb.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     else if (act === 'dv-share') dvShare();
     else if (act === 'dv-dismiss') { S.ui.dvHome = false; render(); }
@@ -7073,7 +7142,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-12';
+  var BUILD_ID = '2026-11-02-13';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7887,6 +7956,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     }, 250);
     setInterval(renderToday, 60000);
     window.addEventListener('scroll', turnAlert, { passive: true });
+    ['pointerdown', 'keydown'].forEach(function (k) { window.addEventListener(k, function () { if (alertsOn()) alertAudio(); }, { passive: true }); });
     /* Closing the tab mid-game still keeps the draft video up to that moment. */
     window.addEventListener('pagehide', function () {
       var g = S.game; if (!g || !REC || REC_G !== g) return;
