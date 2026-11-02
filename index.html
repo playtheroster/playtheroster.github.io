@@ -1691,7 +1691,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   var PICK_SECONDS = TEST.pickSeconds || 60;
   /* 5-second countdown (with the full-screen intro) before every draft: online, Offline vs AI and Practice. Tests turn it off unless they ask for it. */
   var COUNTDOWN_MS = TEST.countdownMs != null ? TEST.countdownMs : (window.__ROSTER_TEST__ ? 0 : 5000);
-  var SUBS_PER_DAY = 5, MAX_PLAYERS = 8, MIN_PLAYERS = 2, GRACE_MS = 5000;
+  var SUBS_PER_DAY = 5, MAX_PLAYERS = 8, MIN_PLAYERS = 2, GRACE_MS = 10000;
   var ARTIFACT_URL = 'https://claude.ai/artifact/DzXuXVgiVSX84zfRUggkkp';
   var EPOCH = Date.UTC(2026, 0, 1);
 
@@ -4466,7 +4466,10 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     if (d.remainingMs <= 0) { setMsg('Time’s up for this pick.', true); return; }
     var sub = S.ui.sub, e = S.ui.chosen;
     $('lock-btn').disabled = true;
+    /* Claim this turn so the clock can't fill in a time-ran-out pick while the real one is sending. */
+    S.autoDone[d.done] = 1;
     var ok = await submitPick(S.me, sub, e.key, false);
+    if (!ok) delete S.autoDone[d.done];
     $('lock-btn').disabled = false;
     if (ok) { setMsg(e.name + ' is locked in for ' + sub + '.'); S.ui.sub = null; S.ui.chosen = null; $('answer-in').value = ''; }
   }
@@ -7019,7 +7022,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-10';
+  var BUILD_ID = '2026-11-02-11';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7242,14 +7245,45 @@ If you want to offset all timestamps of a track such that the first one is zero,
         if (!v || !v.store) return;
         R.answered[v.id] = true;
         var added = false;
-        Object.keys(v.store).forEach(function (k) { if (!(k in R.store) && k.indexOf('_sync') !== 0) { R.store[k] = v.store[k]; added = true; } });
+        Object.keys(v.store).forEach(function (k) {
+          if (k.indexOf('_sync') === 0) return;
+          if (!(k in R.store)) { R.store[k] = v.store[k]; added = true; }
+          else if (isPickRel(k) && !samePick(v.store[k], R.store[k]) && pickWins(v.store[k], R.store[k])) { R.store[k] = v.store[k]; added = true; repairPick(R, k); }
+        });
         if (added) { R.lastMsg = Date.now(); queueNotify(R); }
         return;
       }
       if (v === null) return;
       R.lastMsg = Date.now();
+      if (isPickRel(p.rel) && v !== undefined && (p.rel in R.store)) {
+        var cur = R.store[p.rel];
+        if (!pickWins(v, cur)) { repairPick(R, p.rel); return; }
+        if (R.repair && R.repair[p.rel] && samePick(v, cur)) { clearTimeout(R.repair[p.rel]); delete R.repair[p.rel]; }
+      }
       if (v === undefined) delete R.store[p.rel]; else R.store[p.rel] = v;
       queueNotify(R);
+    }
+    /* Picks: two devices can write the same pick slot (the player's real pick and a friend's phone filling in
+       a "time ran out" pick). The relay keeps whichever arrived last, so settle it the same way on every device:
+       a real pick beats a time-ran-out pick, otherwise the earlier one stands. */
+    function isPickRel(rel) { return /^picks\/p\d+$/.test(rel); }
+    function samePick(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+    function pickWins(a, b) {
+      if (!b || typeof b !== 'object') return true;
+      if (!a || typeof a !== 'object') return false;
+      if (!!a.auto !== !!b.auto) return !a.auto;
+      var ta = Number(a.at) || 0, tb = Number(b.at) || 0;
+      if (ta !== tb) return ta < tb;
+      return JSON.stringify(a) <= JSON.stringify(b);
+    }
+    /* A losing pick replaced the stored copy on the relay: put the winner back so late joiners see it too. */
+    function repairPick(R, rel) {
+      R.repair = R.repair || {};
+      if (R.repair[rel]) return;
+      R.repair[rel] = setTimeout(function () {
+        delete R.repair[rel];
+        if (rel in R.store) sendRaw('rooms/' + R.code + '/' + rel, JSON.stringify(R.store[rel]), true);
+      }, 200 + Math.floor(Math.random() * 1000));
     }
     function sendRaw(path, body, retain, only) {
       var targets = only ? [only] : live();
@@ -7328,6 +7362,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
         var next;
         if (kind === 'set') next = jclone(data);
         else if (kind === 'update') next = Object.assign({}, R.store[p.rel] || {}, jclone(data));
+        if (kind === 'set' && isPickRel(p.rel) && (p.rel in R.store) && !pickWins(next, R.store[p.rel])) return Promise.resolve();
         if (kind === 'delete') delete R.store[p.rel]; else R.store[p.rel] = next;
         queueNotify(R);
         if (p.rel === '' && next) indexRoom(p.code, next);
