@@ -1048,12 +1048,6 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   .stats-me input:hover { outline: 2px solid #000000; outline-offset: 2px; }
 }
 
-/* ---------- Streamer mode: blur the room code and link ---------- */
-.creator-opt { display: grid; gap: 8px; padding: 12px; border: 2px dashed var(--line); border-radius: 14px; }
-.creator-check { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.92rem; min-height: 36px; }
-.creator-check input { width: 20px; height: 20px; accent-color: var(--pop); }
-html.streamer #lobby-code, html.streamer #share-link { filter: blur(10px); user-select: none; }
-
 /* ---------- Draft video: the whole draft board in real time, as a 9:16 video ---------- */
 #dv-slot-home { padding-block: 0 28px; }
 .dv-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -1329,9 +1323,6 @@ html.streamer #lobby-code, html.streamer #share-link { filter: blur(10px); user-
                   <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-list" data-list="hide">No</button>
                 </div>
                 <p class="note" id="lobby-list-note"></p>
-              </div>
-              <div class="creator-opt">
-                <label class="creator-check"><input type="checkbox" class="streamer-cb" data-act="streamer"> Streamer mode: hide the room code and link</label>
               </div>
               <div class="actions">
                 <button class="btn primary" type="button" id="start-btn" data-act="start">Start draft</button>
@@ -3885,7 +3876,6 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     $('back-btn').hidden = !!S.game && !atResults;
     $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
     renderBanner();
-    renderStreamer();
     recSample(); renderDv(scr);
     var fastOn = !!S.fast && !S.game;
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
@@ -4704,15 +4694,6 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     document.querySelectorAll('.level-note').forEach(function (n) { n.textContent = LEVEL_NOTES[lv]; });
   }
 
-  /* ---------- Streamer mode: blur the room code and link while streaming ---------- */
-  function streamerOn() { var o = null; try { o = JSON.parse(store('roster.creator') || 'null'); } catch (e) {} return !!(o && o.streamer); }
-  function setStreamer(v) { store('roster.creator', JSON.stringify({ streamer: !!v })); }
-  function renderStreamer() {
-    var on = streamerOn();
-    document.querySelectorAll('.streamer-cb').forEach(function (c) { c.checked = on; });
-    document.documentElement.classList.toggle('streamer', on);
-  }
-
   /* ---------- Draft recording: what was on the board and when, from opening the room until leaving it ---------- */
   var REC = null, REC_G = null, REC_SAVED = 0;
   function recKey(g) { if (g.mode === 'local') return 'L' + g.startedAt; var h = 7; String(g.code).split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 1000003; }); return 'R' + h; }
@@ -5226,7 +5207,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       afterChange();
       if (g.results) leagueRecord(g);
     }, onErr));
-    try { if (!streamerOn()) history.replaceState(null, '', '#r-' + code); } catch (e) {}
+    try { history.replaceState(null, '', '#r-' + code); } catch (e) {}
     S.view = 'play';
     render();
     window.scrollTo(0, 0);
@@ -6844,7 +6825,6 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
     else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
-    else if (act === 'streamer') { setStreamer(!!t.checked); var sp = { streamer: !!t.checked }; if (sp.streamer) { try { if (/^#r-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } render(); }
     else if (act === 'dv-open') dvOpen();
     else if (act === 'dv-rec') dvRecord();
     else if (act === 'dv-bg') { var bp = dvPref(); bp.bg = t.getAttribute('data-bg'); dvSave(bp); dvRenderControls(); }
@@ -7026,7 +7006,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-07';
+  var BUILD_ID = '2026-11-02-08';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
