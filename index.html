@@ -5563,14 +5563,13 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
       } catch (e) { if (!((e && e.code) === 'permission-denied')) S.leagueDone[id] = false; }
     }
   }
-  /* Standings. Avg finish is weighted by how many league members played: in each game you score the share of
-     the other members you finished ahead of (ties count half). 1st = 100, last = 0, so 2nd of 5 (75) beats
-     2nd of 3 (50). The table is ranked by Avg finish, then wins, then average score. */
+  /* Standings. Avg finish is the average place among the league members in each game (see gamePlace: your place in
+     games of up to 4, scaled onto 1-4 in bigger ones; ties count half). Ranked by Avg finish, then wins, then average score. */
   function leagueTable(L) {
     var cut = L.range === 'all' ? '' : dateKey(new Date(Date.now() - (Number(L.range) - 1) * 864e5));
     var games = Object.keys(L.games).map(function (k) { return L.games[k]; }).filter(function (gm) { return !cut || gm.dateKey >= cut; });
     var st = {};
-    function row(uid) { return st[uid] = st[uid] || { uid: uid, name: L.members[uid].name, games: 0, wins: 0, sum: 0, best: 0, fin: 0 }; }
+    function row(uid) { return st[uid] = st[uid] || { uid: uid, name: L.members[uid].name, games: 0, wins: 0, sum: 0, best: 0, fin: 0, place: 0 }; }
     Object.keys(L.members).forEach(row);
     games.forEach(function (gm) {
       gm.players.forEach(function (p) {
@@ -5579,11 +5578,11 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
         if (!n) return;
         var beat = others.filter(function (q) { return q.total < p.total; }).length, tied = others.filter(function (q) { return q.total === p.total; }).length;
         var r = row(p.uid);
-        r.games++; r.sum += p.total; r.best = Math.max(r.best, p.total); r.fin += (beat + tied / 2) / n;
+        r.games++; r.sum += p.total; r.best = Math.max(r.best, p.total); r.fin += (beat + tied / 2) / n; r.place += gamePlace((beat + tied / 2) / n, n + 1);
         if (!others.some(function (q) { return q.total > p.total; })) r.wins++;
       });
     });
-    function f(r) { return r.games ? r.fin / r.games : -1; }
+    function f(r) { return r.games ? -r.place / r.games : -99; }
     function avg(r) { return r.games ? r.sum / r.games : -1; }
     var list = Object.keys(st).map(function (k) { return st[k]; });
     list.sort(function (a, b) { return f(b) - f(a) || b.wins - a.wins || avg(b) - avg(a) || b.games - a.games || a.name.localeCompare(b.name); });
@@ -5680,29 +5679,31 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     if (x.mode === 'irrelevant') return x.won ? 'Under ' + fmt1(x.target || 20) : 'Over ' + fmt1(x.target || 20);
     return x.won ? 'Won' : (x.rank && x.players ? '#' + x.rank + ' of ' + x.players : 'Played');
   }
-  /* Avg finish is shown as a place on a 4-player scale (1.0 = always first, 4.0 = always last). Each game counts by the
-     share of other players you finished ahead of, so beating more people counts for more: 2nd of 7 = 1.5, 2nd of 3 = 2.5.
-     (Stored internally as 0-100, where 100 = first.) */
+  /* Avg finish is an average place. In games of up to 4 players it is just your place (2nd of 3 = 2.0, last of 3 = 3.0).
+     Bigger games are scaled onto 1-4 by the share of players you beat, so beating more people counts for more:
+     2nd of 7 = 1.5. 1.0 = always first. */
+  function gamePlace(share, players) { return 1 + (1 - Math.max(0, Math.min(1, share))) * Math.min(Math.max(players, 2) - 1, 3); }
   function finPlace(v100) { return v100 == null || !isFinite(v100) ? '—' : (1 + 3 * (1 - Math.max(0, Math.min(100, v100)) / 100)).toFixed(1); }
+  function placeLabel(o) { return o && o.avgPlace != null && isFinite(o.avgPlace) ? Number(o.avgPlace).toFixed(1) : finPlace(o ? o.avgFin : null); }
   function meDate(k) { var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(k || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''; }
   function meSum(list) {
-    var o = { n: list.length, wins: 0, total: 0, best: 0, low: null, fin: 0, finN: 0, days: {} };
+    var o = { n: list.length, wins: 0, total: 0, best: 0, low: null, fin: 0, finN: 0, place: 0, days: {} };
     list.forEach(function (x) {
       var sc = Number(x.score) || 0;
       if (x.won) o.wins++;
       o.total += sc; if (sc > o.best) o.best = sc; if (o.low == null || sc < o.low) o.low = sc;
       if (x.dateKey) o.days[x.dateKey] = 1;
       /* Finish, weighted by how many played: 100 = first, 0 = last (shown with finPlace as 1.0-4.0). */
-      if (x.mode !== 'fast' && x.players > 1 && x.rank >= 1) { o.fin += (x.players - x.rank) / (x.players - 1) * 100; o.finN++; }
+      if (x.mode !== 'fast' && x.players > 1 && x.rank >= 1) { var sh = (x.players - x.rank) / (x.players - 1); o.fin += sh * 100; o.place += gamePlace(sh, x.players); o.finN++; }
     });
-    o.avg = o.n ? o.total / o.n : 0; o.winPct = o.n ? Math.round(o.wins / o.n * 100) : 0; o.avgFin = o.finN ? Math.round(o.fin / o.finN) : null;
+    o.avg = o.n ? o.total / o.n : 0; o.winPct = o.n ? Math.round(o.wins / o.n * 100) : 0; o.avgFin = o.finN ? Math.round(o.fin / o.finN) : null; o.avgPlace = o.finN ? Math.round(o.place / o.finN * 10) / 10 : null;
     return o;
   }
   /* League-mates can look at each other's stats: each player's page writes a summary (no emails, no picks) into
      leagues/{code}/memberStats/{uid} for every league they're in. Only members of that league can read it. */
   function statsSummary(gs, name) {
     gs = (gs || []).filter(function (x) { return x && !x.past && x.mode !== 'practice'; });
-    var pick = function (o) { return { n: o.n, wins: o.wins, avg: Math.round(o.avg * 10) / 10, best: Math.round(o.best * 10) / 10, low: o.low == null ? null : Math.round(o.low * 10) / 10, winPct: o.winPct, avgFin: o.avgFin, days: Object.keys(o.days).length }; };
+    var pick = function (o) { return { n: o.n, wins: o.wins, avg: Math.round(o.avg * 10) / 10, best: Math.round(o.best * 10) / 10, low: o.low == null ? null : Math.round(o.low * 10) / 10, winPct: o.winPct, avgFin: o.avgFin, avgPlace: o.avgPlace, days: Object.keys(o.days).length }; };
     var modes = {};
     ME_MODES.forEach(function (m) { modes[m.k] = pick(meSum(gs.filter(function (x) { return meModeOf(x) === m.k; }))); });
     return { name: clean(name, 20) || 'Player', at: now(), all: pick(meSum(gs.filter(function (x) { return x.mode !== 'irrelevant'; }))), modes: modes,
@@ -5758,7 +5759,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
       tile(all.winPct + '%', 'Win %', 'of games played') +
       tile(fmt1(all.avg), 'Avg score', 'out of 50') +
       tile(fmt1(all.best), 'Best score', 'out of 50') +
-      tile(finPlace(all.avgFin), 'Avg finish', '1.0 = always first') + '</div>';
+      tile(placeLabel(all), 'Avg finish', '1.0 = always first') + '</div>';
     html += '<div class="me-sec"><span class="mono">By game mode</span><div class="me-modes">' + ME_MODES.map(function (m) {
       var list = gs.filter(function (x) { return meModeOf(x) === m.k; });
       if (!list.length && m.k === 'irr') return '<div class="me-mode empty"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">0 games</span></div><p class="note" style="margin:0">Finish any draft, then tap “Play Mr. Irrelevant” on the results screen. Lowest score wins.</p></div>';
@@ -5780,13 +5781,13 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
       return '<div class="me-mode"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">' + o.n + ' game' + (o.n === 1 ? '' : 's') + '</span></div>' +
         '<div class="me-avg"><div class="me-avg-top"><span class="note">Average score</span><b>' + fmt1(o.avg) + ' <small>/ 50</small></b></div><div class="me-bar" aria-hidden="true"><i style="width:' + Math.max(0, Math.min(100, o.avg / 50 * 100)).toFixed(1) + '%"></i></div></div>' +
         '<dl class="me-kv">' + kv(fast ? 'Beat ' + fmt1(FAST_TARGET) : 'Wins', o.wins) + kv('Win %', o.winPct + '%') + kv('Best score', fmt1(o.best)) +
-        (fast ? kv('Days played', Object.keys(o.days).length) : kv('Avg finish', finPlace(o.avgFin))) + '</dl>' + levels + '</div>';
+        (fast ? kv('Days played', Object.keys(o.days).length) : kv('Avg finish', placeLabel(o))) + '</dl>' + levels + '</div>';
     }).join('') + '</div></div>';
     html += '<div class="me-sec"><span class="mono">Recent games</span><ul class="history me-recent">' + gs.slice(0, 10).map(function (x) {
       var m = ME_MODES.filter(function (q) { return q.k === meModeOf(x); })[0];
       return '<li><span>' + esc(meDate(x.dateKey)) + ' · ' + esc(m ? m.name.replace(' ⚡', '') : '') + ' · ' + esc(x.topic || '') + ' · ' + meResult(x) + '</span><strong>' + fmt1(x.score) + '/' + (x.max || 50) + '</strong></li>';
     }).join('') + '</ul></div>';
-    html += '<p class="note">Every game you finish while signed in saves here automatically. Mr. Irrelevant has its own card (lower is better) and isn’t mixed into the totals above. Win % for Fast Money counts the days you beat ' + fmt1(FAST_TARGET) + '. Avg finish counts games against other players or the AI: it’s your average place scaled to a 4-player game, so 1.0 means first every time and 4.0 means last. Beating more people counts for more: 2nd of 7 counts as 1.5, 2nd of 3 as 2.5.' + (S.myStats.partial ? ' Showing your most recent games only.' : '') + '</p>';
+    html += '<p class="note">Every game you finish while signed in saves here automatically. Mr. Irrelevant has its own card (lower is better) and isn’t mixed into the totals above. Win % for Fast Money counts the days you beat ' + fmt1(FAST_TARGET) + '. Avg finish is your average place in games against other players or the AI (lower is better, 1.0 means first every time). In games of up to 4 it’s simply your place, so 2nd of 3 is 2.0. Bigger games are scaled onto 1 to 4, so beating more people counts for more: 2nd of 7 counts as 1.5.' + (S.myStats.partial ? ' Showing your most recent games only.' : '') + '</p>';
     body.innerHTML = html;
   }
   function memberStatsHtml(L, uid) {
@@ -5797,7 +5798,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     var tile = function (v, lbl, sub) { return '<div class="stat-tile"><b>' + v + '</b><span class="lbl">' + lbl + '</span><span class="sub">' + sub + '</span></div>'; };
     var a = st.all || {};
     out += '<div class="stat-tiles me-tiles">' + tile(a.n || 0, 'Games', 'drafts and Fast Money') + tile(a.wins || 0, 'Wins', 'first place or beat the target') + tile((a.winPct || 0) + '%', 'Win %', 'of games played') +
-      tile(a.n ? fmt1(a.avg) : '—', 'Avg score', 'out of 50') + tile(a.n ? fmt1(a.best) : '—', 'Best score', 'out of 50') + tile(finPlace(a.avgFin), 'Avg finish', '1.0 = always first') + '</div>';
+      tile(a.n ? fmt1(a.avg) : '—', 'Avg score', 'out of 50') + tile(a.n ? fmt1(a.best) : '—', 'Best score', 'out of 50') + tile(placeLabel(a), 'Avg finish', '1.0 = always first') + '</div>';
     out += '<div class="me-modes">' + ME_MODES.map(function (m) {
       var o = (st.modes || {})[m.k] || { n: 0 }, irr = m.k === 'irr', fast = m.k === 'fast';
       if (!o.n) return '<div class="me-mode empty"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">0 games</span></div></div>';
@@ -5805,7 +5806,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
       return '<div class="me-mode"><div class="me-mode-head"><strong>' + m.name + '</strong><span class="mono">' + o.n + ' game' + (o.n === 1 ? '' : 's') + '</span></div>' +
         '<div class="me-avg"><div class="me-avg-top"><span class="note">Average score' + (irr ? ' (lower is better)' : '') + '</span><b>' + fmt1(o.avg) + ' <small>/ 50</small></b></div><div class="me-bar" aria-hidden="true"><i style="width:' + Math.max(0, Math.min(100, o.avg / 50 * 100)).toFixed(1) + '%"></i></div></div>' +
         '<dl class="me-kv">' + (irr ? kv('Under ' + fmt1(IRR_TARGET), o.wins) + kv('Win %', o.winPct + '%') + kv('Best (lowest)', o.low == null ? '—' : fmt1(o.low)) + kv('Days played', o.days || 0)
-          : kv(fast ? 'Beat ' + fmt1(FAST_TARGET) : 'Wins', o.wins) + kv('Win %', o.winPct + '%') + kv('Best score', fmt1(o.best)) + (fast ? kv('Days played', o.days || 0) : kv('Avg finish', finPlace(o.avgFin)))) + '</dl></div>';
+          : kv(fast ? 'Beat ' + fmt1(FAST_TARGET) : 'Wins', o.wins) + kv('Win %', o.winPct + '%') + kv('Best score', fmt1(o.best)) + (fast ? kv('Days played', o.days || 0) : kv('Avg finish', placeLabel(o)))) + '</dl></div>';
     }).join('') + '</div>';
     var rec = Array.isArray(st.recent) ? st.recent : [];
     if (rec.length) out += '<span class="mono">Recent games</span><ul class="history me-recent">' + rec.map(function (x) {
@@ -5860,7 +5861,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
         '<div class="org-glance-wrap"><table class="org-glance-table lg-table"><thead><tr><th class="num">#</th><th class="pl">Player</th><th class="num">Games</th><th class="num">Wins</th><th class="num">Win %</th><th class="num">Avg score</th><th class="num">Best</th><th class="num">Avg finish</th></tr></thead><tbody>' +
         T.list.map(function (r, i) {
           var g = r.games;
-          return '<tr' + (r.uid === me ? ' class="me"' : '') + '><td class="rk">' + (g ? i + 1 : '–') + '</td><td class="pl"><button class="linkish lg-who" type="button" data-act="lg-member" data-uid="' + esc(r.uid) + '">' + esc(r.name) + '</button>' + (r.uid === me ? ' (you)' : '') + '</td><td>' + g + '</td><td>' + r.wins + '</td><td>' + (g ? Math.round(100 * r.wins / g) + '%' : '–') + '</td><td>' + (g ? fmt1(r.sum / g) : '–') + '</td><td>' + (g ? fmt1(r.best) : '–') + '</td><td>' + (g ? finPlace(100 * r.fin / g) : '–') + '</td></tr>';
+          return '<tr' + (r.uid === me ? ' class="me"' : '') + '><td class="rk">' + (g ? i + 1 : '–') + '</td><td class="pl"><button class="linkish lg-who" type="button" data-act="lg-member" data-uid="' + esc(r.uid) + '">' + esc(r.name) + '</button>' + (r.uid === me ? ' (you)' : '') + '</td><td>' + g + '</td><td>' + r.wins + '</td><td>' + (g ? Math.round(100 * r.wins / g) + '%' : '–') + '</td><td>' + (g ? fmt1(r.sum / g) : '–') + '</td><td>' + (g ? fmt1(r.best) : '–') + '</td><td>' + (g ? (r.place / g).toFixed(1) : '–') + '</td></tr>';
         }).join('') + '</tbody></table></div>' +
         '<div class="lg-block"><span class="mono">Recent games · ' + lbl[L.range].toLowerCase() + '</span>' +
         (T.games.length ? '<ul class="lg-games">' + T.games.slice(0, 10).map(function (gm) {
@@ -5872,7 +5873,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
           }).join('') + '</span></li>';
         }).join('') + '</ul>' : '<p class="note">No league games yet. Play an online room together: once 2 or more members finish a draft in the same room (signed in), it shows up here.</p>') + '</div>' +
         '<p class="note">Every online room game counts automatically when 2 or more league members finish it together while signed in. Players are ranked only against the other league members in that game; offline and practice games don’t count.</p>' +
-        '<p class="note"><strong>Avg finish</strong> is your average place, scaled to a 4-player game so games of any size compare fairly: 1.0 means first every game, 4.0 means last every game. Beating more people counts for more, so 2nd of 7 counts as 1.5 while 2nd of 3 counts as 2.5. The table is ranked by Avg finish, then wins, then average score.</p>';
+        '<p class="note"><strong>Avg finish</strong> is your average place among the league members in each game (lower is better, 1.0 means first every game). In games of up to 4 it’s simply your place, so 2nd of 3 is 2.0. Bigger games are scaled onto 1 to 4, so beating more people counts for more: 2nd of 7 counts as 1.5. The table is ranked by Avg finish, then wins, then average score.</p>';
     }
     html += '<div class="lg-actions"><button class="btn small" type="button" data-act="league-back">← Leagues</button>' +
       (member && !owner ? '<button class="btn small ghost" type="button" data-act="league-leave">' + (arm('league-leave:') ? 'Tap again to leave' : 'Leave league') + '</button>' : '') + '</div>';
@@ -6628,7 +6629,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-04';
+  var BUILD_ID = '2026-11-02-05';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
