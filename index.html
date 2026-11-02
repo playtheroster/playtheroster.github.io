@@ -1047,6 +1047,76 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   .cal-day[aria-pressed="true"]:not(:disabled):hover { color: #ffffff; }
   .stats-me input:hover { outline: 2px solid #000000; outline-offset: 2px; }
 }
+
+/* ---------- Creator mode: a 9:16 view for filming the draft (camera on top, or green space at the bottom) ---------- */
+.creator-opt { display: grid; gap: 8px; padding: 12px; border: 2px dashed var(--line); border-radius: 14px; }
+.creator-check { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.92rem; min-height: 36px; }
+.creator-check input { width: 20px; height: 20px; accent-color: var(--pop); }
+html.streamer #lobby-code, html.streamer #share-link { filter: blur(10px); user-select: none; }
+html.creator-on, html.creator-on body { background: #000000; }
+html.creator-on body { overflow: hidden; }
+html.creator-on header.nav, html.creator-on footer, html.creator-on #band-hero, html.creator-on #chat, html.creator-on #net-diag, html.creator-on .console-top, html.creator-on #how, html.creator-on #organizer { display: none !important; }
+html.creator-on #play, html.creator-on main { padding: 0 !important; margin: 0 !important; }
+html.creator-on #play > .wrap { padding: 0; width: 100%; }
+html.creator-on #console { width: min(100vw, calc(100dvh * 9 / 16)); height: 100dvh; margin: 0 auto; padding: 0; gap: 0; border: 0; border-radius: 0; box-shadow: none; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+html.creator-on #topic-banner { order: 2; margin: 8px 10px 0; padding: 6px 12px; border-radius: 14px; gap: 0; }
+html.creator-on #topic-banner #tb-q, html.creator-on #topic-banner #tb-subs { display: none; }
+html.creator-on #topic-banner h2 { font-size: 1.5rem; line-height: 1; }
+html.creator-on #scr-draft { order: 3; flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 10px 10px; }
+html.creator-on #scr-draft > div { gap: 8px !important; }
+html.creator-on .draft-grid { display: flex; flex-direction: column; gap: 8px; }
+html.creator-on #order, html.creator-on #browse, html.creator-on #scr-draft .actions { display: none !important; }
+html.creator-on .draft-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+html.creator-on #play-msg { order: 3; margin: 4px 10px 0; }
+html.creator-on #play-msg:empty { display: none; }
+html.creator-on .draft-head h3 { font-size: 1.15rem; }
+html.creator-on #draft-meta { font-size: 0.62rem; }
+html.creator-on .clock { display: flex; align-items: baseline; gap: 6px; }
+html.creator-on .clock > .mono { display: none; }
+html.creator-on .clock .t { font-size: 1.9rem; }
+html.creator-on #bar { height: 6px; }
+html.creator-on .pickbox { padding: 8px 10px; gap: 6px; }
+html.creator-on .pickbox > .mono { display: none; }
+html.creator-on .chips { gap: 5px; }
+html.creator-on .chip { min-height: 32px; padding: 0 10px; font-size: 0.8rem; }
+html.creator-on .waitbox { padding: 6px 10px; font-size: 0.85rem; }
+html.creator-on .board th, html.creator-on .board td { padding: 5px 6px; }
+html.creator-on .board thead th { font-size: 0.72rem; white-space: normal; line-height: 1.1; }
+html.creator-on .board thead th.corner { width: 94px; font-size: 0.55rem; }
+html.creator-on .board tbody th { font-family: var(--font-body); text-transform: none; font-weight: 800; font-size: 0.7rem; hyphens: none; overflow-wrap: normal; word-break: normal; letter-spacing: -0.01em; }
+html.creator-on .board td { font-size: 0.74rem; line-height: 1.15; }
+html.creator-on .board { font-size: 0.78rem; }
+html.creator-on .lastpick { margin: 0; font-weight: 700; }
+.creator-cam { position: relative; order: 1; flex: 0 0 30%; background: #161616; overflow: hidden; border-bottom: 4px solid var(--hi); }
+.creator-cam video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+.creator-cam .cc-msg { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; text-align: center; color: #ffffff; font-weight: 700; }
+.creator-cam .cc-msg[hidden] { display: none; }
+.cc-live { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: 10px; background: var(--pop); color: #ffffff; font-weight: 800; font-size: 0.7rem; letter-spacing: 0.12em; padding: 4px 8px; border-radius: 6px; }
+.cc-exit { position: absolute; top: calc(8px + env(safe-area-inset-top, 0px)); right: 10px; font: inherit; font-size: 0.75rem; font-weight: 800; background: rgba(0,0,0,0.55); color: #ffffff; border: 1.5px solid rgba(255,255,255,0.6); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.cc-url { position: absolute; right: 10px; bottom: 10px; background: #000000; color: var(--hi); font-weight: 800; font-size: 0.78rem; padding: 4px 10px; border-radius: 999px; }
+.creator-green { position: relative; order: 4; flex: 0 0 30%; background: #00b140; border-top: 4px solid #000000; }
+html.creator-on.creator-camera #reveal.rv-full, html.creator-on.creator-green #reveal.rv-full { left: max(0px, calc(50% - 100dvh * 9 / 32)); right: max(0px, calc(50% - 100dvh * 9 / 32)); }
+html.creator-on.creator-camera #reveal.rv-full { top: 30dvh; }
+html.creator-on #intro { left: max(0px, calc(50% - 100dvh * 9 / 32)); right: max(0px, calc(50% - 100dvh * 9 / 32)); }
+html.creator-on.creator-camera #intro { top: 30dvh; }
+html.creator-on.creator-green #intro { bottom: 30dvh; }
+html.creator-on.creator-camera #reveal.rv-full .rv-bar, html.creator-on.creator-green #reveal.rv-full .rv-bar { left: max(0px, calc(50% - 100dvh * 9 / 32)); right: max(0px, calc(50% - 100dvh * 9 / 32)); }
+html.creator-on.creator-green #reveal.rv-full { bottom: 30dvh; }
+html.creator-on.creator-green #reveal.rv-full .rv-bar { bottom: 30dvh; }
+
+/* ---------- Draft video: a downloadable 9:16 replay of the draft ---------- */
+.dv-box { display: grid; gap: 14px; padding: 18px; border: 3px solid var(--edge); border-radius: 20px; background: var(--surface); }
+.dv-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.dv-head h3 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 2rem; line-height: 1; color: var(--accent); }
+.dv-head .note { margin: 4px 0 0; }
+.dv-editor { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start; }
+.dv-editor[hidden] { display: none; }
+.dv-stage { width: min(270px, 70vw); aspect-ratio: 9 / 16; border: 3px solid var(--edge); border-radius: 14px; overflow: hidden; background: #000000; }
+.dv-stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.dv-stage canvas:active { cursor: grabbing; }
+.dv-controls { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.dv-controls input[type="range"] { width: 100%; accent-color: var(--pop); }
+@media (max-width: 640px) { .dv-head, .dv-editor { grid-template-columns: minmax(0, 1fr); } .dv-stage { justify-self: center; } }
 </style>
 <template id="shell">
 <div class="band">
@@ -1106,6 +1176,14 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
     <div class="wrap">
 
       <div class="console" id="console">
+        <div class="creator-green" id="creator-green" hidden=""><span class="cc-url">playtheroster.com</span></div>
+        <div class="creator-cam" id="creator-cam" hidden="">
+          <video id="creator-video" autoplay="" playsinline="" muted=""></video>
+          <p class="cc-msg" id="creator-cam-msg" hidden=""></p>
+          <span class="cc-live">● LIVE</span>
+          <button class="cc-exit" type="button" data-act="creator-exit" aria-label="Turn off creator mode">Exit</button>
+          <span class="cc-url">playtheroster.com</span>
+        </div>
         <div class="console-top">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <button class="btn small" type="button" id="back-btn" data-act="home">← Back</button>
@@ -1205,6 +1283,16 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                   </div>
                 </div>
                 <p class="note list-note"></p>
+                <div class="creator-opt">
+                  <span class="mono label" id="creator-label-offline">Creator mode (for filming)</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="creator-label-offline" data-seg="creator">
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="creator" data-creator="off">Off</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="camera">Camera + draft</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="green">Green screen</button>
+                  </div>
+                  <label class="creator-check"><input type="checkbox" class="streamer-cb" data-act="streamer"> Streamer mode: hide the room code and link</label>
+                  <p class="note creator-note"></p>
+                </div>
                 <button class="btn primary block" type="button" data-act="play-offline">Play offline</button>
               </div>
 
@@ -1269,6 +1357,16 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note" id="lobby-list-note"></p>
               </div>
+              <div class="creator-opt">
+                  <span class="mono label" id="creator-label-room">Creator mode (for filming)</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="creator-label-room" data-seg="creator">
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="creator" data-creator="off">Off</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="camera">Camera + draft</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="creator" data-creator="green">Green screen</button>
+                  </div>
+                  <label class="creator-check"><input type="checkbox" class="streamer-cb" data-act="streamer"> Streamer mode: hide the room code and link</label>
+                  <p class="note creator-note"></p>
+                </div>
               <div class="actions">
                 <button class="btn primary" type="button" id="start-btn" data-act="start">Start draft</button>
                 <button class="btn" type="button" data-act="leave">Leave room</button>
@@ -1340,6 +1438,38 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <p class="note" id="irr-note">You’ve seen the lists. Now score as <strong>low</strong> as you can: pick the least valuable answer for each subtopic. No timer, your draft board stays in view. Stay under 20.0 to win. One try per draft.</p>
               </div>
               <button class="btn primary block" type="button" id="irr-btn" data-act="irr-start">Play Mr. Irrelevant</button>
+            </div>
+            <div class="dv-box" id="dv-box" hidden="">
+              <div class="dv-head">
+                <div>
+                  <span class="mono">For your TikTok or Reels</span>
+                  <h3>Draft video</h3>
+                  <p class="note">A vertical replay of this draft, pick by pick. Drag the board where you want it and set its size, then download it and drop it into your own video.</p>
+                </div>
+                <button class="btn" type="button" id="dv-open" data-act="dv-open">Make a draft video</button>
+              </div>
+              <div class="dv-editor" id="dv-editor" hidden="">
+                <div class="dv-stage"><canvas id="dv-canvas" width="540" height="960" aria-label="Draft video preview. Drag the board to move it."></canvas></div>
+                <div class="dv-controls">
+                  <span class="mono label" id="dv-bg-label">Background</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="dv-bg-label">
+                    <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="dv-bg" data-bg="green">Green screen</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="dv-bg" data-bg="black">Black</button>
+                    <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="dv-bg" data-bg="white">White</button>
+                  </div>
+                  <label class="mono label" for="dv-size">Board size</label>
+                  <input type="range" id="dv-size" min="50" max="100" step="1" value="92">
+                  <span class="mono label" id="dv-pos-label">Quick spots</span>
+                  <div class="seg" role="group" aria-labelledby="dv-pos-label">
+                    <button type="button" class="seg-btn" data-act="dv-pos" data-pos="top">Top</button>
+                    <button type="button" class="seg-btn" data-act="dv-pos" data-pos="middle">Middle</button>
+                    <button type="button" class="seg-btn" data-act="dv-pos" data-pos="bottom">Bottom</button>
+                  </div>
+                  <p class="note">Tip: drag the board on the preview to put it anywhere. Green screen lets TikTok or CapCut cut the background out so the board sits over your own video.</p>
+                  <button class="btn primary block" type="button" id="dv-rec" data-act="dv-rec">Download video</button>
+                  <p class="note" id="dv-msg" role="status" aria-live="polite"></p>
+                </div>
+              </div>
             </div>
             <div class="awards" id="awards" hidden=""></div>
             <div class="scorebox" id="scorebox"></div>
@@ -3820,6 +3950,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     $('back-btn').hidden = !!S.game && !atResults;
     $('back-btn').innerHTML = atResults ? '&larr; Homepage' : '&larr; Back';
     renderBanner();
+    renderCreatorOpts(); renderCreator(scr);
     var fastOn = !!S.fast && !S.game;
     ['modes', 'lobby', 'draft', 'results'].forEach(function (s) { $('scr-' + s).hidden = fastOn || s !== scr; });
     if (S.game && !fastOn && (scr === 'draft' || scr === 'results')) { markPlayed(S.game); statGame(S.game, 'start'); if (scr === 'results') statGame(S.game, 'done'); }
@@ -4293,6 +4424,8 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     /* Mr. Irrelevant: offered after every finished draft you played in (today's or a past day's), near the top. */
     var irrDone = loadIrr(gameId(g)), irrOk = !!(res && inGame);
     $('irr-cta').hidden = !irrOk;
+    $('dv-box').hidden = !irrOk; if (!irrOk && !$('dv-editor').hidden) { $('dv-editor').hidden = true; $('dv-open').textContent = 'Make a draft video'; }
+    if (S.ui.dvFor !== gameId(g)) { S.ui.dvFor = gameId(g); $('dv-editor').hidden = true; $('dv-open').textContent = 'Make a draft video'; $('dv-msg').textContent = ''; }
     $('irr-cta').querySelector('.mono').textContent = irrDone && irrDone.done ? 'Bonus round · done' : 'Bonus round · unlocked';
     $('irr-btn').textContent = irrDone && irrDone.done ? 'See your Mr. Irrelevant' : irrDone ? 'Back to Mr. Irrelevant' : 'Play Mr. Irrelevant';
     $('share-btn').hidden = !(res && inGame);
@@ -4636,6 +4769,176 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     document.querySelectorAll('.seg-btn[data-level]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-level') === lv)); });
     document.querySelectorAll('.level-note').forEach(function (n) { n.textContent = LEVEL_NOTES[lv]; });
   }
+
+  /* ---------- Creator mode ---------- */
+  function creatorPref() { var o = null; try { o = JSON.parse(store('roster.creator') || 'null'); } catch (e) {} o = o && typeof o === 'object' ? o : {}; return { layout: o.layout === 'camera' || o.layout === 'green' ? o.layout : 'off', streamer: !!o.streamer }; }
+  function setCreatorPref(p) { store('roster.creator', JSON.stringify(p)); }
+  var CREATOR_NOTES = { off: 'Filming for TikTok or Reels? Turn on a creator view before the draft starts.', camera: 'Your front camera shows on top and the draft below, so one screen recording catches you and the game. The camera stays on your phone and is never uploaded.', green: 'The game fills the top and the bottom is green, ready for TikTok’s green-screen effect.' };
+  function renderCreatorOpts() {
+    var p = creatorPref();
+    document.querySelectorAll('.seg-btn[data-creator]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-creator') === p.layout)); });
+    document.querySelectorAll('.streamer-cb').forEach(function (c) { c.checked = p.streamer; });
+    document.querySelectorAll('.creator-note').forEach(function (n) { n.textContent = CREATOR_NOTES[p.layout]; });
+    document.documentElement.classList.toggle('streamer', p.streamer);
+  }
+  function creatorActive(scr) {
+    var p = creatorPref(), g = S.game;
+    if (p.layout === 'off' || S.view !== 'play' || !g || S.fast) return null;
+    if (scr === 'draft') return p.layout;
+    if (scr === 'results' && revealOn(g) && !revealDone(g)) return p.layout;
+    return null;
+  }
+  var CAM = { stream: null, starting: false };
+  function camStop() { if (CAM.stream) { CAM.stream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); } CAM.stream = null; var v = $('creator-video'); if (v) v.srcObject = null; }
+  function camStart() {
+    if (CAM.stream || CAM.starting) return;
+    var msg = $('creator-cam-msg');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { msg.hidden = false; msg.textContent = 'This browser can’t show your camera here. Try Green screen instead.'; return; }
+    CAM.starting = true;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }).then(function (st) {
+      CAM.starting = false;
+      if (!document.documentElement.classList.contains('creator-camera')) { st.getTracks().forEach(function (t) { t.stop(); }); return; }
+      CAM.stream = st; msg.hidden = true; var v = $('creator-video'); v.srcObject = st; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+    }).catch(function () { CAM.starting = false; msg.hidden = false; msg.textContent = 'Camera blocked. Allow camera access for playtheroster.com in your browser settings, or switch to Green screen.'; });
+  }
+  function renderCreator(scr) {
+    var lay = creatorActive(scr), h = document.documentElement;
+    h.classList.toggle('creator-on', !!lay); h.classList.toggle('creator-camera', lay === 'camera'); h.classList.toggle('creator-green', lay === 'green');
+    $('creator-cam').hidden = lay !== 'camera'; $('creator-green').hidden = lay !== 'green';
+    if (lay === 'camera') camStart(); else camStop();
+  }
+
+  /* ---------- Draft video ---------- */
+  var DV_COLORS = ['#ca2430', '#000000', '#ffb612', '#1f4fbf', '#f07a1a', '#7b2cbf', '#0c7c7c', '#d2386f'];
+  var DV_INK = ['#ffffff', '#ffb612', '#000000', '#ffffff', '#000000', '#ffffff', '#ffffff', '#ffffff'];
+  function dvPref() { var o = null; try { o = JSON.parse(store('roster.dv') || 'null'); } catch (e) {} o = o && typeof o === 'object' ? o : {}; return { bg: ['green', 'black', 'white'].indexOf(o.bg) >= 0 ? o.bg : 'green', x: isFinite(o.x) ? Math.max(0, Math.min(1, o.x)) : 0.5, y: isFinite(o.y) ? Math.max(0, Math.min(1, o.y)) : 0.4, size: isFinite(o.size) ? Math.max(50, Math.min(100, o.size)) : 92 }; }
+  function dvSave(p) { store('roster.dv', JSON.stringify(p)); }
+  function dvData(g) {
+    var res = g.results, scores = res && res.scores ? res.scores : null;
+    var ps = g.order.map(function (pid) { return { pid: pid, name: playerName(g, pid).replace(/ \(AI\)$/, ''), c: pci(g, pid) }; });
+    var picks = g.picks.slice().sort(function (a, b) { return a.n - b.n; }).map(function (p) { return { pid: p.pid, sub: p.sub, name: p.name, sc: scores && scores['p' + p.n] ? Number(scores['p' + p.n].score) || 0 : null }; });
+    var rows = scores ? standings(g, scores) : [];
+    return { topic: TOPICS[g.topicId].name, date: g.past ? fmtDay(g.dateKey) : fmtDay(g.dateKey || dateKey(new Date())), subs: g.subs.slice(), ps: ps, picks: picks, win: rows[0] ? { name: rows[0].name.replace(/ \(AI\)$/, ''), total: rows[0].total } : null, totals: rows.reduce(function (o, r) { o[r.pid] = r.total; return o; }, {}) };
+  }
+  function dvLength(D) { return 1.4 + D.picks.length * 0.55 + 3.2; }
+  function dvRound(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function dvFit(ctx, text, maxW, font) { ctx.font = font; if (ctx.measureText(text).width <= maxW) return text; var t = text; while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1); return t + '…'; }
+  function dvWrap(ctx, text, maxW) { var words = String(text).split(' '), lines = [''], i; for (i = 0; i < words.length; i++) { var test = lines[lines.length - 1] ? lines[lines.length - 1] + ' ' + words[i] : words[i]; if (ctx.measureText(test).width <= maxW || !lines[lines.length - 1]) lines[lines.length - 1] = test; else lines.push(words[i]); } return lines.slice(0, 2); }
+  /* The board card's size at scale 1 (1080x1920 frame). */
+  function dvCard(D) { var n = D.subs.length; return { w: 1000, h: 190 + 84 + n * 118 + 120 }; }
+  function dvRect(D, p) { var c = dvCard(D), sc = p.size / 100, w = c.w * sc, h = c.h * sc; return { x: (1080 - w) * p.x, y: (1920 - 120 - h) * p.y + 20, w: w, h: h, sc: sc }; }
+  function dvDraw(ctx, D, p, t) {
+    var bgc = { green: '#00b140', black: '#000000', white: '#ffffff' }[p.bg];
+    ctx.save(); ctx.fillStyle = bgc; ctx.fillRect(0, 0, 1080, 1920);
+    var R = dvRect(D, p), shown = Math.max(0, Math.min(D.picks.length, Math.floor((t - 1.4) / 0.55) + 1)), done = t >= 1.4 + D.picks.length * 0.55 + 0.5;
+    var appear = Math.min(1, t / 0.35);
+    ctx.translate(R.x, R.y); ctx.scale(R.sc, R.sc);
+    ctx.globalAlpha = appear;
+    var c = dvCard(D), W = c.w, H = c.h;
+    ctx.fillStyle = '#ca2430'; dvRound(ctx, 14, 14, W, H, 34); ctx.fill();
+    ctx.fillStyle = '#ffffff'; dvRound(ctx, 0, 0, W, H, 34); ctx.fill(); ctx.lineWidth = 7; ctx.strokeStyle = '#000000'; ctx.stroke();
+    ctx.save(); dvRound(ctx, 0, 0, W, H, 34); ctx.clip();
+    ctx.fillStyle = '#ffb612'; ctx.fillRect(0, 0, W, 190); ctx.fillStyle = '#000000'; ctx.fillRect(0, 186, W, 6);
+    ctx.fillStyle = '#000000'; ctx.font = '800 28px Rubik, sans-serif'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('THE ROSTER · ' + D.date.toUpperCase(), 40, 62);
+    ctx.fillText(done ? 'FINAL' : 'ROUND ' + Math.min(D.subs.length, Math.floor(Math.max(0, shown - 1) / D.ps.length) + 1) + ' OF ' + D.subs.length, W - 40 - ctx.measureText(done ? 'FINAL' : 'ROUND 0 OF 0').width, 62);
+    ctx.fillText(dvFit(ctx, D.topic.toUpperCase(), W - 80, '96px "Lilita One", sans-serif'), 40, 160);
+    var top = 192, sw = 230, cw = (W - sw) / D.ps.length, rh = 118;
+    ctx.fillStyle = '#000000'; ctx.fillRect(0, top, W, 84);
+    D.ps.forEach(function (pl, i) {
+      var x = sw + i * cw; ctx.fillStyle = DV_COLORS[pl.c]; ctx.fillRect(x, top + 76, cw, 8);
+      ctx.fillStyle = pl.c === 1 ? '#ffb612' : '#ffffff'; ctx.font = '800 30px Rubik, sans-serif';
+      var label = done && D.totals[pl.pid] != null ? pl.name + ' ' + fmt1(D.totals[pl.pid]) : pl.name;
+      ctx.fillText(dvFit(ctx, label, cw - 20, '800 30px Rubik, sans-serif'), x + 12, top + 52);
+    });
+    ctx.fillStyle = '#ffb612'; ctx.font = '800 22px Rubik, sans-serif'; ctx.fillText('PICK FOR', 24, top + 52);
+    D.subs.forEach(function (sub, r) {
+      var y = top + 84 + r * rh;
+      ctx.fillStyle = '#fff6df'; ctx.fillRect(0, y, sw, rh); ctx.fillStyle = '#000000'; ctx.fillRect(0, y, W, 3);
+      ctx.font = '800 32px Rubik, sans-serif'; var sl = dvWrap(ctx, sub, sw - 36); sl.forEach(function (ln, k) { ctx.fillText(ln, 22, y + rh / 2 + 12 - (sl.length - 1) * 18 + k * 36); });
+      D.ps.forEach(function (pl, i) { var x = sw + i * cw; ctx.fillStyle = '#000000'; ctx.fillRect(x, y, 3, rh); });
+    });
+    for (var k = 0; k < shown; k++) {
+      var pk = D.picks[k], r2 = D.subs.indexOf(pk.sub), i2 = -1; D.ps.forEach(function (pl, ii) { if (pl.pid === pk.pid) i2 = ii; });
+      if (r2 < 0 || i2 < 0) continue;
+      var x2 = sw + i2 * cw, y2 = top + 84 + r2 * rh, fresh = !done && k === shown - 1;
+      var pop = fresh ? Math.min(1, (t - (1.4 + k * 0.55)) / 0.18) : 1;
+      ctx.fillStyle = fresh ? '#ffb612' : '#ffffff'; ctx.fillRect(x2 + 3, y2 + 3, cw - 3, rh - 3);
+      ctx.fillStyle = DV_COLORS[D.ps[i2].c]; ctx.fillRect(x2 + 3, y2 + 3, 10, rh - 3);
+      ctx.save(); ctx.globalAlpha = appear * pop; ctx.fillStyle = '#000000'; ctx.font = '700 30px Rubik, sans-serif';
+      var nw = cw - 40, ny0 = done && pk.sc != null ? y2 + 16 : y2; var nl = dvWrap(ctx, pk.name, nw); nl.forEach(function (ln, kk) { ctx.fillText(dvFit(ctx, ln, nw + 4, '700 30px Rubik, sans-serif'), x2 + 24, ny0 + rh / 2 + 10 - (nl.length - 1) * 17 + kk * 34); });
+      if (done && pk.sc != null) { ctx.font = '800 22px Rubik, sans-serif'; var st = fmt1(pk.sc); var tw = ctx.measureText(st).width + 16; ctx.fillStyle = '#000000'; dvRound(ctx, x2 + 22, y2 + 10, tw, 30, 8); ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.fillText(st, x2 + 30, y2 + 33); }
+      ctx.restore();
+    }
+    var fy = top + 84 + D.subs.length * rh;
+    ctx.fillStyle = '#000000'; ctx.fillRect(0, fy, W, 4);
+    ctx.font = '800 36px Rubik, sans-serif'; ctx.fillStyle = '#000000';
+    var line = done ? (D.win ? 'WINNER: ' + D.win.name + ' · ' + fmt1(D.win.total) : 'Draft complete') : shown ? D.ps.filter(function (pl) { return pl.pid === D.picks[shown - 1].pid; })[0].name + ' takes ' + D.picks[shown - 1].name : 'The draft is on';
+    if (done) { ctx.fillStyle = '#ca2430'; ctx.fillRect(0, fy + 4, W, 116); ctx.fillStyle = '#ffffff'; ctx.font = '60px "Lilita One", sans-serif'; ctx.fillText(dvFit(ctx, line, W - 80, '60px "Lilita One", sans-serif'), 40, fy + 84); }
+    else ctx.fillText(dvFit(ctx, line, W - 80, '800 36px Rubik, sans-serif'), 40, fy + 74);
+    ctx.restore(); ctx.restore();
+    ctx.save(); ctx.font = '800 34px Rubik, sans-serif'; var u = 'playtheroster.com', uw = ctx.measureText(u).width + 48;
+    ctx.fillStyle = '#000000'; dvRound(ctx, 1080 - uw - 36, 1920 - 96, uw, 64, 32); ctx.fill(); ctx.fillStyle = '#ffb612'; ctx.fillText(u, 1080 - uw - 12, 1920 - 52); ctx.restore();
+  }
+  var DV = { raf: 0, t0: 0, drag: null, rec: false };
+  function dvPreview() {
+    var cv = $('dv-canvas'), g = S.game; if (!cv || !g || $('dv-editor').hidden) { DV.raf = 0; return; }
+    var D = DV.data || (DV.data = dvData(g)), ctx = cv.getContext('2d'), len = dvLength(D);
+    if (!DV.t0) DV.t0 = performance.now();
+    var t = ((performance.now() - DV.t0) / 1000) % len;
+    ctx.setTransform(0.5, 0, 0, 0.5, 0, 0); dvDraw(ctx, D, dvPref(), t);
+    DV.raf = requestAnimationFrame(dvPreview);
+  }
+  function dvRenderControls() {
+    var p = dvPref();
+    document.querySelectorAll('.seg-btn[data-bg]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-bg') === p.bg)); });
+    var sz = $('dv-size'); if (sz && document.activeElement !== sz) sz.value = p.size;
+  }
+  function dvOpen() {
+    var ed = $('dv-editor'), g = S.game; if (!g) return;
+    ed.hidden = !ed.hidden; $('dv-open').textContent = ed.hidden ? 'Make a draft video' : 'Close';
+    DV.data = dvData(g); DV.t0 = 0; dvRenderControls();
+    if (!ed.hidden && !DV.raf) DV.raf = requestAnimationFrame(dvPreview);
+  }
+  function dvRecord() {
+    if (DV.rec) return; var g = S.game; if (!g) return;
+    var msg = $('dv-msg'), btn = $('dv-rec');
+    if (typeof MediaRecorder === 'undefined' || !HTMLCanvasElement.prototype.captureStream) { msg.textContent = 'This browser can’t make videos. Try Chrome or Safari on your phone or computer.'; return; }
+    var types = ['video/mp4;codecs=avc1.42E01E', 'video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'], type = '';
+    for (var i = 0; i < types.length; i++) if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(types[i])) { type = types[i]; break; }
+    var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1920;
+    var ctx = cv.getContext('2d'), D = dvData(g), p = dvPref(), len = dvLength(D), chunks = [];
+    var stream = cv.captureStream(30), rec;
+    try { rec = new MediaRecorder(stream, type ? { mimeType: type, videoBitsPerSecond: 6000000 } : { videoBitsPerSecond: 6000000 }); } catch (e) { msg.textContent = 'Couldn’t start the video. Try again.'; return; }
+    DV.rec = true; btn.disabled = true; msg.textContent = 'Making your video… keep this page open (about ' + Math.ceil(len) + ' seconds).';
+    rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
+    rec.onstop = function () {
+      DV.rec = false; btn.disabled = false;
+      var mt = (rec.mimeType || type || 'video/webm').split(';')[0], ext = mt.indexOf('mp4') >= 0 ? 'mp4' : 'webm';
+      var blob = new Blob(chunks, { type: mt }), url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = 'the-roster-' + (g.topicId || 'draft') + '-' + (g.dateKey || dateKey(new Date())) + '.' + ext; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+      msg.textContent = 'Downloaded (' + ext.toUpperCase() + ').' + (ext === 'webm' ? ' If your phone won’t open it, try Chrome, or make it on a computer.' : '');
+      statBump(function (r) { r.dv = (r.dv || 0) + 1; });
+    };
+    var t0 = performance.now(); dvDraw(ctx, D, p, 0); rec.start(500);
+    (function frame() {
+      var t = (performance.now() - t0) / 1000;
+      dvDraw(ctx, D, p, Math.min(t, len));
+      if (t < len) { setTimeout(frame, 1000 / 30); msg.textContent = 'Making your video… ' + Math.max(0, Math.ceil(len - t)) + ' s left. Keep this page open.'; }
+      else setTimeout(function () { try { rec.stop(); } catch (e) {} stream.getTracks().forEach(function (tr) { tr.stop(); }); }, 200);
+    })();
+  }
+  function dvPointer(ev) {
+    var cv = $('dv-canvas'); if (!cv || !DV.data) return;
+    var b = cv.getBoundingClientRect(), fx = (ev.clientX - b.left) / b.width * 1080, fy = (ev.clientY - b.top) / b.height * 1920, p = dvPref();
+    if (ev.type === 'pointerdown') { var R = dvRect(DV.data, p); if (fx >= R.x && fx <= R.x + R.w && fy >= R.y && fy <= R.y + R.h) { DV.drag = { dx: fx - R.x, dy: fy - R.y }; try { cv.setPointerCapture(ev.pointerId); } catch (e) {} ev.preventDefault(); } return; }
+    if (ev.type === 'pointermove' && DV.drag) {
+      var R2 = dvRect(DV.data, p), nx = fx - DV.drag.dx, ny = fy - DV.drag.dy;
+      p.x = R2.w >= 1080 ? 0.5 : Math.max(0, Math.min(1, nx / (1080 - R2.w))); p.y = Math.max(0, Math.min(1, (ny - 20) / Math.max(1, 1920 - 120 - R2.h))); dvSave(p); ev.preventDefault(); return;
+    }
+    if (ev.type === 'pointerup' || ev.type === 'pointercancel') DV.drag = null;
+  }
   function practiceSpec() {
     var ids = Object.keys(TOPICS).filter(function (id) { return id !== TODAY.topicId && id !== S.lastPracticeTopic; });
     var id = ids[Math.floor(Math.random() * ids.length)];
@@ -4837,7 +5140,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
       afterChange();
       if (g.results) leagueRecord(g);
     }, onErr));
-    try { history.replaceState(null, '', '#r-' + code); } catch (e) {}
+    try { if (!creatorPref().streamer) history.replaceState(null, '', '#r-' + code); } catch (e) {}
     S.view = 'play';
     render();
     window.scrollTo(0, 0);
@@ -6454,6 +6757,18 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     else if (act === 'play-offline') playOffline(parseInt($('bot-count').value, 10));
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
     else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
+    else if (act === 'creator') {
+      var cp = creatorPref(); cp.layout = t.getAttribute('data-creator'); setCreatorPref(cp);
+      /* Ask for the camera now, while the tap counts as permission; the view turns it on when the draft starts. */
+      if (cp.layout === 'camera' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false }).then(function (st) { st.getTracks().forEach(function (x) { x.stop(); }); }).catch(function () {});
+      render();
+    }
+    else if (act === 'streamer') { var sp = creatorPref(); sp.streamer = !!t.checked; setCreatorPref(sp); if (sp.streamer) { try { if (/^#r-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } render(); }
+    else if (act === 'dv-open') dvOpen();
+    else if (act === 'dv-rec') dvRecord();
+    else if (act === 'dv-bg') { var bp = dvPref(); bp.bg = t.getAttribute('data-bg'); dvSave(bp); dvRenderControls(); }
+    else if (act === 'dv-pos') { var pp = dvPref(); pp.y = { top: 0.04, middle: 0.5, bottom: 0.96 }[t.getAttribute('data-pos')]; pp.x = 0.5; dvSave(pp); }
+    else if (act === 'creator-exit') { var ep = creatorPref(); ep.layout = 'off'; setCreatorPref(ep); render(); }
     else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
     else if (act === 'list') { store('roster.list', t.getAttribute('data-list')); renderListPref(); }
     else if (act === 'room-list') setRoomList(t.getAttribute('data-list') === 'show');
@@ -6629,7 +6944,7 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-05';
+  var BUILD_ID = '2026-11-02-06';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7400,6 +7715,8 @@ F("construction-vehicles","Big Machines","machine","Which machines make the ulti
     else if (ev.key === 'Enter') { ev.preventDefault(); if (ms.length) fastSubmit(ms[S.ui.fastSel] ? ms[S.ui.fastSel].e : ms[0].e); }
   });
   $('fast-list').addEventListener('mousedown', function (ev) { var li = ev.target.closest ? ev.target.closest('[data-key]') : null; if (!li) return; ev.preventDefault(); fastSubmit(TOPICS[S.fast.topicId].byKey[li.getAttribute('data-key')]); });
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel'].forEach(function (k) { $('dv-canvas').addEventListener(k, dvPointer); });
+  $('dv-size').addEventListener('input', function () { var sp = dvPref(); sp.size = Number($('dv-size').value) || 92; dvSave(sp); });
   $('chat-form').addEventListener('submit', function (ev) {
     ev.preventDefault();
     var inp = $('chat-in'), v = inp.value; inp.value = '';
