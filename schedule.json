@@ -149,7 +149,7 @@
    "topicId": "excuses",
    "subs": [
     "Believability",
-    "Commonness",
+    "Most common",
     "Creativity",
     "Reusability",
     "Sympathy"
@@ -188,7 +188,7 @@
   "2026-10-30": {
    "topicId": "phobias",
    "subs": [
-    "Commonness",
+    "Most common",
     "Fame",
     "Intensity",
     "Relatability",
