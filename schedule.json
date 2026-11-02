@@ -1,66 +1,16 @@
 {
  "version": 1,
- "from": "2026-10-23",
- "updatedAt": 1793622115134,
+ "from": "2026-11-02",
+ "updatedAt": 1793658060675,
  "days": {
-  "2026-10-23": {
-   "topicId": "pop-stars",
-   "subs": [
-    "Vocal ability",
-    "Stage presence",
-    "Cultural influence",
-    "Live performances",
-    "Hit songs"
-   ]
-  },
-  "2026-10-26": {
-   "topicId": "superheroes",
-   "subs": [
-    "Popularity",
-    "Gadgets",
-    "Speed",
-    "Intelligence",
-    "Strength"
-   ]
-  },
-  "2026-10-28": {
-   "topicId": "vegetables",
-   "subs": [
-    "Roasted",
-    "Taste",
-    "Nutrition",
-    "Raw crunch",
-    "Versatility"
-   ]
-  },
-  "2026-10-29": {
-   "topicId": "animated-movies",
-   "subs": [
-    "Story",
-    "Animation",
-    "Villain",
-    "Songs",
-    "Heart"
-   ]
-  },
-  "2026-10-30": {
-   "topicId": "jobs",
-   "subs": [
-    "Impact",
-    "Salary",
-    "Job security",
-    "Prestige",
-    "Fun"
-   ]
-  },
   "2026-11-03": {
-   "topicId": "fashion-brands",
+   "topicId": "board-games",
    "subs": [
-    "Quality",
-    "Celebrity appeal",
-    "Luxury",
-    "Streetwear cred",
-    "Iconic logo"
+    "Replayability",
+    "Family friendly",
+    "Classic status",
+    "Party fun",
+    "Strategy"
    ]
   },
   "2026-11-11": {
@@ -71,36 +21,6 @@
     "Innovation",
     "Natural beauty",
     "Quality of life"
-   ]
-  },
-  "2026-10-24": {
-   "topicId": "us-presidents",
-   "subs": [
-    "Crisis leadership",
-    "Economy",
-    "Foreign policy",
-    "Public persuasion",
-    "Legacy"
-   ]
-  },
-  "2026-10-25": {
-   "topicId": "nfl-qbs",
-   "subs": [
-    "Pocket presence",
-    "Accuracy",
-    "Clutch performance",
-    "Mobility",
-    "Arm strength"
-   ]
-  },
-  "2026-11-01": {
-   "topicId": "mlb-hitters",
-   "subs": [
-    "Clutch hitting",
-    "Contact",
-    "Plate discipline",
-    "Power",
-    "Speed"
    ]
   },
   "2026-11-02": {
@@ -122,79 +42,59 @@
     "Replayability",
     "Multiplayer"
    ]
+  },
+  "2026-11-04": {
+   "topicId": "sea-creatures",
+   "subs": [
+    "Intelligence",
+    "Hunting ability",
+    "Speed",
+    "Uniqueness",
+    "Biggest"
+   ]
+  },
+  "2026-11-05": {
+   "topicId": "biggest-cities",
+   "subs": [
+    "Most tourists",
+    "Most people",
+    "Biggest economy",
+    "Biggest area",
+    "Most crowded"
+   ]
+  },
+  "2026-11-06": {
+   "topicId": "famous-brits",
+   "subs": [
+    "National treasure",
+    "Influence",
+    "Fame",
+    "Legacy",
+    "Talent"
+   ]
+  },
+  "2026-11-07": {
+   "topicId": "heisman-winners",
+   "subs": [
+    "College stats",
+    "Fame",
+    "Team success",
+    "Margin of victory",
+    "NFL career"
+   ]
+  },
+  "2026-11-08": {
+   "topicId": "draft-busts",
+   "subs": [
+    "Infamy",
+    "Pre-draft hype",
+    "Disappointment",
+    "Highest pick",
+    "Fame"
+   ]
   }
  },
  "fast": {
-  "2026-10-23": {
-   "topicId": "seafood",
-   "subs": [
-    "Texture",
-    "Versatility",
-    "Healthiness",
-    "Luxury",
-    "Taste"
-   ]
-  },
-  "2026-10-24": {
-   "topicId": "game-franchises",
-   "subs": [
-    "Longevity",
-    "Sales",
-    "Gameplay",
-    "Cultural impact",
-    "Story"
-   ]
-  },
-  "2026-10-25": {
-   "topicId": "excuses",
-   "subs": [
-    "Believability",
-    "Most common",
-    "Creativity",
-    "Reusability",
-    "Sympathy"
-   ]
-  },
-  "2026-10-26": {
-   "topicId": "got-characters",
-   "subs": [
-    "Fame",
-    "Cunning",
-    "Power",
-    "Honor",
-    "Survival skills"
-   ]
-  },
-  "2026-10-28": {
-   "topicId": "fall-favorites",
-   "subs": [
-    "Coziness",
-    "Affordability",
-    "Fun",
-    "Popularity",
-    "Nostalgia"
-   ]
-  },
-  "2026-10-29": {
-   "topicId": "dorm-essentials",
-   "subs": [
-    "Space-saving",
-    "Comfort",
-    "Affordability",
-    "Popularity",
-    "Usefulness"
-   ]
-  },
-  "2026-10-30": {
-   "topicId": "phobias",
-   "subs": [
-    "Most common",
-    "Fame",
-    "Intensity",
-    "Relatability",
-    "Weirdness"
-   ]
-  },
   "2026-11-02": {
    "topicId": "explorers",
    "subs": [
