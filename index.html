@@ -344,6 +344,16 @@ html.on-clock.low-clock { background-color: #ca2430; }
 .reveal.rv-full { position: fixed; inset: 0; z-index: 80; overflow-y: auto; display: block; padding: calc(28px + env(safe-area-inset-top, 0px)) 16px calc(112px + env(safe-area-inset-bottom, 0px)); background: var(--pop); color: #ffffff; }
 .reveal.rv-full::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,0.08) 79px 81px); }
 html.rv-on, html.rv-on body { overflow: hidden; }
+.reveal.rv-full { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.reveal.rv-full:focus { outline: none; }
+/* Short laptop screens: a smaller podium, and the rest of the places in two columns, so it all fits. */
+@media (min-width: 641px) and (max-height: 820px) {
+  .reveal.rv-full { padding-top: 16px; }
+  .rv-in { gap: 10px; }
+  .rv-in .podium .p1 .block { height: 104px; } .rv-in .podium .p2 .block { height: 76px; } .rv-in .podium .p3 .block { height: 54px; }
+  .rv-in .podium .spot .av { width: 44px; height: 44px; font-size: 1.3rem; }
+  .rv-in .podium-rest { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 760px; }
+}
 .rv-in { position: relative; width: 100%; max-width: 900px; margin: 0 auto; min-height: calc(100% - 8px); display: grid; align-content: center; justify-items: center; gap: clamp(12px, 2.4vh, 22px); text-align: center; }
 .rv-in .mono { color: var(--hi); letter-spacing: 0.14em; }
 .rv-in .intro-topic { font-size: clamp(2.8rem, 12vw, 7.5rem); }
@@ -1144,8 +1154,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
       <div class="dv-box" id="dv-box" hidden="">
         <div class="dv-head">
           <div>
-            <span class="mono" id="dv-kicker">For your TikTok or Reels</span>
-            <h3>Draft video</h3>
+            <span class="mono" id="dv-kicker" hidden></span>
+            <h3>Download the draft</h3>
             <p class="note" id="dv-note"></p>
           </div>
           <div class="dv-actions">
@@ -1460,6 +1470,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 
         <!-- FAST MONEY -->
         <div id="scr-fast" hidden="">
+          <div id="irr-back" hidden=""><button class="btn small" type="button" data-act="irr-back" id="irr-back-btn">← Back to your draft results</button></div>
           <div id="fast-play" style="display:grid;gap:16px">
             <div class="draft-head">
               <div>
@@ -3308,7 +3319,7 @@ F("mlb-stat-leaders","MLB Stat Leaders","MLB slugger","Which hitters make the ul
 F("richest-people","Richest People","billionaire","Which billionaires make the ultimate money lineup?",["Highest net worth", "Oldest", "Most employees", "Most given to charity", "Youngest to $1 billion"],"Elon Musk|Larry Page|Larry Ellison|Jeff Bezos|Sergey Brin|Mark Zuckerberg|Bernard Arnault|Jensen Huang|Warren Buffett|Steve Ballmer|Michael Dell|Amancio Ortega|Rob Walton|Jim Walton|Alice Walton|Carlos Slim|Bill Gates|Michael Bloomberg|Mukesh Ambani|Françoise Bettencourt Meyers|Gautam Adani|Thomas Peterffy|Zhong Shanshan|Jeff Yass|Ma Huateng|Masayoshi Son|Ken Griffin|Stephen Schwarzman|Jacqueline Mars|Colin Huang|Phil Knight|Jack Ma|MacKenzie Scott|Lakshmi Mittal|Dustin Moskovitz|Mark Cuban|Daniel Ek|Brian Chesky|Evan Spiegel|Jack Dorsey|Sam Altman|Alexandr Wang|George Lucas|Steven Spielberg|Michael Jordan|Oprah Winfrey|Jay-Z|Taylor Swift|Rihanna|Kim Kardashian|LeBron James|Tiger Woods|Magic Johnson|Bruce Springsteen|Peter Thiel|Eric Schmidt|Reed Hastings|Miriam Adelson|Rupert Murdoch|David Geffen|Ray Dalio|Jan Koum|Pierre Omidyar|Laurene Powell Jobs|John Mars|Tadashi Yanai|Giovanni Ferrero|Dieter Schwarz|Klaus-Michael Kühne|Len Blavatnik|Gina Rinehart|Shiv Nadar|Lei Jun|Zhang Yiming|Robin Zeng",["000201030405060708090a0b0e0c0d0f0g0i0h0j0k0m0l210o220n0p0q0r1s0s1t0t1v1w201u0u1z1x1l0w1j0v0x1y1m1i1p1o0y1r1q111n101k0z161317121518191a141d1b1g1c1f1e1h", "081m0b1s1w0u0f1v0s0h1n0c0l16021z1l0r170d061t1o0e0x1h0j1y191j0m0g090i0p1x0n0z1g1k0k0718031r0a0v1u1q1i0q220w201a000o01041p1f130t111d2110050y141e1c121b15", "0e0c0d030w1v080i0g091z0604011j0f020b1s210s22000v0x0o0a0j1w050u1p0p1t1u200k1l071m0t0h0m1k1q1310110q1x0r1y121i0l0n141o160y151d170z19181c1n1b1a1e1g1r1f1h", "0g080h0w0a000503090y0f0o0u1r0e040q201k021z1q0r1o160c0d06010i0b0j071j1w0v0k1x0t1n0n13191v1s210s0m1p1l0l170p1t220z0x1m1i1y1u11101812141f1c1b1a1e1h1g1d15", "0515120y041u0g0a011q0o210q111f1c1b03100e130d0p1e070t1p14060j201x1i1d0c000z090v0i0k1k0x1n221r020w1j191a0f1m1t1o17180u0m161y0h1z0n080b1v1s0s1w0r1l0l1g1h"],"Elon Musk=Musk | Larry Ellison=Ellison | Jeff Bezos=Bezos | Sergey Brin=Brin | Mark Zuckerberg=Zuckerberg;Zuck | Bernard Arnault=Arnault | Jensen Huang=Jensen | Warren Buffett=Buffett | Steve Ballmer=Ballmer | Michael Dell=Dell | Bill Gates=Gates | Michael Bloomberg=Bloomberg | Mukesh Ambani=Ambani | Françoise Bettencourt Meyers=Francoise Bettencourt Meyers | Gautam Adani=Adani | Ma Huateng=Pony Ma | Mark Cuban=Cuban | Sam Altman=Altman | Steven Spielberg=Spielberg | Michael Jordan=MJ | Oprah Winfrey=Oprah | LeBron James=LeBron | Klaus-Michael Kühne=Klaus-Michael Kuhne","2026-11-06");
 F("deadliest-animals","Deadliest Animals","animal","Which animals make the ultimate danger list?",["Most human deaths per year", "Strongest venom", "Heaviest", "Fastest", "Widest range"],"Mosquito|Freshwater snail|Dog|Russell's viper|Sand fly|Indian cobra|Common krait|Assassin bug|Tsetse fly|Saw-scaled viper|Scorpion|Roundworm|Puff adder|Tapeworm|Nile crocodile|Hippopotamus|Elephant|Black mamba|Saltwater crocodile|Deer|Lion|Cape buffalo|Tiger|Honeybee|Leopard|King cobra|Box jellyfish|Asian giant hornet|Pufferfish|Fer-de-lance|Wolf|Hyena|Brown bear|Wild boar|Great white shark|Bull shark|Tiger shark|Rattlesnake|Eastern brown snake|Stingray|Rhinoceros|Moose|Polar bear|Black widow spider|Brazilian wandering spider|Cone snail|Stonefish|Chimpanzee|Blue-ringed octopus|Portuguese man o' war|Cougar|Jaguar|Cassowary|Komodo dragon|Sydney funnel-web spider|Inland taipan|Golden poison frog|Orca|Gorilla",["000102030405060807090a0c0b0d0e0g0f0h0i0j0l0k0m0n0t0q0o0p0r0s0u0y0w0x0v11100z14121315161a191b17181f1e1c1d1g1h1l1j1m1k1i", "1j1k0q0s1c12190h061i1a0a090p0503180t0c1711130r1d1h0n020j1l0g0y0l0k0w0o0f0x0e100u150m0i0v0z1f1e161400010804071b0b0d1g1m", "0g1l140f0y0l0i1015160e0w0m0k1m0z0x1f0j1h0o0v1e1g1b0u02130p030c0t11050q121j1a0h0s0609191d1c01180r1i0a171k070d0b0n080004", "0k1f0j1e0m0u0v0o0l1l0w15140x1g020g0y0z160r1b1m100f0e0i0n080h121h0p03051j0906130t0s0c0q111c180a0004071i1a171k1d01190b0d", "1l020n001d0b0d0x0j0y0a011310040s0w0u0z0o15171a19070q090c1e160g0v08111f0h0e030f0r0l050p1c180k060i120t141j1b0m1g1m1i1k1h"],"Freshwater snail=Snail | Dog=Dogs | Sand fly=Sandfly | Indian cobra=Spectacled cobra | Common krait=Krait | Assassin bug=Kissing bug | Scorpion=Deathstalker scorpion | Roundworm=Ascaris | Hippopotamus=Hippo | Honeybee=Bees | Asian giant hornet=Murder hornet | Pufferfish=Fugu | Brown bear=Grizzly bear | Rhinoceros=Rhino | Black widow spider=Black widow | Cougar=Mountain lion | Sydney funnel-web spider=Funnel-web spider | Golden poison frog=Poison dart frog | Orca=Killer whale","2026-11-06");
 F("most-visited-attractions","Most-Visited Attractions","attraction","Which attractions make the ultimate tourist trip?",["Most visitors per year", "Oldest", "Tallest point", "Most expensive ticket", "Biggest area"],"Dubai Mall|Grand Bazaar|Times Square|Central Park|Las Vegas Strip|Mall of America|Senso-ji|Magic Kingdom|Forbidden City|Disneyland|Universal Studios Japan|Tiananmen Square|Tokyo Disneyland|Tokyo DisneySea|Colosseum|Notre-Dame de Paris|EPCOT|Shanghai Disneyland|Sydney Opera House|Golden Gate Bridge|Disneyland Paris|Hollywood Walk of Fame|Pike Place Market|Great Wall of China|Meiji Shrine|Universal Studios Hollywood|Gardens by the Bay|Navy Pier|Trevi Fountain|Louvre|Lincoln Memorial|Versailles|Vatican Museums|Taj Mahal|Eiffel Tower|British Museum|Metropolitan Museum of Art|Leaning Tower of Pisa|Sagrada Família|Acropolis|Statue of Liberty|Empire State Building|Hagia Sophia|Red Square|Pyramids of Giza|Tower of London|Alhambra|Angkor Wat|Chichen Itza|Mount Rushmore|Christ the Redeemer|CN Tower|Gateway Arch|Burj Khalifa|Arc de Triomphe|Machu Picchu|Alcatraz|Stonehenge|Neuschwanstein Castle|Space Needle|Petra|Petronas Towers|Graceland|Buckingham Palace",["000102030405060709080a0c0b0d0g0h0e0f0i0k0n0j0o0m0l0p0q0r0s0t0v0u0w0x0y0z101112131415161817191a1b1c1d1h1g1f1e1i1j1l1k1m1n1o1p1q1r", "1l18131o0n0e16061c191b0f1a110b081j01170w0x0v1r0z0s0t1i031k1012141m0y020m0r0o0u151e0j1q041d090l1n0p1g070i1f0g0c0k051p0d0a001h0q0h", "1h1f1p15040y1j020j1g1n12180w0f14170x1b0i1m0h0r0d07110g16060k0c0q1i0e1o0p0v030a000b1e081c10050z0u191a1k0s1r090t131d010n0o1q0m1l0l", "09070g0p0k1q1o0d0c0a0h1j1h15190i1r1k0y1b1c1l1n1312101f1614180w0q0t1p0v1i1a1m0e111g0x1e171d080n0s040306020b010f000j0r050o0z0m0u0l", "1j1o0n0v041d1c03181b0p0g000q0h080o0k0a050d0c0w0b071g0901170t0r0x1r1a061h111k0z1019141q0j1p0m02131l0y0e0i0l12161f151m0f1n0u1i1e0s"],"Las Vegas Strip=The Strip | Senso-ji=Sensoji | Notre-Dame de Paris=Notre Dame | Great Wall of China=Great Wall | Versailles=Palace of Versailles | Vatican Museums=St. Peter's Basilica;Vatican | Metropolitan Museum of Art=The Met | Sagrada Família=Sagrada Familia | Acropolis=Parthenon | Red Square=Kremlin | Pyramids of Giza=Great Pyramid | Neuschwanstein Castle=Neuschwanstein","2026-11-06");
-F("biggest-cities","World's Biggest Cities","city","Which cities make the ultimate megacity lineup?",["Most people", "Biggest area", "Oldest", "Most billionaires", "Biggest economy"],"Jakarta|Dhaka|Tokyo|Delhi|Shanghai|Guangzhou|Cairo|Manila|Kolkata|Seoul|Mumbai|São Paulo|Mexico City|Beijing|New York City|Osaka|Karachi|Kinshasa|Lagos|Istanbul|Buenos Aires|Shenzhen|Bangalore|Lahore|Rio de Janeiro|Moscow|Los Angeles|Chennai|Bogotá|Lima|Paris|Bangkok|Hyderabad|Johannesburg|London|Chengdu|Tehran|Ho Chi Minh City|Chicago|Wuhan|Ahmedabad|Kuala Lumpur|Dallas|Riyadh|Hong Kong|Houston|Taipei|Santiago|Madrid|Toronto|Washington, D.C.|Philadelphia|Atlanta|Miami|Singapore|Addis Ababa|Barcelona|Sydney|Nairobi|Hanoi|Boston|San Francisco|Berlin|Montreal|Rome|Dubai|Athens|Lisbon|Amsterdam|Mecca|Las Vegas|Vienna|Prague|Honolulu|Cancún|Venice",["0001020403050607080b0c090d0a0e0f0g0h0i0j0k0m0n0o0l0p0q0r0s0t0u0v0w0x0y0z101112131415161719181a1b1c1d1e1f1g1h1i1k1j1l1n1m1o1p1q1r1s1t1u1v1w1x1y1z20212223", "0e1g0212040q0p1o161f1e19050d000x0k1h0b0f0v0u0t091p0c031d0615110o1l0l1707100y0z13011t0j081c1q1r1y0i1s0w0r1x180m1a1k0g1v1w1n0n1b1i1m0a0s0h141u201j1z212223", "1u1v0d1s0j031z0z0u05091k0y131x230f1c20060n1n0p101q1w040c14020i0a000t0k0m0s1b0b0o070w010e1o0r1r1f08111a0g171p0q0v1l1e1d211i121t191g1618150h0x1j1h1m1y220l", "0e0p180y0a0d0l041p1i0q050b090j1a02030u0v1t1h1d00121c0m161l190z0w1o1e0c1q17141y071g0r151r1f13081k0o0f1b1z060t1s0x200k0i1w0g1v110s1u1n0n21101m011x0h231j22", "0e020q0y090u1204161p0f190d1e1i0l1o1f0b1g0p1h050c001d18031l0j0a0z131c1a0k0o1k170v1q071s1r1w15010g08101b1z1y061t0m0t0x0s0i0w0r1v111u200n21141n1m1x0h1j2223"],"Delhi=New Delhi | São Paulo=Sao Paulo | New York City=New York;NYC | Bangalore=Bengaluru | Rio de Janeiro=Rio | Los Angeles=LA | Bogotá=Bogota | Ho Chi Minh City=Saigon | Dallas=Dallas-Fort Worth | Washington, D.C.=Washington DC | San Francisco=SF | Cancún=Cancun","2026-11-06");
+F("biggest-cities","World's Biggest Cities","city","Which cities make the ultimate megacity lineup?",["Most people", "Biggest area", "Oldest", "Most billionaires", "Biggest economy"],"Jakarta|Dhaka|Tokyo|Delhi|Shanghai|Guangzhou|Cairo|Manila|Kolkata|Seoul|Mumbai|São Paulo|Mexico City|Beijing|New York City|Osaka|Karachi|Kinshasa|Lagos|Istanbul|Buenos Aires|Shenzhen|Bangalore|Lahore|Rio de Janeiro|Moscow|Los Angeles|Chennai|Bogotá|Lima|Paris|Bangkok|Hyderabad|Johannesburg|London|Chengdu|Tehran|Ho Chi Minh City|Chicago|Wuhan|Ahmedabad|Kuala Lumpur|Dallas|Riyadh|Hong Kong|Houston|Taipei|Santiago|Madrid|Toronto|Washington, D.C.|Philadelphia|Atlanta|Miami|Singapore|Addis Ababa|Barcelona|Sydney|Nairobi|Hanoi|Boston|San Francisco|Berlin|Montreal|Rome|Dubai|Athens|Lisbon|Amsterdam|Mecca|Las Vegas|Vienna|Prague|Honolulu|Cancún|Venice",["000102030405060708090g0a0b0v0c0d0n0j0p110k0e0l0m0f0i0q0r0h0s0t0y0o0u0w101a151418130x171b1j0z1m1i1c1d1t1n1216191e1f1g1h1k1l1o1p1q1r1s1u1v1w1x1y1z20212223", "0e041o02051g0q0p121e19161f0d000x0l1h0k0b0f0v0u091p0c031d0611150o1l1707100y0z13011t0j081c1q1r1y1s0w0i0r1x180m1a1k0g1v1n1w0t0n1b1i1m0a0s0h141u201j1z212223", "1u1v0d1s0j031z0z0u05091k0y131x230f1c20060n1n0p101q1w040c14020i0a000t0k0m0s1b0b0o070w010e1o0r1r1f08111a0g171p0q0v1l1e1d211i121t191g1618150h0x1j1h1m1y220l", "0e0p180y0d0a1i041p0q0l050b090j1a02030u0v1t1d1h00121c0m161l190z0w1o1e0c171q141y071g0r151r131f081k0o0f1b1z061s0t0x200k0i1w110g1v0s1u1n0n21101m011x0h231j22", "0e020q0y090u12041p160f190d1e1i0l1o1f0b1g0p1h050c001d18031l0j0a0z1c131a0k0o1k170v1q071s1r1w15010g08101b1z1y061t0m0t0x0s0w0i110r1v1u200n21141n1m1x0h1j2223"],"Delhi=New Delhi | São Paulo=Sao Paulo | New York City=New York;NYC | Bangalore=Bengaluru | Rio de Janeiro=Rio | Los Angeles=LA | Bogotá=Bogota | Ho Chi Minh City=Saigon | Dallas=Dallas-Fort Worth | Washington, D.C.=Washington DC | San Francisco=SF | Cancún=Cancun","2026-11-06");
 F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the ultimate draft class?",["Most seasons played", "Most All-Star or Pro Bowl picks", "Most championships", "Most MVPs", "Most career earnings"],"LeBron James|Kareem Abdul-Jabbar|Magic Johnson|Shaquille O'Neal|Tim Duncan|Hakeem Olajuwon|Allen Iverson|Patrick Ewing|David Robinson|Oscar Robertson|Elgin Baylor|Elvin Hayes|Bill Walton|James Worthy|Mark Aguirre|Ralph Sampson|Brad Daugherty|Mychal Thompson|Danny Manning|Pervis Ellison|Derrick Coleman|Larry Johnson|Chris Webber|Glenn Robinson|Joe Smith|Michael Olowokandi|Elton Brand|Kenyon Martin|Kwame Brown|Yao Ming|Dwight Howard|Andrew Bogut|Greg Oden|Derrick Rose|Blake Griffin|John Wall|Kyrie Irving|Anthony Davis|Andrew Wiggins|Karl-Anthony Towns|Ben Simmons|Markelle Fultz|Deandre Ayton|Zion Williamson|Anthony Edwards|Cade Cunningham|Paolo Banchero|Victor Wembanyama|Zaccharie Risacher|Cooper Flagg|Peyton Manning|John Elway|Troy Aikman|Terry Bradshaw|Bruce Smith|Earl Campbell|Lee Roy Selmon|Paul Hornung|Chuck Bednarik|Jim Plunkett|Too Tall Jones|Billy Sims|George Rogers|Irving Fryar|Bo Jackson|Vinny Testaverde|Jeff George|Russell Maryland|Drew Bledsoe|Dan Wilkinson|Ki-Jana Carter|Keyshawn Johnson|Orlando Pace|Tim Couch|Courtney Brown|Michael Vick|David Carr|Carson Palmer|Eli Manning|Mario Williams|JaMarcus Russell|Jake Long|Matthew Stafford|Sam Bradford|Cam Newton|Andrew Luck|Eric Fisher|Jadeveon Clowney|Jameis Winston|Jared Goff|Myles Garrett|Baker Mayfield|Kyler Murray|Joe Burrow|Trevor Lawrence|Travon Walker|Bryce Young|Caleb Williams|Cam Ward",["001t0104031i050u1e072a0q1r1f260b0o100x0m250r0i0k1o1n1108060y091h1w1m0a0v0220230e1x1g120d2c2f0h0s1u0z130n1z0j2h270c1v0l2g242i1l2e0f1k0p140t2j16292b1j0g152k171q1y182l2d222m19211p1a2n1s1b282o0w2p1c1d2q", "000104031e0205090b06071i0a1108101f0u1m0t0d202i0y1g1k0z130m1r1j0g261w2327182d290f0x1h2c252h140e2f1z2j1o1p2a0q1t1l0n0i0c2k170l2e1q1b120r0k1v2l2m191a2p1s0v0o161n0h0s2b2g1x1u24150p0j222n1y21282o0w1c1d2q", "01040200031h1l1g0d1v1e05081f261m0e0c1n0h11100u2a090b12201w0v0n1z1o1q06071i0y0x0z130m2c2i0q252h1t23140a0t0r2f271r0i0k2j182k0o162l172d0l292e2m0s2b1j2g0g1x0f1u1k24150p190j1a1b222n1y21281p2o0w2p1c1s1d2q", "011e0002040305081f06090x1h2c1l0c1j11100u26072a1i0y1g0z0b130m120d202i0q252h1w1m1t23140a0v0e0t0r2f0n271r1z0i0k2j182k1v0o162l1o1n172d0l290h2e2m0s2b2g0g1x0f1u1k24150p190j1q1a1b222n1y21281p2o0w2p1c1s1d2q", "002a110z101312030y2h1e26040u142l2i162c2k0x0m0q2m252j18061723272b070r2f080v050n2d0t0k2g190l2e15201w1g0i0o290s1f1z1a2n1i1t240p1b282o1x1u2221011c0w020g0j2p0d0e0f1y1d1r1v2q0c1s0h0b1j091h1o1n1q0a1k1p1l1m"],"LeBron James=LeBron | Kareem Abdul-Jabbar=Kareem | Magic Johnson=Magic | Shaquille O'Neal=Shaq | Hakeem Olajuwon=Hakeem | Allen Iverson=AI | Oscar Robertson=The Big O | Glenn Robinson=Big Dog | Karl-Anthony Towns=KAT | Zion Williamson=Zion | Anthony Edwards=Ant | Victor Wembanyama=Wemby | Peyton Manning=Peyton | John Elway=Elway | Troy Aikman=Aikman | Too Tall Jones=Ed Jones | Michael Vick=Vick | Matthew Stafford=Stafford","2026-11-06");
   /* NEW TOPICS (fully ranked) END */
   /* A fully ranked (100-answer) version of a topic replaces its older version. */
@@ -4394,7 +4405,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       run = function () { rvAfter(calm ? 0 : 1300, function () { rvConfetti(g); }); };
     }
     html = '<div class="rv-in">' + html + '</div>' + bar;
-    $('reveal').innerHTML = html;
+    var rvEl = $('reveal'); rvEl.innerHTML = html;
+    /* Focus the reveal so Page Down, the arrow keys and Space scroll it in every browser. */
+    rvEl.tabIndex = -1; try { if (!rvEl.contains(document.activeElement) || document.activeElement === rvEl) rvEl.focus({ preventScroll: true }); } catch (e) {}
     if (run) run();
   }
   function renderResults() {
@@ -4812,7 +4825,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     REC_G = g; REC_SAVED = 0;
   }
   function recSample() {
-    var g = S.game; if (!g) return;
+    var g = S.game; if (!g || g.noRec) return;
     if (g !== REC_G) { if (REC && REC_G) recFinish(REC_G); recStart(g); }
     var t = now(), ph = g.status === 'lobby' ? 'lobby' : 'draft';
     if (ph === 'draft' && g.order && g.order.length && derive(g, t).complete) ph = g.results ? 'results' : 'scoring';
@@ -5066,7 +5079,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     if (S.ui.dvFor !== key) { S.ui.dvFor = key; $('dv-editor').hidden = true; $('dv-open').textContent = 'Adjust the look'; if (!DV.busy) $('dv-msg').textContent = ''; DV.rec = null; DV.blob = null; $('dv-share').hidden = true; }
     box.hidden = !(atResults || atHome);
     $('dv-dismiss').hidden = !atHome;
-    $('dv-kicker').textContent = atHome ? 'Your last draft · ' + lr.D.topic : 'For your TikTok or Reels';
+    $('dv-kicker').textContent = atHome ? 'Your last draft · ' + lr.D.topic : ''; $('dv-kicker').hidden = !atHome;
     dvTick();
   }
   function dvTick() {
@@ -5424,6 +5437,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       S.env.db.doc('rooms/' + g.code + '/players/' + S.me).delete().catch(function () {});
     }
     S.game = null; S.ui.sub = null; S.ui.chosen = null; S.ui.turnN = -1;
+    if (!silent) S.irrBack = null;
     closeList();
     try { if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     if (!silent) { S.view = 'home'; setMsg(''); render(); window.scrollTo(0, 0); }
@@ -6991,12 +7005,13 @@ If you want to offset all timestamps of a track such that the first one is zero,
     var act = t.getAttribute('data-act');
     if (act === 'goto-mode' && t.getAttribute('data-mode') === 'fast' && !S.game) openFast();
     else if (act === 'goto-mode') { if (t.id === 'league-btn' && S.league && !S.game) { leagueUnwatch(); S.league = null; try { if (/^#league-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } gotoMode(t.getAttribute('data-mode')); }
-    else if (act === 'home') { ev.preventDefault(); if (S.fast) { if (S.fast.done) leaveGame(false); else window.scrollTo(0, 0); } else if (!S.game) showView('home'); else if (screenFor() === 'results') leaveGame(false); else window.scrollTo(0, 0); }
+    else if (act === 'home') { ev.preventDefault(); if (S.fast || S.game) leaveGame(false); else showView('home'); }
     else if (act === 'share') { ev.preventDefault(); shareScore(); }
     else if (act === 'fast-start') startFast();
     else if (act === 'irr-start') { if (S.game && S.reveal) { var rg = S.game; var a0 = revealedList().filter(function (x) { return x !== gameId(rg); }); a0.push(gameId(rg)); store('roster.revealed', JSON.stringify(a0.slice(-30))); rvClear(); S.reveal = null; document.documentElement.classList.remove('rv-on'); } startIrr(); }
     else if (act === 'reveal-next') { if (S.reveal) revealStep(S.reveal.step + 1); }
     else if (act === 'reveal-skip' || act === 'reveal-done') { if (S.game) revealFinish(S.game); }
+    else if (act === 'irr-back') irrBackToDraft();
     else if (act === 'irr-home') { var isrc = irrTodaySrc(); if (isrc && !S.game) startIrr(isrc); }
     else if (act === 'fast-skip') fastSubmit(null);
     else if (act === 'irr-sub') irrChooseSub(parseInt(t.getAttribute('data-i'), 10));
@@ -7189,7 +7204,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-03-02';
+  var BUILD_ID = '2026-11-03-04';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7680,8 +7695,11 @@ If you want to offset all timestamps of a track such that the first one is zero,
   }
   function startIrr(src) {
     if (!src) { var g = S.game; if (!g || !g.results) return; src = irrSrcFromGame(g); }
-    var gid = src.gid, f = loadIrr(gid);
-    leaveGame(true); S.fastDay = null;
+    var gid = src.gid, f = loadIrr(gid), g0 = S.game;
+    /* Keep the finished draft so "Back to your draft results" can reopen it (an accidental tap shouldn't lose the board). */
+    S.irrBack = g0 && g0.results && gameId(g0) === gid ? { gid: gid, shared: g0.mode === 'shared', code: g0.code, game: g0, me: S.me, mode: S.mode, lastSettings: S.lastSettings } : (S.irrBack && S.irrBack.gid === gid ? S.irrBack : null);
+    var keep = S.irrBack;
+    leaveGame(true); S.fastDay = null; S.irrBack = keep;
     if (!f) {
       var t0 = now();
       f = { kind: 'irr', untimed: true, gid: gid, topicId: src.topicId, subs: src.subs.slice(), dateKey: src.dateKey, past: !!src.past, idx: 0, answers: [], startedAt: t0, endsAt: t0, done: false, finishedAt: 0, uid: fbOn() && FB.user ? FB.user.uid : '', game: src.snap, me: src.me };
@@ -7693,6 +7711,15 @@ If you want to offset all timestamps of a track such that the first one is zero,
     if (!f.done && fastExpired(f)) finishFast(); else saveFast();
     setMsg(''); render(); window.scrollTo(0, 0);
     if (!f.done) setTimeout(function () { var i = $('fast-in'); if (i) i.focus(); }, 50);
+  }
+  function irrBackToDraft() {
+    var b = S.irrBack; if (!b || !S.fast || S.fast.gid !== b.gid) return;
+    saveFast(); S.fast = null; S.ui.fastQ = '';
+    try { sessionStorage.removeItem('roster.irrNow'); } catch (e) {}
+    /* Reopened boards aren't recorded again, so the saved draft video stays the full draft. */
+    if (b.shared && b.code) { enterRoom(b.code); if (S.game) S.game.noRec = true; S.irrBack = b; return; }
+    b.game.noRec = true; S.game = b.game; S.me = b.me; S.mode = b.mode; S.lastSettings = b.lastSettings; S.view = 'play';
+    setMsg(''); render(); window.scrollTo(0, 0);
   }
   function statIrr(kind) { statBump(function (r) { r[kind] = r[kind] || {}; r[kind].irr = (r[kind].irr || 0) + 1; }); }
   function irrRecord(f) {
@@ -7852,6 +7879,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     var f = S.fast, t = TOPICS[f.topicId];
     $('fast-play').hidden = f.done; $('fast-done').hidden = !f.done;
     var irr = f.kind === 'irr';
+    $('irr-back').hidden = !(irr && S.irrBack && S.irrBack.gid === f.gid);
     if (!f.done) {
       var untimed = !!f.untimed, nPicked = f.answers.filter(function (a) { return !!a; }).length;
       $('fast-clock').hidden = untimed; $('fast-bar').hidden = untimed; $('fast-skip').hidden = untimed; $('fast-play').classList.toggle('untimed', untimed);
@@ -8005,6 +8033,20 @@ If you want to offset all timestamps of a track such that the first one is zero,
     }, 250);
     setInterval(renderToday, 60000);
     window.addEventListener('scroll', turnAlert, { passive: true });
+    /* While the full-screen reveal is up the page itself can't scroll, so a wheel or trackpad scroll that lands
+       anywhere else (another fixed layer, the page edge) scrolls the reveal instead. */
+    document.addEventListener('wheel', function (ev) {
+      if (!document.documentElement.classList.contains('rv-on')) return;
+      var rv = $('reveal'); if (!rv || rv.hidden || rv.contains(ev.target)) return;
+      rv.scrollTop += ev.deltaY * (ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? rv.clientHeight : 1);
+    }, { passive: true });
+    document.addEventListener('keydown', function (ev) {
+      if (!document.documentElement.classList.contains('rv-on') || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+      var rv = $('reveal'); if (!rv || rv.hidden || rv.contains(document.activeElement)) return;   /* focused reveal scrolls by itself */
+      var h = rv.clientHeight, d = { ArrowDown: 40, ArrowUp: -40, PageDown: h * 0.85, PageUp: -h * 0.85, ' ': ev.shiftKey ? -h * 0.85 : h * 0.85 }[ev.key];
+      if (ev.key === 'End') d = rv.scrollHeight; else if (ev.key === 'Home') d = -rv.scrollHeight;
+      if (!d) return; ev.preventDefault(); rv.scrollTop += d;
+    });
     /* Closing the tab mid-game still keeps the draft video up to that moment. */
     window.addEventListener('pagehide', function () {
       var g = S.game; if (!g || !REC || REC_G !== g) return;
