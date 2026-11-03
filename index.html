@@ -6560,7 +6560,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     var all = statsLoadLocal(), sid = statsSid();
     Object.keys(all).forEach(function (d) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
-      var r = all[d], out = { v: 1, site: r.site, visits: r.visits || 0, start: r.start || {}, done: r.done || {}, rooms: r.rooms || 0, joins: r.joins || 0, first: r.first || 0, last: r.last || 0 };
+      var r = all[d], out = { v: 1, site: r.site, visits: r.visits || 0, start: r.start || {}, done: r.done || {}, rooms: r.rooms || 0, joins: r.joins || 0, dv: r.dv || 0, first: r.first || 0, last: r.last || 0 };
       /* Online drafts: every player in a room shares the same game id, so the organizer can count each draft once. */
       function roomIds(kind) { return (r.g || []).filter(function (id) { return id.indexOf(kind + ':') === 0 && id.indexOf(kind + ':LOCAL:') !== 0 && /^[a-z]+:[A-Z]{5}:\d{6,16}$/.test(id); }).map(function (id) { return id.slice(kind.length + 1); }).slice(-40); }
       out.rg = roomIds('start'); out.rgd = roomIds('done');
@@ -6579,7 +6579,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     Object.keys(map).forEach(function (topic) {
       var m = /stats\/v1\/\d{4}-\d{2}\/(\d{4}-\d{2}-\d{2})\/([A-Za-z0-9_-]{4,40})$/.exec(topic), v = map[topic];
       if (!m || !v || typeof v !== 'object') return;
-      var row = { day: m[1], sid: m[2], site: String(v.site || ''), visits: statNum(v.visits), rooms: statNum(v.rooms), joins: statNum(v.joins), start: {}, done: {} };
+      var row = { day: m[1], sid: m[2], site: String(v.site || ''), visits: statNum(v.visits), rooms: statNum(v.rooms), joins: statNum(v.joins), dv: statNum(v.dv), start: {}, done: {} };
       function ids(a) { return Array.isArray(a) ? a.filter(function (x) { return typeof x === 'string' && /^[A-Z]{5}:\d{6,16}$/.test(x); }).slice(0, 40) : null; }
       row.rg = ids(v.rg); row.rgd = ids(v.rgd);
       STATS_MODES.forEach(function (x) { row.start[x[0]] = statNum(v.start && v.start[x[0]]); row.done[x[0]] = statNum(v.done && v.done[x[0]]); });
@@ -6623,7 +6623,8 @@ If you want to offset all timestamps of a track such that the first one is zero,
         tile(fbc.leagues.length, 'Leagues', fbc.leagues.filter(function (l) { return l.vis === 'public'; }).length + ' public · ' + fbc.leagues.filter(function (l) { return l.vis !== 'public'; }).length + ' private · ' + fbc.leagues.filter(function (l) { return l.at >= cutAt; }).length + ' new ' + label);
     $('stats-tiles').innerHTML = tile(uniq(sel), 'Visitors', 'devices, ' + label) + tile(sum(sel, function (r) { return r.visits; }), 'Visits', 'page opens, ' + label) +
       tile(allDrafts(sel), 'Drafts played', 'an online draft counts once, ' + label) + tile(sum(sel, function (r) { return r.start.fast; }), 'Fast Money plays', label) +
-      tile(sum(sel, function (r) { return r.start.irr; }), 'Mr. Irrelevant plays', uniq(sel, function (r) { return r.start.irr > 0; }) + ' player' + (uniq(sel, function (r) { return r.start.irr > 0; }) === 1 ? '' : 's') + ' · ' + sum(sel, function (r) { return r.done.irr; }) + ' finished, ' + label);
+      tile(sum(sel, function (r) { return r.start.irr; }), 'Mr. Irrelevant plays', uniq(sel, function (r) { return r.start.irr > 0; }) + ' player' + (uniq(sel, function (r) { return r.start.irr > 0; }) === 1 ? '' : 's') + ' · ' + sum(sel, function (r) { return r.done.irr; }) + ' finished, ' + label) +
+      tile(sum(sel, function (r) { return r.dv || 0; }), 'Draft videos downloaded', uniq(sel, function (r) { return r.dv > 0; }) + ' device' + (uniq(sel, function (r) { return r.dv > 0; }) === 1 ? '' : 's') + ', ' + label);
     $('stats-modes').innerHTML = '<thead><tr><th>Mode</th><th class="num">Games</th><th class="num">Finished</th><th class="num">Players</th><th class="num">Avg. players per game</th></tr></thead><tbody>' +
       STATS_MODES.map(function (x) {
         var k = x[0], gms = games(sel, k), seats = sum(sel, function (r) { return r.start[k]; });
@@ -7115,7 +7116,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-16';
+  var BUILD_ID = '2026-11-02-17';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
