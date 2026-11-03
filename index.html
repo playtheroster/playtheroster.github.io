@@ -5217,10 +5217,10 @@ If you want to offset all timestamps of a track such that the first one is zero,
     try {
       var code = null;
       if (fixedCode) code = fixedCode;
-      for (var i = 0; i < 6 && !code; i++) { var c = newCode(); var ex = await db.doc('rooms/' + c).get(); if (!ex.exists) code = c; }
+      for (var i = 0; i < 6 && !code; i++) { var c = newCode(); var ex = await db.doc('rooms/' + c).get({ quick: true }); if (!ex.exists) code = c; }
       if (!code) throw new Error('no code');
-      await db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, past: !!day, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' });
-      await db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name, code, spec.topicId));
+      /* The room and your seat in it are saved at the same time. */
+      await Promise.all([db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, past: !!day, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' }), db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name, code, spec.topicId))]);
       enterRoom(code);
       if (!fixedCode) statBump(function (r) { r.rooms = (r.rooms || 0) + 1; });
       return code;
@@ -7116,7 +7116,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-02-17';
+  var BUILD_ID = '2026-11-02-18';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7392,7 +7392,9 @@ If you want to offset all timestamps of a track such that the first one is zero,
     }
     /* Subscribe to a room, then gather its documents: stored copies from the relay, plus a copy
        from anyone already in the room (asked for with a sync request). */
-    function ensure(code) {
+    /* quick: for checking a brand-new room code. Saved room data comes back right after subscribing, so if nothing
+       at all arrives within ~0.9 s the code is free (instead of waiting the full 3.5 s used when opening a room). */
+    function ensure(code, quick) {
       var R = room(code);
       if (R.ready) return R.ready;
       R.ready = subscribe(topicFor('rooms/' + code + '/#')).then(function () {
@@ -7401,7 +7403,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
           var start = Date.now();
           (function wait() {
             var t = Date.now() - start, idle = Date.now() - (R.lastMsg || start);
-            if (('' in R.store && idle > 400 && t > 700) || t > 3500) resolve(R);
+            if (('' in R.store && idle > 400 && t > 700) || t > 3500 || (quick && !R.lastMsg && t > 900)) resolve(R);
             else setTimeout(wait, 100);
           })();
         });
@@ -7451,7 +7453,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       var p = parse(path);
       return {
         id: path.split('/').pop(),
-        get: function () { if (!p) return Promise.resolve({ exists: false, data: function () {} }); return ensure(p.code).then(function (R) { return docSnap(R, p.rel); }); },
+        get: function (o) { if (!p) return Promise.resolve({ exists: false, data: function () {} }); return ensure(p.code, !!(o && o.quick)).then(function (R) { return docSnap(R, p.rel); }); },
         set: function (d) { return write(path, 'set', d); },
         update: function (d) { return write(path, 'update', d); },
         delete: function () { return write(path, 'delete'); },
