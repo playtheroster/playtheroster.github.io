@@ -531,7 +531,7 @@ button.bsub[aria-pressed="true"] .mono { color: var(--hi-ink); }
 .org-glance-table thead th { border-top: 0; background: var(--deep); color: var(--deep-ink); font-weight: 700; }
 .org-glance-table tbody th { font-weight: 700; white-space: nowrap; }
 .org-glance-table .mono { font-size: 0.62rem; color: var(--accent); }
-.org-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 6px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); }
+.org-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 6px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); }
 .org-tab { min-height: 52px; border: 0; border-radius: 13px; background: transparent; font-weight: 800; font-size: 1.02rem; color: var(--muted); }
 .org-tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 var(--drop); }
 #org-tab-fast[aria-selected="true"] { background: linear-gradient(100deg, var(--grad-a), var(--grad-b)); color: var(--grad-ink); }
@@ -792,6 +792,35 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .fast-results .sc.tier { padding: 4px 9px; font-family: var(--font-mono); font-size: 0.95rem; }
 .share-box { display: grid; gap: 8px; padding: 14px; border: 2px dashed var(--accent); border-radius: 16px; background: var(--tint); }
 .share-text { min-height: 0; height: auto; padding: 10px 12px; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.45; resize: none; white-space: pre-wrap; overflow-wrap: anywhere; }
+.streak-chip { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 12px; border-radius: 999px; background: #000000; color: #ffb612; font-weight: 800; font-size: 0.95rem; width: max-content; max-width: 100%; }
+.streak-chip small { color: #ffffff; font-weight: 600; font-size: 0.8rem; }
+.pct-line { display: flex; flex-wrap: wrap; gap: 8px; }
+.pct-line span { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2.5px solid var(--edge); border-radius: 999px; background: var(--tint); font-weight: 800; }
+.ch-slot .ch-card { width: min(560px, 100%); max-height: calc(100% - 8px); overflow-y: auto; }
+.ch-card { display: grid; gap: 12px; padding: 18px 20px; border: 3px solid var(--edge); border-radius: 20px; background: var(--surface); box-shadow: 8px 8px 0 var(--pop); }
+.ch-card h2 { margin: 0; font-size: clamp(1.6rem, 5vw, 2.4rem); }
+.ch-card .ch-score { font-family: var(--font-display); color: var(--pop); }
+.ch-card .actions { margin: 0; }
+.ch-card .field { max-width: 320px; }
+.ch-res { display: grid; gap: 10px; padding: 16px 18px; border: 3px solid var(--edge); border-radius: 18px; background: var(--surface); }
+.ch-res h3 { margin: 0; font-size: 1.5rem; }
+.ch-grid { display: grid; }
+.ch-row { display: grid; gap: 4px; padding: 8px 0; border-top: 1px solid var(--line); }
+.ch-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; font-weight: 700; }
+.ch-pair > span { min-width: 0; overflow-wrap: anywhere; }
+.ch-pair .sc { margin-right: 6px; }
+.ch-head { padding-bottom: 4px; }
+.ch-res .ch-sub { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.org-posts { display: grid; gap: 18px; }
+.post-block { display: grid; gap: 10px; padding: 16px 18px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--surface); }
+.post-block h3 { margin: 0; }
+.post-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.post-row select { width: auto; min-width: 0; flex: 1 1 220px; max-width: 420px; }
+.post-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.post-names label { display: grid; gap: 4px; }
+.post-out { display: flex; flex-wrap: wrap; gap: 14px; }
+.post-out figure { margin: 0; display: grid; gap: 6px; justify-items: start; }
+.post-out img { width: 170px; height: auto; border: 2px solid var(--edge); border-radius: 12px; display: block; }
 .mm-box { display: grid; gap: 10px; padding: 14px 16px; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--tint); }
 .mm-box .mm-row { display: flex; align-items: center; gap: 10px; font-weight: 700; }
 .mm-box .mm-t { font-family: var(--font-mono); font-variant-numeric: tabular-nums; margin-left: auto; }
@@ -1124,11 +1153,12 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
     <h1 class="display tagline">Build Your Roster. <span class="mark">Beat Your Friends.</span></h1>
     <p class="lede">Draft the best roster from today's topic and prove your friends wrong.</p>
   </div>
-  <div class="band-clock"><span class="mono">New topic in</span><span class="display" id="band-next">--:--:--</span></div>
+  <div class="band-clock"><span class="mono">New topic in</span><span class="display" id="band-next">--:--:--</span><span class="streak-chip" id="streak-chip" hidden=""></span></div>
 </div>
 </div>
 
 <main id="top">
+  <div class="overlay ch-slot" id="ch-slot" hidden="" role="dialog" aria-modal="true" aria-label="Challenge"></div>
   <section class="wrap hero" id="hero">
     <div class="topic" aria-labelledby="today-name">
       <div class="topic-head">
@@ -1432,6 +1462,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
           <div style="display:grid;gap:20px" id="results-main">
             <div class="t10-focus" id="t10-focus" hidden=""></div>
             <div class="winner" id="winner" hidden=""></div>
+            <div class="pct-line" id="pct-line" hidden=""></div>
+            <div class="ch-res" id="ch-res" hidden=""></div>
             <div class="irr-cta" id="irr-cta" hidden="">
               <div class="irr-cta-text">
                 <span class="mono">Bonus round · unlocked</span>
@@ -1449,6 +1481,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <ol class="standings" id="standings"></ol>
                 <div class="actions">
                   <button class="btn primary" type="button" id="share-btn" data-act="share">Share my score</button>
+                  <button class="btn" type="button" id="ch-btn" data-act="challenge">⚔️ Challenge a friend</button>
                   <button class="btn" type="button" id="save-btn" data-act="save">Save my result</button>
                   <button class="btn" type="button" id="again-btn" data-act="again">Play again</button>
                   <button class="btn" type="button" id="home-btn" data-act="go-home">← Back to homepage</button>
@@ -1584,6 +1617,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
           <button type="button" class="org-tab" role="tab" id="org-tab-daily" data-act="org-tab" data-tab="daily" aria-selected="true">🗓️ Daily draft</button>
           <button type="button" class="org-tab" role="tab" id="org-tab-fast" data-act="org-tab" data-tab="fast" aria-selected="false">⚡ Fast Money</button>
           <button type="button" class="org-tab" role="tab" id="org-tab-stats" data-act="org-tab" data-tab="stats" aria-selected="false">📊 Stats</button>
+          <button type="button" class="org-tab" role="tab" id="org-tab-posts" data-act="org-tab" data-tab="posts" aria-selected="false">📣 Posts</button>
         </div>
         <div style="display:grid;gap:8px">
           <h2 class="display org-title" id="org-heading">Daily draft schedule</h2>
@@ -1609,6 +1643,22 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
           <p class="note" id="stats-sites"></p>
           <label class="stats-me"><input type="checkbox" id="stats-nome"> Don’t count my visits and games from this device</label>
           <p class="note">How it’s counted: each phone or computer counts as one visitor, so one person on two devices counts twice, and clearing browser data makes a device count as new. Nothing personal is recorded (no names or emails), only anonymous counts. A game counts when the draft starts and again under “Finished” when results appear. An online draft counts as one game no matter how many people are in the room; “Players” is how many different people played that mode, and “Avg. players per game” is how full the rooms were (AI players aren’t counted). Counting started on Oct 16, 2026, and only covers the website, not the Claude version.</p>
+        </div>
+        <div class="org-posts" id="org-posts" hidden="">
+          <div class="post-block">
+            <h3>Today’s topic</h3>
+            <p class="note">One slide announcing a day’s topic and its 5 subtopics. Post it in the morning.</p>
+            <div class="post-row"><label class="mono label" for="post-day">Day</label><select class="field" id="post-day"></select><button class="btn primary" type="button" data-act="post-topic" id="post-topic-btn">Make the slide</button></div>
+            <div class="post-out" id="post-topic-out"></div>
+          </div>
+          <div class="post-block">
+            <h3>Which team is better?</h3>
+            <p class="note" id="post-draft-note">Three slides from the last draft played on this device: the board with the scores hidden, the reveal, and a “play for yourself” slide.</p>
+            <div class="post-names" id="post-names"></div>
+            <div class="post-row"><button class="btn primary" type="button" data-act="post-draft" id="post-draft-btn">Make the slides</button></div>
+            <div class="post-out" id="post-draft-out"></div>
+          </div>
+          <p class="note">Slides are 1080×1920, the size TikTok and Reels use. Tap a slide’s Download button to save it, then post them in order.</p>
         </div>
         <ol class="org-list" id="org-list"></ol>
         <div><button class="btn small" type="button" id="org-more" data-act="org-more">Show 30 more days</button></div>
@@ -3922,6 +3972,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var scr = screenFor();
     var inOrg = S.view === 'organizer' && !S.game;
     var inPlay = !inOrg && (!!S.game || S.view === 'play');
+    renderChallengeCard(); renderStreak();
     $('hero').hidden = inPlay || inOrg; $('band-hero').hidden = inPlay || inOrg; $('how').hidden = inPlay || inOrg; $('play').hidden = !inPlay; $('organizer').hidden = !inOrg;
     $('org-btn').hidden = !orgAllowed() || inOrg;
     if (!$('hero').hidden) fitCats();
@@ -4479,7 +4530,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('save-btn').disabled = !res || saved;
     $('save-btn').textContent = saved ? (fbOn() ? 'Saved to your stats' : 'Saved to your account') : 'Save my result';
     if (res && inGame && !saved) autoSaveResult(g);
-    if (res && inGame) recordDay(g);
+    if (res && inGame) { recordDay(g); pctSubmit(g); if (isTodayGame(g)) pctWatch(g.dateKey); }
+    renderPct(g); renderChallengeResult(g);
+    $('ch-btn').hidden = !(res && inGame && !g.practice);
     if (res && inGame && !g.past) irrSaveSrc(g);
     /* Mr. Irrelevant: offered after every finished draft you played in (today's or a past day's), near the top. */
     var irrDone = loadIrr(gameId(g)), irrOk = !!(res && inGame);
@@ -4487,7 +4540,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('irr-cta').querySelector('.mono').textContent = irrDone && irrDone.done ? 'Bonus round · done' : 'Bonus round · unlocked';
     $('irr-btn').textContent = irrDone && irrDone.done ? 'See your Mr. Irrelevant' : irrDone ? 'Back to Mr. Irrelevant' : 'Play Mr. Irrelevant';
     $('share-btn').hidden = !(res && inGame);
-    if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; }
+    if (S.ui.shareFor !== gameId(g)) { S.ui.shareFor = gameId(g); $('share-box').hidden = true; $('share-note').textContent = ''; $('share-box').querySelector('.mono').textContent = 'Your score card'; }
     $('save-note').textContent = g.past ? (res ? 'Past days don’t count toward your stats or leagues.' : '') : (!res || saved) ? '' : (S.env.db && S.env.uid ? (S.account.profile ? '' : (fbOn() ? 'Sign in to save this result to your stats.' : S.env.web ? 'Pick a username to save results on this device.' : 'Saving needs an account.')) : 'Saving needs an account, which needs you signed in to claude.ai on this page.');
     var againTxt = g.practice ? 'New random topic' : g.mode === 'local' ? 'Play again' : 'New game';
     document.querySelectorAll('#scr-results [data-act="again"]').forEach(function (b) { b.textContent = againTxt; });
@@ -4643,6 +4696,138 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   var SHARE_URL = 'https://playtheroster.com';
   var TIER_SQUARES = { 5: '🟩', 4: '🟩', 3: '🟨', 2: '🟧', 1: '🟥' };
   function medal(rank) { return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank + '.'; }
+  /* ---------- growth: challenge links, percentile, streaks ---------- */
+  function b64uEnc(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function b64uDec(s) { s = String(s).replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); }
+  function myRow(g) { if (!g || !g.results) return null; var rows = standings(g, g.results.scores); return rows.filter(function (r) { return r.pid === S.me; })[0] || null; }
+  function isTodayGame(g) { return !!(g && !g.practice && !g.past && g.dateKey === dateKey(new Date())); }
+
+  /* Challenge a friend: a link carrying the topic, your name, score and roster. Your friend drafts the same topic
+     against the AI whenever they like, and the results compare the two rosters. */
+  function challengeFrom(g) {
+    var me = myRow(g); if (!me || g.practice) return null;
+    var t = TOPICS[g.topicId];
+    return { v: 1, d: g.dateKey, t: g.topicId, s: g.subs.slice(), n: String(g.players[S.me].name || me.name).replace(/ \(AI\)$/, '').slice(0, 24), sc: round1(me.total),
+      p: g.subs.map(function (sub) { var pk = filled(g, S.me, sub); return pk ? t.pool.indexOf(t.byKey[pk.key]) : -1; }),
+      x: g.subs.map(function (sub) { var pk = filled(g, S.me, sub), q = pk ? g.results.scores['p' + pk.n] : null; return q ? round1(Number(q.score) || 0) : 0; }) };
+  }
+  function challengeUrl(c) { return (S.env.web ? location.origin + location.pathname : SHARE_URL + '/') + '#c-' + b64uEnc(JSON.stringify(c)); }
+  function parseChallenge(hash) {
+    var m = /^#c-([A-Za-z0-9_-]{10,1500})$/.exec(hash || ''); if (!m) return null;
+    try {
+      var c = JSON.parse(b64uDec(m[1])), t = c && TOPICS[c.t];
+      if (!t || c.v !== 1 || !/^\d{4}-\d\d-\d\d$/.test(c.d) || !Array.isArray(c.s) || !c.s.length || c.s.length > 8) return null;
+      if (!c.s.every(function (sub) { return typeof sub === 'string' && t.ranks[sub]; })) return null;
+      if (!Array.isArray(c.p) || c.p.length !== c.s.length || !Array.isArray(c.x) || c.x.length !== c.s.length) return null;
+      var keys = c.p.map(function (i) { return Number.isInteger(i) && i >= 0 && i < t.pool.length ? t.pool[i].key : null; });
+      var sc = Number(c.sc); if (!isFinite(sc) || sc < 0 || sc > c.s.length * 10) return null;
+      return { d: c.d, t: c.t, s: c.s.map(String), n: clean(String(c.n || '')).slice(0, 24) || 'Your friend', sc: round1(sc), keys: keys, x: c.x.map(function (v) { v = Number(v); return isFinite(v) ? Math.max(0, Math.min(10, round1(v))) : 0; }) };
+    } catch (e) { return null; }
+  }
+  function renderChallengeCard() {
+    var slot = $('ch-slot'); if (!slot) return;
+    var c = S.challenge, show = !!c && !S.game && !S.fast && S.view === 'home';
+    slot.hidden = !show; if (!show) { slot.innerHTML = ''; return; }
+    var t = TOPICS[c.t], today = dateKey(new Date());
+    slot.innerHTML = '<div class="ch-card"><span class="mono">⚔️ You’ve been challenged</span>' +
+      '<h2 class="display">' + esc(c.n) + ' scored <span class="ch-score">' + fmt1(c.sc) + '</span></h2>' +
+      '<p style="margin:0">on <strong>' + esc(t.name) + '</strong> (' + (c.d === today ? 'today’s topic' : esc(fmtDay(c.d))) + '). Draft the same topic against the AI and try to beat it. You’ll see both rosters side by side at the end.</p>' +
+      (myName() ? '' : '<label class="mono label" for="ch-name">Your name</label><input class="field" id="ch-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Your name">') +
+      '<div class="actions"><button class="btn primary" type="button" data-act="ch-accept" id="ch-accept">Accept the challenge</button><button class="btn" type="button" data-act="ch-dismiss">Not now</button></div>' +
+      '<p class="msg" id="ch-msg" role="status"></p></div>';
+  }
+  function acceptChallenge() {
+    var c = S.challenge; if (!c) return;
+    var ni = $('ch-name'); if (ni) { var nv = clean(ni.value); if (!nv) { $('ch-msg').textContent = 'Enter your name first.'; $('ch-msg').className = 'msg bad'; ni.focus(); return; } $('player-name').value = nv; store('roster.name', nv); }
+    var today = dateKey(new Date()), day = c.d < today ? c.d : null;
+    var bc = $('bot-count'), count = parseInt(bc ? bc.value : '3', 10) || 3;
+    S.challenge = null; try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    playOffline(count, false, day, { topicId: c.t, subs: c.s.slice(), dateKey: day || today });
+    if (S.game) { S.game.challenge = { n: c.n, sc: c.sc, keys: c.keys, x: c.x }; try { sessionStorage.setItem('roster.local', JSON.stringify({ game: S.game, settings: S.lastSettings })); } catch (e) {} }
+    statBump(function (r) { r.chAcc = (r.chAcc || 0) + 1; });
+    window.scrollTo(0, 0);
+  }
+  function renderChallengeResult(g) {
+    var box = $('ch-res'), c = g.challenge, me = myRow(g);
+    if (!c || !me) { box.hidden = true; box.innerHTML = ''; return; }
+    var t = TOPICS[g.topicId], mine = round1(me.total), diff = round1(mine - c.sc);
+    var head = diff > 0 ? 'You beat ' + esc(c.n) + '! 🎉' : diff < 0 ? esc(c.n) + ' wins this one' : 'Dead even!';
+    box.hidden = false;
+    box.innerHTML = '<span class="mono">⚔️ Challenge result</span><h3 class="display">' + head + '</h3>' +
+      '<p style="margin:0"><strong>You ' + fmt1(mine) + '</strong> vs <strong>' + esc(c.n) + ' ' + fmt1(c.sc) + '</strong>' + (diff ? ' · ' + (diff > 0 ? 'won' : 'lost') + ' by ' + fmt1(Math.abs(diff)) : '') + '</p>' +
+      '<div class="ch-grid"><div class="ch-pair ch-head"><span class="ch-sub">You</span><span class="ch-sub">' + esc(c.n) + '</span></div>' +
+      g.subs.map(function (sub, i) {
+        var pk = filled(g, S.me, sub), q = pk ? g.results.scores['p' + pk.n] : null;
+        var theirKey = c.keys[i], theirName = theirKey && t.byKey[theirKey] ? t.byKey[theirKey].name : '—';
+        return '<div class="ch-row"><span class="ch-sub">' + esc(sub) + '</span><div class="ch-pair"><span>' + (q ? scoreBadge(q.score) : '') + esc(pk ? pk.name : '—') + '</span><span>' + scoreBadge(c.x[i] || 0) + esc(theirName) + '</span></div></div>';
+      }).join('') + '</div>' +
+      '<div class="actions" style="margin:0"><button class="btn primary small" type="button" data-act="challenge">Send a challenge back</button></div>';
+  }
+  async function shareChallenge(btn) {
+    var g = S.game, c = challengeFrom(g); if (!c) return;
+    var t = TOPICS[g.topicId], url = challengeUrl(c);
+    var text = 'I scored ' + fmt1(c.sc) + '/' + (g.subs.length * 10) + ' drafting ' + t.name + ' on The Roster' + (isTodayGame(g) ? ' today' : '') + '. Think you can beat me? ⚔️';
+    statBump(function (r) { r.chSent = (r.chSent || 0) + 1; });
+    var coarse = false; try { coarse = window.matchMedia('(pointer: coarse)').matches; } catch (e) {}
+    if (navigator.share && coarse) { try { await navigator.share({ text: text, url: url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    var box = $('share-box'), ta = $('share-text'), note = $('share-note'), full = text + '\n' + url;
+    box.hidden = false; box.querySelector('.mono').textContent = 'Your challenge link'; ta.value = full; ta.rows = 4;
+    await copyScore(full, ta, note, btn || $('ch-btn'));
+  }
+
+  /* Percentile: every device sends its best score on today's topic; results show how many of today's players you beat. */
+  var PCT_MIN = TEST.pctMin || 3;
+  function scoresOn() { return !!S.env.web && (!window.__ROSTER_TEST__ || !!TEST.scores) && !!(S.env.db && S.env.db.net && S.env.db.net.scoresPut); }
+  function pctSubmit(g) {
+    if (!scoresOn() || !isTodayGame(g)) return;
+    var id = gameId(g); S.pctSent = S.pctSent || {}; if (S.pctSent[id]) return; S.pctSent[id] = 1;
+    var me = myRow(g); if (!me) return;
+    var k = 'roster.best.' + g.dateKey, best = Math.max(Number(store(k)) || 0, round1(me.total)); store(k, String(best));
+    try { Object.keys(localStorage).forEach(function (x) { if (x.indexOf('roster.best.') === 0 && x !== k) localStorage.removeItem(x); }); } catch (e) {}
+    S.env.db.net.scoresPut('scores/v1/' + g.dateKey + '/' + statsSid(), { b: best, at: now() }).catch(function () {});
+  }
+  function pctWatch(day) {
+    if (!scoresOn() || S.pctDay === day) return; S.pctDay = day;
+    S.env.db.net.scoresWatch(day, function () { clearTimeout(S.pctT); S.pctT = setTimeout(function () { if (S.game && screenFor() === 'results') renderPct(S.game); }, 300); }).catch(function () {});
+  }
+  function pctFor(g) {
+    if (!scoresOn() || !isTodayGame(g)) return null;
+    var me = myRow(g); if (!me) return null;
+    var map = S.env.db.net.scoresMap(), pre = 'scores/v1/' + g.dateKey + '/', mine = pre + statsSid(), others = [];
+    Object.keys(map).forEach(function (k) { if (k.indexOf(pre) === 0 && k !== mine) { var b = Number(map[k] && map[k].b); if (isFinite(b) && b >= 0 && b <= 80) others.push(b); } });
+    if (others.length < PCT_MIN) return null;
+    var total = round1(me.total), beat = others.filter(function (b) { return b < total; }).length;
+    return { pct: Math.round(100 * beat / others.length), n: others.length + 1, rank: 1 + others.filter(function (b) { return b > total; }).length };
+  }
+  function pctText(pc) { return pc.rank === 1 ? 'Top score of ' + pc.n + ' players today' : pc.pct >= 10 ? 'Beat ' + pc.pct + '% of today’s players' : 'Ranked #' + pc.rank + ' of ' + pc.n + ' today'; }
+  function renderPct(g) {
+    var box = $('pct-line'); if (!box) return;
+    var bits = [], st = isTodayGame(g) && g.players[S.me] && g.results ? streakInfo() : null, pc = pctFor(g);
+    if (st && st.n >= 1) bits.push('<span>🔥 ' + st.n + '-day streak</span>');
+    if (pc) bits.push('<span>📊 ' + pctText(pc) + (pc.rank !== 1 && pc.pct >= 10 ? ' <small class="mono">' + pc.n + ' played</small>' : '') + '</span>');
+    box.hidden = !bits.length; box.innerHTML = bits.join('');
+  }
+
+  /* Streaks: days in a row you finished that day's draft or Fast Money (past days and practice don't count). */
+  function streakDays() { try { var a = JSON.parse(store('roster.streak') || '[]'); return Array.isArray(a) ? a.filter(function (k) { return /^\d{4}-\d\d-\d\d$/.test(k); }) : []; } catch (e) { return []; } }
+  function streakMark(day) {
+    if (day !== dateKey(new Date())) return;
+    var a = streakDays(); if (a.indexOf(day) < 0) { a.push(day); a = a.sort().slice(-400); store('roster.streak', JSON.stringify(a)); }
+    renderStreak();
+  }
+  function streakInfo() {
+    var set = {}; streakDays().forEach(function (k) { set[k] = 1; });
+    var d = new Date(), today = !!set[dateKey(d)], n = 0;
+    if (!today) d.setDate(d.getDate() - 1);
+    while (set[dateKey(d)]) { n++; d.setDate(d.getDate() - 1); }
+    return { n: n, today: today };
+  }
+  function renderStreak() {
+    var el = $('streak-chip'); if (!el) return;
+    var st = streakInfo();
+    el.hidden = st.n < 1;
+    el.innerHTML = st.n < 1 ? '' : '🔥 ' + st.n + '-day streak' + (st.today ? '' : ' <small>· play today to keep it</small>');
+  }
   function shareText(g) {
     var res = g.results; if (!res) return '';
     var rows = standings(g, res.scores), me = rows.filter(function (r) { return r.pid === S.me; })[0];
@@ -4664,6 +4849,11 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       var top = p && (t.ranks[sub] || [])[0] === p.key;
       lines.push((sc ? TIER_SQUARES[tier(sc.score)] : '⬜') + ' ' + sub + ' ' + (sc ? fmt1(sc.score) : '–') + (top ? ' ⭐' : ''));
     });
+    if (isTodayGame(g)) {
+      var st = streakInfo(), pc = pctFor(g);
+      if (pc) lines.push('📊 ' + pctText(pc));
+      if (st.n >= 2) lines.push('🔥 ' + st.n + '-day streak');
+    }
     lines.push(g.practice || g.past ? 'Can you beat it? ' + SHARE_URL : 'Play today’s topic: ' + SHARE_URL);
     return lines.join('\n');
   }
@@ -4671,7 +4861,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var g = S.game; if (!g || !g.results) return;
     var text = shareText(g); if (!text) return;
     var box = $('share-box'), ta = $('share-text'), note = $('share-note');
-    box.hidden = false; ta.value = text; ta.rows = text.split('\n').length + 1;
+    box.hidden = false; box.querySelector('.mono').textContent = 'Your score card'; ta.value = text; ta.rows = text.split('\n').length + 1;
     await copyScore(text, ta, note, $('share-btn'));
   }
   /* Copy the score straight to the clipboard on tap, so the player only has to paste. */
@@ -4972,7 +5162,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   function dvCard(D) { var n = D.subs.length; return { w: 1000, h: 190 + 84 + n * 118 + 130 }; }
   function dvRect(D, p) { var c = dvCard(D), sc = p.size / 100, w = c.w * sc, h = c.h * sc; return { x: (1080 - w) * p.x, y: (1920 - 120 - h) * p.y + 20, w: w, h: h, sc: sc }; }
   function dvDraw(ctx, D, p, st) {
-    var bgc = { green: '#00b140', black: '#000000', white: '#ffffff' }[p.bg];
+    var bgc = { green: '#00b140', black: '#000000', white: '#ffffff' }[p.bg] || p.bg;
     ctx.save(); ctx.fillStyle = bgc; ctx.fillRect(0, 0, 1080, 1920);
     var R = dvRect(D, p), done = st.ph === 'results', c = dvCard(D), W = c.w, H = c.h;
     ctx.translate(R.x, R.y); ctx.scale(R.sc, R.sc);
@@ -5211,12 +5401,12 @@ If you want to offset all timestamps of a track such that the first one is zero,
     S.lastPracticeTopic = id;
     return { dateKey: dateKey(new Date()), topicId: id, subs: shuffled(TOPICS[id].subs, Math.random).slice(0, SUBS_PER_DAY) };
   }
-  function playOffline(count, practice, day) {
+  function playOffline(count, practice, day, specOver) {
     var name = myName() || 'You', today = dateKey(new Date());
     count = Math.max(1, Math.min(7, count || 3));
     if (practice || !day || day >= today) day = null;
     leaveGame(true);
-    var spec = practice ? practiceSpec() : dailySpec(day || today);
+    var spec = specOver || (practice ? practiceSpec() : dailySpec(day || today));
     var players = { you: { name: name, joinedAt: 0 } };
     var bots = shuffled(BOT_NAMES, Math.random).slice(0, count);
     bots.forEach(function (b, i) { players['bot' + i] = { name: b + ' (AI)', bot: true, joinedAt: i + 1 }; });
@@ -5532,6 +5722,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     var all = dayLog(), d = all[g.dateKey] || { best: 0, n: 0 };
     d.best = Math.max(d.best || 0, Number(mine.total) || 0); d.n = (d.n || 0) + 1; all[g.dateKey] = d;
     store('roster.days', JSON.stringify(all));
+    if (isTodayGame(g)) streakMark(g.dateKey);
   }
   /* Signed in on the website: every finished game saves to your stats by itself. */
   var AUTO_SAVE_TRIED = {};
@@ -6551,6 +6742,146 @@ If you want to offset all timestamps of a track such that the first one is zero,
     return canon(draft) !== canon(futureOnly(SCHEDULE.days)) || canon(S.org.fast) !== canon(futureOnly(SCHEDULE.fast || {}));
   }
   function orgMsg(t, bad) { var m = $('org-msg'); m.textContent = t || ''; m.className = 'msg' + (bad ? ' bad' : ''); }
+  /* ---------- organizer: social post maker (1080x1920 slides drawn on a canvas) ---------- */
+  var POST_RED = '#ca2430', POST_GOLD = '#ffb612';
+  function renderPosts() {
+    var sel = $('post-day'), keep = sel.value;
+    sel.innerHTML = orgDays().slice(0, 7).map(function (key, i) { var sp = orgSpec(key); return '<option value="' + key + '">' + (i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : esc(keyLabel(key))) + ' · ' + esc(TOPICS[sp.topicId].name) + '</option>'; }).join('');
+    if (keep) sel.value = keep;
+    var r = lastRec(), box = $('post-names');
+    $('post-draft-btn').disabled = !r;
+    if (!r) { box.innerHTML = '<p class="note" style="margin:0">Play a draft on this device first (online or against the AI). Its board is what the slides show.</p>'; return; }
+    if (box._for === r.t0) return; box._for = r.t0;
+    box.innerHTML = '<p class="note" style="margin:0;grid-column:1/-1">From your ' + esc(r.D.topic) + ' draft (' + esc(r.D.date) + '). Change the names if you’d rather not show real ones.</p>' +
+      r.D.ps.map(function (p, i) { return '<label><span class="mono label">Player ' + (i + 1) + '</span><input class="field" type="text" maxlength="16" data-post-name="' + esc(p.pid) + '" value="' + esc(p.name) + '"></label>'; }).join('');
+  }
+  async function postFonts() { try { if (document.fonts && document.fonts.load) await Promise.all([document.fonts.load('400 100px "Lilita One"'), document.fonts.load('800 40px Rubik'), document.fonts.load('700 40px Rubik')]); } catch (e) {} }
+  function postCanvas(bg, dark) {
+    var c = document.createElement('canvas'); c.width = 1080; c.height = 1920; var ctx = c.getContext('2d');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, 1080, 1920);
+    ctx.fillStyle = dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.12)';
+    for (var y = 22; y < 1920; y += 44) for (var x = 22; x < 1080; x += 44) { ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill(); }
+    return c;
+  }
+  function postBrand(ctx, n, of) {
+    ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left'; ctx.font = '400 56px "Lilita One", sans-serif'; ctx.fillStyle = '#ffffff';
+    ctx.fillText('THE ROSTER', 60, 100); ctx.fillStyle = POST_GOLD; ctx.fillText('.', 60 + ctx.measureText('THE ROSTER').width, 100);
+    if (of) { ctx.textAlign = 'right'; ctx.font = '400 42px "Lilita One", sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fillText(n + '/' + of, 1020, 100); }
+  }
+  function postLines(ctx, text, maxW) {
+    var words = String(text).split(/\s+/), lines = [''];
+    words.forEach(function (w) { var tst = lines[lines.length - 1] ? lines[lines.length - 1] + ' ' + w : w; if (ctx.measureText(tst).width <= maxW || !lines[lines.length - 1]) lines[lines.length - 1] = tst; else lines.push(w); });
+    return lines;
+  }
+  /* Centered text block; returns the y just below it. */
+  function postText(ctx, text, y, font, color, maxW, lh, upper) {
+    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    var lines = postLines(ctx, upper ? String(text).toUpperCase() : text, maxW || 940);
+    lines.forEach(function (l, i) { ctx.fillText(l, 540, y + i * lh); });
+    return y + (lines.length - 1) * lh;
+  }
+  function postKicker(ctx, text, y) { ctx.save(); ctx.font = '800 36px Rubik, sans-serif'; ctx.fillStyle = POST_GOLD; ctx.textAlign = 'center'; var t = String(text).toUpperCase(), sp = 5, w = 0, i; for (i = 0; i < t.length; i++) w += ctx.measureText(t[i]).width + sp; var x = 540 - w / 2; ctx.textAlign = 'left'; for (i = 0; i < t.length; i++) { ctx.fillText(t[i], x, y); x += ctx.measureText(t[i]).width + sp; } ctx.restore(); }
+  /* Two-line headline in the display face, shrunk until both lines fit. */
+  function postHead(ctx, l1, l2, y, c1, c2) {
+    var size = 124; ctx.font = '400 ' + size + 'px "Lilita One", sans-serif';
+    while (size > 60 && Math.max(ctx.measureText(l1.toUpperCase()).width, ctx.measureText((l2 || '').toUpperCase()).width) > 960) { size -= 4; ctx.font = '400 ' + size + 'px "Lilita One", sans-serif'; }
+    ctx.textAlign = 'center'; ctx.fillStyle = c1; ctx.fillText(l1.toUpperCase(), 540, y);
+    if (l2) { ctx.fillStyle = c2; ctx.fillText(l2.toUpperCase(), 540, y + size * 0.98); }
+    return y + (l2 ? size * 0.98 : 0);
+  }
+  function postPill(ctx, text, cy, bg, fg) {
+    ctx.font = '800 44px Rubik, sans-serif'; var w = Math.min(980, ctx.measureText(text).width + 96), h = 92, x = 540 - w / 2;
+    ctx.fillStyle = bg; dvRound(ctx, x, cy - h / 2, w, h, h / 2); ctx.fill();
+    ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 540, cy + 2); ctx.textBaseline = 'alphabetic';
+  }
+  function postJersey(ctx, cx, cy, size) {
+    ctx.save(); ctx.translate(cx - size / 2, cy - size / 2); ctx.scale(size / 200, size / 200);
+    var body = new Path2D('M72 36 L46 46 L22 74 L42 96 L58 86 L58 168 L142 168 L142 86 L158 96 L178 74 L154 46 L128 36 Q100 62 72 36 Z');
+    ctx.fillStyle = POST_GOLD; ctx.fill(body); ctx.lineWidth = 6; ctx.lineJoin = 'round'; ctx.strokeStyle = '#000000'; ctx.stroke(body);
+    ctx.strokeStyle = POST_RED; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.stroke(new Path2D('M78 40 Q100 60 122 40')); ctx.stroke(new Path2D('M30 78 L44 92 M170 78 L156 92'));
+    ctx.fillStyle = '#000000'; ctx.font = '400 62px "Lilita One", sans-serif'; ctx.textAlign = 'center'; ctx.fillText('01', 100, 146);
+    ctx.restore();
+  }
+  function postOut(box, canvases, base) {
+    box.innerHTML = canvases.map(function (c, i) {
+      var url = c.toDataURL('image/png'), name = base + (canvases.length > 1 ? '-' + (i + 1) : '') + '.png';
+      return '<figure><img src="' + url + '" alt="Slide ' + (i + 1) + '"><a class="btn small" href="' + url + '" download="' + esc(name) + '">Download' + (canvases.length > 1 ? ' ' + (i + 1) : '') + '</a></figure>';
+    }).join('');
+  }
+  function postSlug(t) { return String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40); }
+  function postSubsSentence(subs) { var l = subs.map(function (x, i) { return i ? x.toLowerCase() : x; }); return (l.length > 1 ? l.slice(0, -1).join(', ') + ' and ' + l[l.length - 1] : l[0]) + '.'; }
+  async function postTopic() {
+    var key = $('post-day').value || dateKey(new Date()), sp = orgSpec(key), t = TOPICS[sp.topicId];
+    await postFonts();
+    var c = postCanvas(POST_RED, false), ctx = c.getContext('2d');
+    postBrand(ctx);
+    var when = key === dateKey(new Date()) ? 'Today’s topic' : 'Topic for ' + keyLabel(key);
+    postKicker(ctx, when + ' · ' + new Date(key + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }), 400);
+    var y = postHead(ctx, 'Draft the best', t.name, 545, '#ffffff', POST_GOLD);
+    y = postText(ctx, t.q || '', y + 110, '700 44px Rubik, sans-serif', '#ffffff', 900, 58);
+    /* subtopic tiles like the homepage */
+    var top = y + 90, cols = 2, gw = 460, gh = 170, gap = 22, x0 = 540 - (cols * gw + gap) / 2;
+    sp.subs.forEach(function (sub, i) {
+      var r = Math.floor(i / cols), col = i % cols, n = sp.subs.length, lastOdd = n % 2 === 1 && i === n - 1;
+      var x = lastOdd ? 540 - gw / 2 : x0 + col * (gw + gap), yy = top + r * (gh + gap);
+      ctx.fillStyle = '#000000'; dvRound(ctx, x, yy, gw, gh, 26); ctx.fill();
+      ctx.textAlign = 'left'; ctx.fillStyle = POST_GOLD; ctx.font = '400 54px "Lilita One", sans-serif'; ctx.fillText('0' + (i + 1), x + 30, yy + 74);
+      ctx.fillStyle = '#ffffff'; ctx.font = '800 40px Rubik, sans-serif'; ctx.fillText(dvFit(ctx, sub, gw - 60, '800 42px Rubik, sans-serif'), x + 30, yy + 136);
+    });
+    var after = top + Math.ceil(sp.subs.length / cols) * (gh + gap) + 90;
+    postPill(ctx, 'Draft yours at playtheroster.com', Math.min(1700, after + 40), POST_GOLD, '#000000');
+    postText(ctx, 'New topic every day. Free, no app.', Math.min(1800, after + 160), '800 40px Rubik, sans-serif', '#ffffff', 940, 52);
+    postOut($('post-topic-out'), [c], 'roster-topic-' + key);
+  }
+  /* The finished board, as the draft video draws it, cut out and placed on a slide. */
+  function postCard(ctx, D, st, bg, top) {
+    var off = document.createElement('canvas'); off.width = 1080; off.height = 1920;
+    var p = { bg: bg, x: 0.5, y: 0.4, size: 92 }, o = off.getContext('2d'); dvDraw(o, D, p, st);
+    var R = dvRect(D, p), pad = 6, sw = R.w + 14 * R.sc + pad * 2, sh = R.h + 14 * R.sc + pad * 2, sc = 980 / sw;
+    ctx.drawImage(off, R.x - pad, R.y - pad, sw, sh, 540 - sw * sc / 2, top, sw * sc, sh * sc);
+    return top + sh * sc;
+  }
+  async function postDraft() {
+    var r = lastRec(); if (!r) return;
+    var D = JSON.parse(JSON.stringify(r.D)), names = {};
+    document.querySelectorAll('[data-post-name]').forEach(function (inp) { var v = clean(inp.value); if (v) names[inp.getAttribute('data-post-name')] = v.slice(0, 16); });
+    D.ps.forEach(function (p) { if (names[p.pid]) { if (D.win && D.win.name === p.name) D.win.name = names[p.pid]; p.name = names[p.pid]; } });
+    /* the finished board: the first moment with results and no reveal on screen */
+    var len = recLen(r), fin = null;
+    for (var T = len; T < len + 180; T += 0.25) { var s0 = recAt(r, T); if (s0.ph === 'results' && !s0.rv) { fin = s0; break; } }
+    var out = $('post-draft-out');
+    if (!fin || !D.win) { out.innerHTML = '<p class="note">That draft finished without scores, so there’s nothing to reveal. Play another one and try again.</p>'; return; }
+    await postFonts();
+    var hid = JSON.parse(JSON.stringify(fin)); hid.ph = 'scoring'; hid.rv = null;
+    var rows = D.ps.map(function (p) { return { name: p.name, total: Number(D.totals[p.pid]) || 0 }; }).sort(function (a, b) { return b.total - a.total; });
+    var gap = rows.length > 1 ? round1(rows[0].total - rows[1].total) : 0;
+    /* 1: which team is better? */
+    var c1 = postCanvas(POST_RED, false), x1 = c1.getContext('2d');
+    postBrand(x1, 1, 3); postKicker(x1, D.ps.length + ' players · 1 draft · ' + D.topic, 200);
+    var y1 = postHead(x1, 'Which team', 'is better?', 330, '#ffffff', POST_GOLD);
+    y1 = postCard(x1, D, hid, POST_RED, y1 + 50);
+    y1 = postText(x1, postSubsSentence(D.subs) + ' One pick per category.', y1 + 80, '800 44px Rubik, sans-serif', '#ffffff', 920, 56);
+    postPill(x1, 'Comment your pick, then swipe →', Math.min(1830, y1 + 100), '#000000', POST_GOLD);
+    /* 2: the reveal */
+    var c2 = postCanvas('#000000', true), x2 = c2.getContext('2d');
+    postBrand(x2, 2, 3); postKicker(x2, 'The reveal', 230);
+    var y2 = gap === 0 ? postHead(x2, 'It’s a', 'tie!', 360, '#ffffff', POST_GOLD) : gap < 3 ? postHead(x2, 'Decided by', fmt1(gap) + (gap === 1 ? ' point' : ' points'), 360, '#ffffff', POST_GOLD) : postHead(x2, rows[0].name + ' wins', 'by ' + fmt1(gap), 360, '#ffffff', POST_GOLD);
+    y2 = postCard(x2, D, fin, '#000000', y2 + 50);
+    y2 = postText(x2, rows.map(function (r0) { return r0.name + ' ' + fmt1(r0.total); }).join(' · '), y2 + 80, '800 44px Rubik, sans-serif', '#ffffff', 960, 56);
+    postPill(x2, 'Swipe to play for yourself →', Math.min(1830, y2 + 100), POST_GOLD, '#000000');
+    /* 3: play for yourself */
+    var c3 = postCanvas(POST_RED, false), x3 = c3.getContext('2d');
+    postBrand(x3, 3, 3); postKicker(x3, 'Your turn', 330);
+    postHead(x3, 'Play for', 'yourself', 470, '#ffffff', POST_GOLD);
+    postJersey(x3, 540, 960, 480);
+    x3.font = '400 92px "Lilita One", sans-serif'; var uw = x3.measureText('playtheroster.com').width + 100;
+    x3.fillStyle = POST_GOLD; dvRound(x3, 540 - uw / 2 + 14, 1300 + 14, uw, 140, 30); x3.fill();
+    x3.fillStyle = '#000000'; dvRound(x3, 540 - uw / 2, 1300, uw, 140, 30); x3.fill();
+    x3.fillStyle = '#ffffff'; x3.textAlign = 'center'; x3.fillText('playtheroster.com', 540, 1402);
+    postText(x3, 'A new topic every day. Free, no app.', 1580, '800 46px Rubik, sans-serif', '#ffffff', 940, 60);
+    postText(x3, 'Draft with friends or against the AI.', 1645, '800 46px Rubik, sans-serif', '#ffffff', 940, 60);
+    postOut(out, [c1, c2, c3], 'roster-' + postSlug(D.topic) + '-' + D.dk);
+  }
   function keyLabel(key) {
     var p = key.split('-').map(Number);
     return new Date(p[0], p[1] - 1, p[2]).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
@@ -6659,7 +6990,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     var all = statsLoadLocal(), sid = statsSid();
     Object.keys(all).forEach(function (d) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
-      var r = all[d], out = { v: 1, site: r.site, visits: r.visits || 0, start: r.start || {}, done: r.done || {}, rooms: r.rooms || 0, joins: r.joins || 0, dv: r.dv || 0, first: r.first || 0, last: r.last || 0 };
+      var r = all[d], out = { v: 1, site: r.site, visits: r.visits || 0, start: r.start || {}, done: r.done || {}, rooms: r.rooms || 0, joins: r.joins || 0, dv: r.dv || 0, chs: r.chSent || 0, cha: r.chAcc || 0, first: r.first || 0, last: r.last || 0 };
       /* Online drafts: every player in a room shares the same game id, so the organizer can count each draft once. */
       function roomIds(kind) { return (r.g || []).filter(function (id) { return id.indexOf(kind + ':') === 0 && id.indexOf(kind + ':LOCAL:') !== 0 && /^[a-z]+:[A-Z]{5}:\d{6,16}$/.test(id); }).map(function (id) { return id.slice(kind.length + 1); }).slice(-40); }
       out.rg = roomIds('start'); out.rgd = roomIds('done');
@@ -6678,7 +7009,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     Object.keys(map).forEach(function (topic) {
       var m = /stats\/v1\/\d{4}-\d{2}\/(\d{4}-\d{2}-\d{2})\/([A-Za-z0-9_-]{4,40})$/.exec(topic), v = map[topic];
       if (!m || !v || typeof v !== 'object') return;
-      var row = { day: m[1], sid: m[2], site: String(v.site || ''), visits: statNum(v.visits), rooms: statNum(v.rooms), joins: statNum(v.joins), dv: statNum(v.dv), start: {}, done: {} };
+      var row = { day: m[1], sid: m[2], site: String(v.site || ''), visits: statNum(v.visits), rooms: statNum(v.rooms), joins: statNum(v.joins), dv: statNum(v.dv), chs: statNum(v.chs), cha: statNum(v.cha), start: {}, done: {} };
       function ids(a) { return Array.isArray(a) ? a.filter(function (x) { return typeof x === 'string' && /^[A-Z]{5}:\d{6,16}$/.test(x); }).slice(0, 40) : null; }
       row.rg = ids(v.rg); row.rgd = ids(v.rgd);
       STATS_MODES.forEach(function (x) { row.start[x[0]] = statNum(v.start && v.start[x[0]]); row.done[x[0]] = statNum(v.done && v.done[x[0]]); });
@@ -6723,7 +7054,8 @@ If you want to offset all timestamps of a track such that the first one is zero,
     $('stats-tiles').innerHTML = tile(uniq(sel), 'Visitors', 'devices, ' + label) + tile(sum(sel, function (r) { return r.visits; }), 'Visits', 'page opens, ' + label) +
       tile(allDrafts(sel), 'Drafts played', 'an online draft counts once, ' + label) + tile(sum(sel, function (r) { return r.start.fast; }), 'Fast Money plays', label) +
       tile(sum(sel, function (r) { return r.start.irr; }), 'Mr. Irrelevant plays', uniq(sel, function (r) { return r.start.irr > 0; }) + ' player' + (uniq(sel, function (r) { return r.start.irr > 0; }) === 1 ? '' : 's') + ' · ' + sum(sel, function (r) { return r.done.irr; }) + ' finished, ' + label) +
-      tile(sum(sel, function (r) { return r.dv || 0; }), 'Draft videos downloaded', uniq(sel, function (r) { return r.dv > 0; }) + ' device' + (uniq(sel, function (r) { return r.dv > 0; }) === 1 ? '' : 's') + ', ' + label);
+      tile(sum(sel, function (r) { return r.dv || 0; }), 'Draft videos downloaded', uniq(sel, function (r) { return r.dv > 0; }) + ' device' + (uniq(sel, function (r) { return r.dv > 0; }) === 1 ? '' : 's') + ', ' + label) +
+      tile(sum(sel, function (r) { return r.chs || 0; }), 'Challenges sent', sum(sel, function (r) { return r.cha || 0; }) + ' accepted, ' + label);
     $('stats-modes').innerHTML = '<thead><tr><th>Mode</th><th class="num">Games</th><th class="num">Finished</th><th class="num">Players</th><th class="num">Avg. players per game</th></tr></thead><tbody>' +
       STATS_MODES.map(function (x) {
         var k = x[0], gms = games(sel, k), seats = sum(sel, function (r) { return r.start[k]; });
@@ -6843,13 +7175,19 @@ If you want to offset all timestamps of a track such that the first one is zero,
   function renderOrganizer() {
     if (!S.org.draft) orgStart();
     renderOrgConnect();
-    var tab = S.org.tab === 'fast' ? 'fast' : S.org.tab === 'stats' ? 'stats' : 'daily';
+    var tab = S.org.tab === 'fast' ? 'fast' : S.org.tab === 'stats' ? 'stats' : S.org.tab === 'posts' ? 'posts' : 'daily';
     var saved = futureOnly(SCHEDULE.days), savedF = futureOnly(SCHEDULE.fast || {});
-    ['daily', 'fast', 'stats'].forEach(function (x) { var b = $('org-tab-' + x); b.setAttribute('aria-selected', String(x === tab)); });
-    var isStats = tab === 'stats';
-    $('org-stats').hidden = !isStats;
-    ['org-list', 'org-more'].forEach(function (id) { $(id).hidden = isStats; });
-    document.querySelector('#organizer .org-save').hidden = isStats;
+    ['daily', 'fast', 'stats', 'posts'].forEach(function (x) { var b = $('org-tab-' + x); b.setAttribute('aria-selected', String(x === tab)); });
+    var isStats = tab === 'stats', isPosts = tab === 'posts';
+    $('org-stats').hidden = !isStats; $('org-posts').hidden = !isPosts;
+    ['org-list', 'org-more'].forEach(function (id) { $(id).hidden = isStats || isPosts; });
+    document.querySelector('#organizer .org-save').hidden = isStats || isPosts;
+    if (isPosts) {
+      $('org-heading').textContent = 'Social posts';
+      $('org-intro').textContent = 'Ready-to-post slides for TikTok, Reels and Stories, made from the schedule and from your drafts.';
+      renderPosts();
+      return;
+    }
     if (isStats) {
       $('org-heading').textContent = 'Players & visits';
       $('org-intro').textContent = 'How many people visited the websites and played each mode. It updates live while this page is open.';
@@ -7051,6 +7389,11 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'invite-join') inviteJoin();
     else if (act === 'invite-other') { S.invite = null; try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} render(); }
     else if (act === 'find-match') findMatch();
+    else if (act === 'post-topic') postTopic();
+    else if (act === 'post-draft') postDraft();
+    else if (act === 'challenge') shareChallenge(t.id === 'ch-btn' ? t : null);
+    else if (act === 'ch-accept') acceptChallenge();
+    else if (act === 'ch-dismiss') { S.challenge = null; try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} render(); }
     else if (act === 'mm-wait') { if (S.mm) { S.mm.offerAt = Math.floor((now() - S.mm.since) / 1000) + MM_OFFER; renderMm(); } }
     else if (act === 'mm-ai') { S.mm = null; var bc = $('bot-count'); playOffline(parseInt(bc ? bc.value : '3', 10) || 3); }
     else if (act === 'start') startDraft();
@@ -7219,7 +7562,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-04-01';
+  var BUILD_ID = '2026-11-04-02';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7364,6 +7707,10 @@ If you want to offset all timestamps of a track such that the first one is zero,
     }
     /* Only this month and last month: older counts stay on the relay but aren't downloaded, so the page stays fast as the game grows. */
     function statsWatch(cb) { statsCb = cb; return Promise.all(statsMonths().map(function (m) { return subscribe(topicFor('stats/v1/' + m + '/#')); })); }
+    /* Today's scores (one per device) for the "you beat X% of players" line. */
+    var scoresStore = {}, scoresCb = null;
+    function scoresPut(path, data) { return statsPut(path, data); }
+    function scoresWatch(day, cb) { scoresCb = cb; return whenLive(30000, true).then(function () { return subscribe(topicFor('scores/v1/' + day + '/#')); }); }
     function client() { return whenLive(); }
     /* Send something that the relay acknowledges (publish or subscribe) on every live connection; done when any
        one answers. Connections that don't answer in a few seconds are restarted, and the request is retried. */
@@ -7419,6 +7766,13 @@ If you want to offset all timestamps of a track such that the first one is zero,
     function onMessage(topic, payload) {
       if (topic.indexOf(MQTT_ROOT) !== 0) return;
       var path = topic.slice(MQTT_ROOT.length);
+      if (path.indexOf('scores/v1/') === 0) {
+        var scv = decode(payload);
+        if (scv === undefined) delete scoresStore[path];
+        else if (scv && typeof scv === 'object' && !Array.isArray(scv)) scoresStore[path] = scv;
+        if (scoresCb) scoresCb();
+        return;
+      }
       if (path.indexOf('stats/v1/') === 0) {
         var sv = decode(payload);
         if (sv === undefined) delete statsStore[path];
@@ -7581,7 +7935,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
         return new Promise(function (resolve) { setTimeout(function () { resolve(jclone(S.env.pubIndex) || {}); }, 2000); });
       });
     }
-    return { doc: doc, collection: collection, publicRooms: publicRooms, warm: start, statsPut: statsPut, statsWatch: statsWatch, statsMap: function () { return statsStore; } };
+    return { doc: doc, collection: collection, publicRooms: publicRooms, warm: start, statsPut: statsPut, statsWatch: statsWatch, statsMap: function () { return statsStore; }, scoresPut: scoresPut, scoresWatch: scoresWatch, scoresMap: function () { return scoresStore; } };
   }
   function makeWebDb(uid) {
     var local = makeLocalStore(), net = makeNetStore(uid);
@@ -7859,6 +8213,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       return { sub: sub, name: a.name, key: a.key, score: q.score, rank: list.indexOf(a.key) };
     });
     f.total = round1(f.results.reduce(function (m, r) { return m + r.score; }, 0));
+    if (!irr && !f.past && f.dateKey === dateKey(new Date())) streakMark(f.dateKey);
     saveFast(); render();
     fastSyncAccount();
   }
@@ -8041,6 +8396,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     }
     var lm = /^#league-([A-Z]{6})$/i.exec(location.hash || '');
     if (/^#past$/i.test(location.hash || '')) { S.view = 'play'; S.mode = 'past'; }
+    var chl = parseChallenge(location.hash); if (chl) { S.challenge = chl; S.view = 'home'; }
     if (lm) { S.view = 'play'; S.mode = 'league'; S.leagueOpenCode = lm[1].toUpperCase(); }
     var restored = null, roomCode = null, orgSaved = null;
     try {
