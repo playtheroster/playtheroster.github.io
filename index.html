@@ -792,6 +792,14 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .fast-results .sc.tier { padding: 4px 9px; font-family: var(--font-mono); font-size: 0.95rem; }
 .share-box { display: grid; gap: 8px; padding: 14px; border: 2px dashed var(--accent); border-radius: 16px; background: var(--tint); }
 .share-text { min-height: 0; height: auto; padding: 10px 12px; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.45; resize: none; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mm-box { display: grid; gap: 10px; padding: 14px 16px; border: 2.5px solid var(--edge); border-radius: 16px; background: var(--tint); }
+.mm-box .mm-row { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.mm-box .mm-t { font-family: var(--font-mono); font-variant-numeric: tabular-nums; margin-left: auto; }
+.mm-box .mm-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); animation: mmPulse 1.2s ease-in-out infinite; flex: 0 0 auto; }
+.mm-box.offer { border-color: var(--accent); }
+.mm-box .actions { margin: 0; }
+@keyframes mmPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+@media (prefers-reduced-motion: reduce) { .mm-box .mm-dot { animation: none; } }
 .chat { display: grid; gap: 10px; padding: 16px; border: 2.5px solid var(--edge); border-radius: 18px; background: var(--tint); }
 .chat-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .chat-list { list-style: none; margin: 0; padding: 4px 2px; display: grid; gap: 6px; max-height: 280px; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
@@ -1357,6 +1365,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note" id="lobby-list-note"></p>
               </div>
+              <div class="mm-box" id="mm-box" hidden="" aria-live="polite"></div>
               <div class="actions">
                 <button class="btn primary" type="button" id="start-btn" data-act="start">Start draft</button>
                 <button class="btn" type="button" data-act="leave">Leave room</button>
@@ -5345,7 +5354,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
         if (ps.size > 0 && ps.size < MAX_PLAYERS) { await joinRoom(rooms[i].code); return; }
       }
       setMsg('No open rooms right now, so you opened one. Others who tap “Join a random room” will join you here.');
-      await createRoom(true);
+      var mc = await createRoom(true); if (mc) mmStart(mc);
     } catch (e) { setMsg('Matchmaking failed. Try again.', true); }
   }
   function enterRoom(code) {
@@ -5441,7 +5450,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       S.env.db.doc('rooms/' + g.code + '/players/' + S.me).delete().catch(function () {});
     }
     S.game = null; S.ui.sub = null; S.ui.chosen = null; S.ui.turnN = -1;
-    if (!silent) S.irrBack = null;
+    if (!silent) { S.irrBack = null; S.mm = null; }
     closeList();
     try { if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     if (!silent) { S.view = 'home'; setMsg(''); render(); window.scrollTo(0, 0); }
@@ -7042,6 +7051,8 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'invite-join') inviteJoin();
     else if (act === 'invite-other') { S.invite = null; try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} render(); }
     else if (act === 'find-match') findMatch();
+    else if (act === 'mm-wait') { if (S.mm) { S.mm.offerAt = Math.floor((now() - S.mm.since) / 1000) + MM_OFFER; renderMm(); } }
+    else if (act === 'mm-ai') { S.mm = null; var bc = $('bot-count'); playOffline(parseInt(bc ? bc.value : '3', 10) || 3); }
     else if (act === 'start') startDraft();
     else if (act === 'kick') {
       var kp = t.getAttribute('data-pid');
@@ -7208,7 +7219,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
      On a normal website (no claude.ai capabilities) rooms run peer to peer through PeerJS.
      The room creator's browser hosts the room's data; everyone else connects to it directly.
      It mimics the small slice of the db interface the room code uses, so the game logic is shared. */
-  var BUILD_ID = '2026-11-03-05';
+  var BUILD_ID = '2026-11-04-01';
   var MQTT_ROOT = 'theroster/v2/';
   var MQTT_BROKERS = (window.__ROSTER_TEST__ && TEST.brokers) || ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
   var MQTT_SRCS = ['https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js'];
@@ -7598,8 +7609,26 @@ If you want to offset all timestamps of a track such that the first one is zero,
         if (ps.size > 0 && ps.size < MAX_PLAYERS) { await joinRoom(open[i].code); return; }
       }
       setMsg('No open rooms right now, so you opened one. Others who tap “Join a random room” will join you here.');
-      await createRoom(true);
+      var mc = await createRoom(true); if (mc) mmStart(mc);
     } catch (e) { setMsg('Matchmaking failed. Check your connection and try again.', true); }
+  }
+  /* Matchmaking: a room opened by "Join a random room" shows how long you've been waiting. After MM_OFFER
+     seconds alone, it offers a game against the AI instead (and again every MM_OFFER seconds if you keep waiting). */
+  var MM_OFFER = (window.__ROSTER_TEST__ && TEST.mmOfferSec) || 45;
+  function mmStart(code) { S.mm = { code: code, since: now(), offerAt: MM_OFFER }; renderMm(); }
+  function renderMm() {
+    var box = $('mm-box'); if (!box) return;
+    var g = S.game, mm = S.mm;
+    var on = !!(mm && g && g.mode === 'shared' && g.code === mm.code && g.status === 'lobby' && Object.keys(g.players || {}).length < MIN_PLAYERS);
+    if (!on) { if (!box.hidden) { box.hidden = true; box.innerHTML = ''; box._k = ''; } return; }
+    var sec = Math.floor((now() - mm.since) / 1000), offer = sec >= mm.offerAt;
+    var k = offer ? 'offer' : 'wait:' + sec; if (box._k === k && !box.hidden) return; box._k = k;
+    box.hidden = false; box.classList.toggle('offer', offer);
+    var t = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+    box.innerHTML = offer
+      ? '<div class="mm-row">No one has joined yet<span class="mm-t">' + t + '</span></div><p class="note" style="margin:0">Not many people are looking for a random room right now. Play against the AI instead, or keep this room open for a bit longer.</p>' +
+        '<div class="actions"><button class="btn primary" type="button" data-act="mm-ai" id="mm-ai">Play vs AI</button><button class="btn" type="button" data-act="mm-wait" id="mm-wait">Keep waiting</button></div>'
+      : '<div class="mm-row"><span class="mm-dot" aria-hidden="true"></span>Looking for players<span class="mm-t" id="mm-t">' + t + '</span></div>';
   }
   function downloadFile(name, text) {
     var blob = new Blob([text], { type: 'text/html' }), url = URL.createObjectURL(blob), a = document.createElement('a');
@@ -8031,7 +8060,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     renderLevels(); renderPrivacy(); renderListPref();
     render();
     setInterval(function () {
-      tick(); fastTick(); recSample(); dvTick(); turnAlert();
+      tick(); fastTick(); recSample(); dvTick(); turnAlert(); renderMm();
       var g = S.game;
       if (g && !g.results && g.mode === 'shared' && !S.waitShown && S.scoreWaitSince && now() - S.scoreWaitSince > 20000 && screenFor() === 'results') { S.waitShown = true; renderResults(); }
     }, 250);
