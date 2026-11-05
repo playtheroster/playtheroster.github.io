@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1793915203653,
+ "updatedAt": 1793915373836,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -403,6 +403,16 @@
     "Caffeine",
     "Most expensive",
     "Taste"
+   ]
+  },
+  "2026-11-06": {
+   "topicId": "fictional-athletes",
+   "subs": [
+    "Personality",
+    "Athletic ability",
+    "Overall legacy",
+    "Iconic moments",
+    "Competitive drive"
    ]
   }
  }
