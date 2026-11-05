@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1793658965883,
+ "updatedAt": 1793915203653,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -173,16 +173,6 @@
     "Biggest economy"
    ]
   },
-  "2026-11-11": {
-   "topicId": "countries",
-   "subs": [
-    "Culture",
-    "Sports",
-    "Innovation",
-    "Natural beauty",
-    "Quality of life"
-   ]
-  },
   "2026-11-02": {
    "topicId": "famous-duos",
    "subs": [
@@ -193,16 +183,6 @@
     "Humor"
    ]
   },
-  "2026-11-09": {
-   "topicId": "video-games",
-   "subs": [
-    "Gameplay",
-    "Story",
-    "Graphics",
-    "Replayability",
-    "Multiplayer"
-   ]
-  },
   "2026-11-04": {
    "topicId": "sea-creatures",
    "subs": [
@@ -211,6 +191,26 @@
     "Speed",
     "Uniqueness",
     "Biggest"
+   ]
+  },
+  "2026-11-11": {
+   "topicId": "countries",
+   "subs": [
+    "Culture",
+    "Sports",
+    "Innovation",
+    "Natural beauty",
+    "Quality of life"
+   ]
+  },
+  "2026-11-09": {
+   "topicId": "video-games",
+   "subs": [
+    "Gameplay",
+    "Story",
+    "Graphics",
+    "Replayability",
+    "Multiplayer"
    ]
   },
   "2026-11-05": {
@@ -393,6 +393,16 @@
     "Iconic",
     "Could lead their own story",
     "Loyalty"
+   ]
+  },
+  "2026-11-05": {
+   "topicId": "energy-drinks",
+   "subs": [
+    "Most calories",
+    "Most sugar",
+    "Caffeine",
+    "Most expensive",
+    "Taste"
    ]
   }
  }
