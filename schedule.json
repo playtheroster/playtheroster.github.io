@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1793915373836,
+ "updatedAt": 1794249427975,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -193,26 +193,6 @@
     "Biggest"
    ]
   },
-  "2026-11-11": {
-   "topicId": "countries",
-   "subs": [
-    "Culture",
-    "Sports",
-    "Innovation",
-    "Natural beauty",
-    "Quality of life"
-   ]
-  },
-  "2026-11-09": {
-   "topicId": "video-games",
-   "subs": [
-    "Gameplay",
-    "Story",
-    "Graphics",
-    "Replayability",
-    "Multiplayer"
-   ]
-  },
   "2026-11-05": {
    "topicId": "board-games",
    "subs": [
@@ -251,6 +231,36 @@
     "Power",
     "Speed",
     "Chin"
+   ]
+  },
+  "2026-11-11": {
+   "topicId": "countries",
+   "subs": [
+    "Culture",
+    "Sports",
+    "Innovation",
+    "Natural beauty",
+    "Quality of life"
+   ]
+  },
+  "2026-11-09": {
+   "topicId": "video-games",
+   "subs": [
+    "Gameplay",
+    "Story",
+    "Graphics",
+    "Replayability",
+    "Multiplayer"
+   ]
+  },
+  "2026-11-10": {
+   "topicId": "sodas",
+   "subs": [
+    "Fame",
+    "Taste",
+    "Availability",
+    "Nostalgia",
+    "Fizz"
    ]
   }
  },
@@ -385,16 +395,6 @@
     "Fame"
    ]
   },
-  "2026-11-14": {
-   "topicId": "sidekicks",
-   "subs": [
-    "Humor",
-    "Usefulness",
-    "Iconic",
-    "Could lead their own story",
-    "Loyalty"
-   ]
-  },
   "2026-11-05": {
    "topicId": "energy-drinks",
    "subs": [
@@ -413,6 +413,26 @@
     "Overall legacy",
     "Iconic moments",
     "Competitive drive"
+   ]
+  },
+  "2026-11-14": {
+   "topicId": "sidekicks",
+   "subs": [
+    "Humor",
+    "Usefulness",
+    "Iconic",
+    "Could lead their own story",
+    "Loyalty"
+   ]
+  },
+  "2026-11-10": {
+   "topicId": "fast-food-sides",
+   "subs": [
+    "Crunch",
+    "Most calories",
+    "Shareability",
+    "Most expensive",
+    "Taste"
    ]
   }
  }
