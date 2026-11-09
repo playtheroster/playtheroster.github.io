@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794249427975,
+ "updatedAt": 1794250489788,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -433,6 +433,16 @@
     "Shareability",
     "Most expensive",
     "Taste"
+   ]
+  },
+  "2026-11-13": {
+   "topicId": "karaoke-songs",
+   "subs": [
+    "Ease to sing",
+    "Fame",
+    "Singalong",
+    "Showstopper factor",
+    "Crowd energy"
    ]
   }
  }
