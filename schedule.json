@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794250489788,
+ "updatedAt": 1794250541003,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -234,13 +234,13 @@
    ]
   },
   "2026-11-11": {
-   "topicId": "countries",
+   "topicId": "famous-dogs",
    "subs": [
-    "Culture",
-    "Sports",
-    "Innovation",
-    "Natural beauty",
-    "Quality of life"
+    "Intelligence",
+    "Fame",
+    "Cuteness",
+    "Bravery",
+    "Loyalty"
    ]
   },
   "2026-11-09": {
