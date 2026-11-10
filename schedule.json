@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794258060137,
+ "updatedAt": 1794345275827,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -233,16 +233,6 @@
     "Chin"
    ]
   },
-  "2026-11-11": {
-   "topicId": "famous-dogs",
-   "subs": [
-    "Intelligence",
-    "Fame",
-    "Cuteness",
-    "Bravery",
-    "Loyalty"
-   ]
-  },
   "2026-11-09": {
    "topicId": "world-heritage-sites",
    "subs": [
@@ -253,14 +243,24 @@
     "Historical importance"
    ]
   },
-  "2026-11-10": {
-   "topicId": "sodas",
+  "2026-11-11": {
+   "topicId": "famous-dogs",
    "subs": [
+    "Intelligence",
     "Fame",
-    "Taste",
-    "Availability",
-    "Nostalgia",
-    "Fizz"
+    "Cuteness",
+    "Bravery",
+    "Loyalty"
+   ]
+  },
+  "2026-11-10": {
+   "topicId": "pixar-characters",
+   "subs": [
+    "Heart",
+    "Humor",
+    "Bravery",
+    "Fame",
+    "Merch"
    ]
   }
  },
