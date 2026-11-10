@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794345275827,
+ "updatedAt": 1794345554690,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -244,13 +244,13 @@
    ]
   },
   "2026-11-11": {
-   "topicId": "famous-dogs",
+   "topicId": "cereals",
    "subs": [
-    "Intelligence",
-    "Fame",
-    "Cuteness",
-    "Bravery",
-    "Loyalty"
+    "Crunch",
+    "Most sugar",
+    "Taste",
+    "Nostalgia",
+    "Healthiness"
    ]
   },
   "2026-11-10": {
@@ -261,6 +261,26 @@
     "Bravery",
     "Fame",
     "Merch"
+   ]
+  },
+  "2026-11-12": {
+   "topicId": "actors",
+   "subs": [
+    "Action hero",
+    "Comedy",
+    "Acting range",
+    "Box office",
+    "Fame"
+   ]
+  },
+  "2026-11-13": {
+   "topicId": "sports-rivalries",
+   "subs": [
+    "Fan passion",
+    "History",
+    "Stakes",
+    "Star power",
+    "Bad blood"
    ]
   }
  },
