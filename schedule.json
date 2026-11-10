@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794345554690,
+ "updatedAt": 1794345589724,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -281,6 +281,16 @@
     "Stakes",
     "Star power",
     "Bad blood"
+   ]
+  },
+  "2026-11-15": {
+   "topicId": "nba-centers",
+   "subs": [
+    "Rim protection",
+    "Defensive versatility",
+    "Interior scoring",
+    "Passing",
+    "Rebounding"
    ]
   }
  },
