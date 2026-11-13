@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794345589724,
+ "updatedAt": 1794601782240,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -274,13 +274,13 @@
    ]
   },
   "2026-11-13": {
-   "topicId": "sports-rivalries",
+   "topicId": "soups",
    "subs": [
-    "Fan passion",
-    "History",
-    "Stakes",
-    "Star power",
-    "Bad blood"
+    "Fame",
+    "Taste",
+    "Healthiness",
+    "Heartiness",
+    "Comfort"
    ]
   },
   "2026-11-15": {
@@ -445,16 +445,6 @@
     "Competitive drive"
    ]
   },
-  "2026-11-14": {
-   "topicId": "sidekicks",
-   "subs": [
-    "Humor",
-    "Usefulness",
-    "Iconic",
-    "Could lead their own story",
-    "Loyalty"
-   ]
-  },
   "2026-11-10": {
    "topicId": "fast-food-sides",
    "subs": [
@@ -463,6 +453,16 @@
     "Shareability",
     "Most expensive",
     "Taste"
+   ]
+  },
+  "2026-11-14": {
+   "topicId": "sidekicks",
+   "subs": [
+    "Humor",
+    "Usefulness",
+    "Iconic",
+    "Could lead their own story",
+    "Loyalty"
    ]
   },
   "2026-11-13": {
