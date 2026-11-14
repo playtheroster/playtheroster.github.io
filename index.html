@@ -754,6 +754,7 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .bopt.taken { color: var(--muted); }
 .bopt.taken .nm { text-decoration: line-through; }
 .bopt.pick { cursor: pointer; }
+.irr-lock { justify-self: start; margin-top: 10px; max-width: 100%; white-space: normal; text-align: left; }
 @media (hover: hover) and (pointer: fine) { .bopt.pick:hover { background: var(--hi); color: var(--hi-ink); } }
 .bopt.pick.chosen, .bopt.pick.chosen:nth-child(odd) { background: var(--ink); color: var(--hi); }
 .bopt.pick.chosen .via { color: var(--hi); }
@@ -1531,7 +1532,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <ul class="list fast-list" id="fast-list" role="listbox" aria-label="Matching answers" hidden=""></ul>
               </div>
-              <p class="note">Type, then tap an answer or press Enter for the top match.</p>
+              <button class="btn primary irr-lock" type="button" id="irr-lock-btn" data-act="irr-lock" hidden="">Lock in</button>
+              <p class="note" id="fast-note">Type, then tap an answer or press Enter for the top match.</p>
               <div class="irr-listopt" id="irr-listopt" hidden="">
                 <span class="mono label" id="irr-listopt-label">Show every answer?</span>
                 <div class="seg two" role="radiogroup" aria-labelledby="irr-listopt-label">
@@ -7368,6 +7370,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'irr-back') irrBackToDraft();
     else if (act === 'irr-home') { var isrc = irrTodaySrc(); if (isrc && !S.game) startIrr(isrc); }
     else if (act === 'fast-skip') fastSubmit(null);
+    else if (act === 'irr-lock') irrLock();
     else if (act === 'irr-sub') irrChooseSub(parseInt(t.getAttribute('data-i'), 10));
     else if (act === 'irr-list') { store('roster.irrList', t.getAttribute('data-list') === 'show' ? 'show' : 'hide'); if (S.fast) renderFast(); }
     else if (act === 'irr-letter') irrJump(t.getAttribute('data-l'));
@@ -8165,14 +8168,15 @@ If you want to offset all timestamps of a track such that the first one is zero,
     var t = TOPICS[f.topicId], q = (S.ui.fastQ || '').trim(), used = {}, html = '', last = '', letters = [];
     f.answers.forEach(function (a, i) { if (a && a.key) used[a.key] = f.subs[i]; });
     var res = search(f.topicId, q);
-    $('irr-all-label').textContent = (q ? res.length + ' match' + (res.length === 1 ? '' : 'es') : 'All ' + t.pool.length + ' ' + plural(t.noun)) + ' · tap one to pick it for ' + f.subs[f.idx];
+    $('irr-all-label').textContent = (q ? res.length + ' match' + (res.length === 1 ? '' : 'es') : 'All ' + t.pool.length + ' ' + plural(t.noun)) + ' · tap one, then lock it in for ' + f.subs[f.idx];
     res.forEach(function (r) {
       if (!q) {
         var L = norm(r.e.name).charAt(0).toUpperCase(); if (!/[A-Z]/.test(L)) L = '#';
         if (L !== last) { html += '<li class="list-head" role="presentation" id="irr-l-' + (L === '#' ? 'num' : L) + '">' + L + '</li>'; last = L; letters.push(L); }
       }
       var tk = used[r.e.key];
-      html += '<li class="bopt' + (tk ? ' taken' : ' pick') + '"' + (tk ? '' : ' data-key="' + esc(r.e.key) + '" role="button" tabindex="0"') + '><span><span class="nm">' + esc(r.e.name) + '</span>' + (r.via ? ' <span class="via">' + esc(r.via) + '</span>' : '') + '</span>' + (tk ? '<span class="why">Your pick for ' + esc(tk) + '</span>' : '') + '</li>';
+      var isCh = !tk && S.ui.irrChosen && S.ui.irrChosen.idx === f.idx && S.ui.irrChosen.key === r.e.key;
+      html += '<li class="bopt' + (tk ? ' taken' : ' pick') + (isCh ? ' chosen' : '') + '"' + (tk ? '' : ' data-key="' + esc(r.e.key) + '" role="button" tabindex="0"') + '><span><span class="nm">' + esc(r.e.name) + '</span>' + (r.via ? ' <span class="via">' + esc(r.via) + '</span>' : '') + '</span>' + (tk ? '<span class="why">Your pick for ' + esc(tk) + '</span>' : '') + '</li>';
     });
     $('irr-letters').hidden = !!q;
     $('irr-letters').innerHTML = letters.map(function (L) { return '<button type="button" data-act="irr-letter" data-l="' + (L === '#' ? 'num' : L) + '">' + L + '</button>'; }).join('');
@@ -8183,13 +8187,26 @@ If you want to offset all timestamps of a track such that the first one is zero,
   function irrNextOpen(f, from) { for (var k = 1; k <= f.subs.length; k++) { var j = (from + k) % f.subs.length; if (!f.answers[j]) return j; } return -1; }
   function irrChooseSub(i) {
     var f = S.fast; if (!f || f.done || !f.untimed || !(i >= 0 && i < f.subs.length) || f.answers[i]) return;
-    f.idx = i; S.ui.fastQ = ''; S.ui.fastSel = 0; var inp = $('fast-in'); if (inp) inp.value = '';
+    f.idx = i; S.ui.fastQ = ''; S.ui.fastSel = 0; S.ui.irrChosen = null; var inp = $('fast-in'); if (inp) inp.value = '';
     saveFast(); renderFast(); if (inp && !irrListOn()) inp.focus();
   }
-  function fastSubmit(entry) {
+  /* Mr. Irrelevant works like the draft: tapping an answer (or Enter) only selects it, and "Lock in" makes it final. */
+  function irrSelect(entry) {
+    var f = S.fast; if (!f || f.done || !f.untimed || !entry || f.answers[f.idx]) return;
+    S.ui.irrChosen = { key: entry.key, name: entry.name, idx: f.idx };
+    S.ui.fastQ = ''; S.ui.fastSel = 0; var inp = $('fast-in'); if (inp) { inp.value = entry.name; inp.setAttribute('aria-expanded', 'false'); }
+    renderFast();
+    var lb = $('irr-lock-btn'); if (lb && !lb.hidden) { try { lb.scrollIntoView({ block: 'nearest' }); } catch (e) {} try { lb.focus({ preventScroll: true }); } catch (e) { lb.focus(); } }
+  }
+  function irrLock() {
+    var f = S.fast, c = S.ui.irrChosen; if (!f || f.done || !f.untimed || !c || c.idx !== f.idx || f.answers[f.idx]) return;
+    S.ui.irrChosen = null; fastSubmit(TOPICS[f.topicId].byKey[c.key], true);
+  }
+  function fastSubmit(entry, locked) {
     var f = S.fast; if (!f || f.done) return;
     if (f.untimed) {   /* untimed Mr. Irrelevant: fill the chosen subtopic, then move to the next open one */
       if (!entry || f.answers[f.idx]) return;
+      if (!locked) { irrSelect(entry); return; }
       f.answers[f.idx] = { key: entry.key, name: entry.name };
       S.ui.fastQ = ''; S.ui.fastSel = 0;
       var nx = irrNextOpen(f, f.idx);
@@ -8277,6 +8294,11 @@ If you want to offset all timestamps of a track such that the first one is zero,
       $('fast-step').textContent = untimed ? 'Mr. Irrelevant · ' + nPicked + ' of ' + f.subs.length + ' picked · Stay under ' + fmt1(IRR_TARGET) + ' · No timer'
         : 'Subtopic ' + (f.idx + 1) + ' of ' + f.subs.length + (irr ? ' · Stay under ' + fmt1(IRR_TARGET) : ' · Beat ' + fmt1(FAST_TARGET));
       $('fast-sub').textContent = f.subs[f.idx];
+      var ch = untimed && S.ui.irrChosen && S.ui.irrChosen.idx === f.idx && !f.answers[f.idx] ? S.ui.irrChosen : null;
+      if (!ch) S.ui.irrChosen = null;
+      $('irr-lock-btn').hidden = !ch;
+      if (ch) $('irr-lock-btn').textContent = 'Lock in ' + ch.name + ' for ' + f.subs[f.idx];
+      $('fast-note').textContent = untimed ? (ch ? 'Not sure? Pick a different answer, or tap Lock in to make it final.' : 'Type or tap an answer, then lock it in.') : 'Type, then tap an answer or press Enter for the top match.';
       $('fast-label').textContent = (irr ? 'Least valuable ' : 'Best ') + t.noun + ' for ' + f.subs[f.idx];
       var ms = fastMatches();
       if (!(S.ui.fastSel < ms.length)) S.ui.fastSel = 0;
@@ -8373,7 +8395,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     $('fast-share-box').hidden = false; ta.value = text; ta.rows = text.split('\n').length + 1;
     await copyScore(text, ta, note, $('fast-share-btn'));
   }
-  $('fast-in').addEventListener('input', function () { S.ui.fastQ = this.value; S.ui.fastSel = 0; renderFast(); $('fast-in').setAttribute('aria-expanded', String(!!this.value.trim())); });
+  $('fast-in').addEventListener('input', function () { S.ui.fastQ = this.value; S.ui.fastSel = 0; S.ui.irrChosen = null; renderFast(); $('fast-in').setAttribute('aria-expanded', String(!!this.value.trim())); });
   $('fast-in').addEventListener('keydown', function (ev) {
     var ms = fastMatches();
     if (ev.key === 'ArrowDown') { ev.preventDefault(); S.ui.fastSel = Math.min(ms.length - 1, S.ui.fastSel + 1); renderFast(); }
