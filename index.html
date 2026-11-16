@@ -4248,6 +4248,10 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         { transform: 'scale(1.04) rotateY(0deg)', opacity: 1, offset: 0.5 },
         { transform: 'scale(1) rotateY(0deg)', opacity: 1, offset: 0.78 }
       ], { duration: LAND, fill: 'forwards', easing: 'ease-out' }));
+      /* swap faces at the halfway turn too, so the flip reads right even where backface-visibility is ignored */
+      var fr = $('slam-front'), bk = card.querySelector('.slam-back');
+      SLAM.anims.push(fr.animate([{ opacity: 0 }, { opacity: 0, offset: 0.33 }, { opacity: 1, offset: 0.34 }, { opacity: 1 }], { duration: LAND, fill: 'forwards' }));
+      SLAM.anims.push(bk.animate([{ opacity: 1 }, { opacity: 1, offset: 0.33 }, { opacity: 0, offset: 0.34 }, { opacity: 0 }], { duration: LAND, fill: 'forwards' }));
       /* the flight is computed when it starts, so it heads for wherever the square is on screen right now */
       SLAM.timers.push(setTimeout(function () {
         var cell = slamCell(g, p), r = cell && cell.getBoundingClientRect(), cr = card.getBoundingClientRect();
