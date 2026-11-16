@@ -208,20 +208,16 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 @media (prefers-reduced-motion: reduce) { .pick-ticker .pt-run { animation: none; } }
 html.has-ticker body { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
 html.has-ticker .turn-bubble { bottom: calc(46px + env(safe-area-inset-bottom, 0px)); }
-.pick-banner { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; z-index: 72; width: min(560px, calc(100% - 24px)); transform: translateX(-50%); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px 16px; background: #000000; color: #ffffff; border: 3px solid #ffb612; border-radius: 18px; box-shadow: 6px 6px 0 #ca2430; pointer-events: none; }
-.pick-banner .pb-no { width: 58px; height: 58px; border-radius: 14px; display: grid; place-items: center; background: var(--pc, #ffb612); color: var(--pi, #000000); font-family: var(--font-display); font-size: 1.55rem; line-height: 1; border: 2px solid #ffffff; }
-.pick-banner .pb-no small { display: block; font-family: var(--font-body, inherit); font-weight: 800; font-size: 0.55rem; letter-spacing: 0.12em; opacity: 0.85; }
-.pick-banner .pb-k { font-weight: 800; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: #ffb612; }
-.pick-banner .pb-who { font-weight: 800; font-size: 0.98rem; margin-top: 2px; }
-.pick-banner .pb-nm { font-family: var(--font-display); font-size: clamp(1.5rem, 6.2vw, 2.1rem); line-height: 1.02; color: #ffb612; text-transform: uppercase; overflow-wrap: anywhere; margin-top: 2px; }
-.pick-banner .pb-sub { font-weight: 700; font-size: 0.85rem; color: #d4d4d4; margin-top: 3px; }
+.pick-banner { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); left: 50%; z-index: 72; width: min(400px, calc(100% - 24px)); transform: translateX(-50%); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 7px 12px 7px 7px; background: #000000; color: #ffffff; border: 2px solid #ffb612; border-radius: 14px; box-shadow: 3px 3px 0 #ca2430; pointer-events: none; }
+.pick-banner .pb-no { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--pc, #ffb612); color: var(--pi, #000000); font-family: var(--font-display); font-size: 1.05rem; line-height: 1; border: 2px solid #ffffff; }
+.pick-banner .pb-k { font-weight: 800; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: #ffb612; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-banner .pb-nm { font-weight: 800; font-size: 0.95rem; line-height: 1.2; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.pick-banner .pb-nm b { color: #ffb612; }
 .pick-banner.in { animation: pbIn 0.42s cubic-bezier(.2, 1.4, .4, 1) both; }
 .pick-banner.out { animation: pbOut 0.28s ease-in both; }
-.pick-banner.in .pb-nm { animation: pbName 0.5s 0.18s ease-out both; }
 @keyframes pbIn { from { transform: translate(-50%, -140%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 @keyframes pbOut { from { transform: translate(-50%, 0); opacity: 1; } to { transform: translate(-50%, -140%); opacity: 0; } }
-@keyframes pbName { from { letter-spacing: 0.25em; opacity: 0; } to { letter-spacing: 0; opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .pick-banner.in, .pick-banner.out, .pick-banner.in .pb-nm { animation-duration: 0.01s; } }
+@media (prefers-reduced-motion: reduce) { .pick-banner.in, .pick-banner.out { animation-duration: 0.01s; } }
 .board td.pb-fresh { animation: pbCell 1.6s ease-out; }
 @keyframes pbCell { 0% { background: #ffb612; } 100% { background: transparent; } }
 .turn-glow { position: fixed; top: calc(-1 * env(safe-area-inset-top, 0px)); bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); left: 0; right: 0; z-index: 70; pointer-events: none; box-shadow: inset 0 0 0 7px #ffb612, inset 0 0 36px 12px rgba(255, 182, 18, 0.7); animation: turnGlow 1.6s ease-in-out infinite; }
@@ -4203,10 +4199,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     PB.busy = true;
     var n = (g.order || []).length || 1, round = Math.floor(p.n / n) + 1, mine = p.pid === S.me;
     el.className = 'pick-banner pc' + pci(g, p.pid);
-    el.innerHTML = '<div class="pb-no"><span><small>PICK</small>' + (p.n + 1) + '</span></div><div style="min-width:0">' +
-      '<div class="pb-k">' + (p.auto ? '⏱ Time’s up · auto-pick' : 'The pick is in') + ' · Round ' + round + '</div>' +
-      '<div class="pb-who">' + (mine ? 'You were given' : 'With the ' + ordinal(p.n + 1) + ' pick, ' + esc(playerName(g, p.pid)) + ' selects') + '</div>' +
-      '<div class="pb-nm">' + esc(p.name) + '</div><div class="pb-sub">for ' + esc(p.sub) + '</div></div>';
+    el.innerHTML = '<div class="pb-no">' + (p.n + 1) + '</div><div style="min-width:0">' +
+      '<div class="pb-k">' + (p.auto ? '⏱ Auto-pick · ' : 'The pick is in · ') + 'Round ' + round + ' · ' + esc(p.sub) + '</div>' +
+      '<div class="pb-nm">' + (mine ? 'You got ' : esc(playerName(g, p.pid)) + ' took ') + '<b>' + esc(p.name) + '</b></div></div>';
     el.hidden = false; void el.offsetWidth; el.classList.add('in');
     /* flash the new square on the board too */
     try { var cells = document.querySelectorAll('#board td'); cells.forEach(function (td) { if (td.textContent.indexOf(p.name) >= 0) { td.classList.remove('pb-fresh'); void td.offsetWidth; td.classList.add('pb-fresh'); } }); } catch (e) {}
