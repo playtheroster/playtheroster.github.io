@@ -195,6 +195,22 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .draft-grid.wide-board.huge { grid-template-columns: minmax(0, 0.5fr) minmax(0, 1.5fr); }
 .pickbox { display: grid; gap: 14px; padding: 16px; background: var(--tint); border-radius: 14px; }
 /* Your turn: a gold glow around the screen, and a countdown bubble whenever the clock is scrolled out of view. */
+.pick-banner { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; z-index: 72; width: min(560px, calc(100% - 24px)); transform: translateX(-50%); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px 16px; background: #000000; color: #ffffff; border: 3px solid #ffb612; border-radius: 18px; box-shadow: 6px 6px 0 #ca2430; cursor: pointer; }
+.pick-banner .pb-no { width: 58px; height: 58px; border-radius: 14px; display: grid; place-items: center; background: var(--pc, #ffb612); color: var(--pi, #000000); font-family: var(--font-display); font-size: 1.55rem; line-height: 1; border: 2px solid #ffffff; }
+.pick-banner .pb-no small { display: block; font-family: var(--font-body, inherit); font-weight: 800; font-size: 0.55rem; letter-spacing: 0.12em; opacity: 0.85; }
+.pick-banner .pb-k { font-weight: 800; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: #ffb612; }
+.pick-banner .pb-who { font-weight: 800; font-size: 0.98rem; margin-top: 2px; }
+.pick-banner .pb-nm { font-family: var(--font-display); font-size: clamp(1.5rem, 6.2vw, 2.1rem); line-height: 1.02; color: #ffb612; text-transform: uppercase; overflow-wrap: anywhere; margin-top: 2px; }
+.pick-banner .pb-sub { font-weight: 700; font-size: 0.85rem; color: #d4d4d4; margin-top: 3px; }
+.pick-banner.in { animation: pbIn 0.42s cubic-bezier(.2, 1.4, .4, 1) both; }
+.pick-banner.out { animation: pbOut 0.28s ease-in both; }
+.pick-banner.in .pb-nm { animation: pbName 0.5s 0.18s ease-out both; }
+@keyframes pbIn { from { transform: translate(-50%, -140%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+@keyframes pbOut { from { transform: translate(-50%, 0); opacity: 1; } to { transform: translate(-50%, -140%); opacity: 0; } }
+@keyframes pbName { from { letter-spacing: 0.25em; opacity: 0; } to { letter-spacing: 0; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pick-banner.in, .pick-banner.out, .pick-banner.in .pb-nm { animation-duration: 0.01s; } }
+.board td.pb-fresh { animation: pbCell 1.6s ease-out; }
+@keyframes pbCell { 0% { background: #ffb612; } 100% { background: transparent; } }
 .turn-glow { position: fixed; top: calc(-1 * env(safe-area-inset-top, 0px)); bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); left: 0; right: 0; z-index: 70; pointer-events: none; box-shadow: inset 0 0 0 7px #ffb612, inset 0 0 36px 12px rgba(255, 182, 18, 0.7); animation: turnGlow 1.6s ease-in-out infinite; }
 .turn-glow.low { box-shadow: inset 0 0 0 7px #ca2430, inset 0 0 36px 12px rgba(202, 36, 48, 0.55); animation-duration: 0.7s; }
 @keyframes turnGlow { 50% { opacity: 0.55; } }
@@ -1457,6 +1473,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <div class="waitbox" id="waitbox"></div>
                 <div class="turn-glow" id="turn-glow" hidden=""></div>
+                <div class="pick-banner" id="pick-banner" hidden="" role="status" aria-live="polite" data-act="pick-banner"></div>
                 <button class="turn-bubble" id="turn-bubble" type="button" data-act="turn-bubble" aria-label="Your pick: time left" hidden=""><span><small>YOUR PICK</small><b id="turn-bubble-t">1:00</b></span></button>
                 <div class="browse" id="browse" hidden="">
                   <label class="mono label" for="browse-in" id="browse-label">Browse the answers while you wait</label>
@@ -4047,7 +4064,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     renderChat();
     var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !S.env.showRelay || !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
     if (scr === 'lobby') renderLobby();
-    if (scr === 'draft') renderDraft();
+    if (scr === 'draft') renderDraft(); else if (PB.busy || !$('pick-banner').hidden) { PB.q = []; PB.busy = false; hidePickBanner(true); }
     if (scr === 'results') renderResults(); else document.documentElement.classList.remove('rv-on');
     if (fastOn) { var fname = S.fast.kind === 'irr' ? 'Mr. Irrelevant' : 'Fast Money'; $('console-label').textContent = S.fast.done ? fname + ' · results' : fname; renderFast(); }
     renderAccountBtn();
@@ -4154,8 +4171,45 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('intro-you').hidden = d.first !== S.me;
     if (el.hidden) { el.hidden = false; document.documentElement.classList.add('intro-on'); }
   }
+  /* "The pick is in" banner: when someone else picks (or you're auto-picked), a broadcast-style banner drops in
+     over the top of the screen for a few seconds. The board stays visible underneath. */
+  var PB = { gid: '', n: 0, q: [], busy: false, timer: 0 };
+  function pickBannerCheck(g) {
+    if (!g || !Array.isArray(g.picks)) return;
+    var id = gameId(g);
+    if (PB.gid !== id) { PB.gid = id; PB.n = g.picks.length; PB.q = []; hidePickBanner(true); return; }   /* joining mid-draft doesn't replay old picks */
+    if (g.picks.length < PB.n) { PB.n = g.picks.length; return; }
+    while (PB.n < g.picks.length) { var p = g.picks[PB.n]; PB.n++; if (p && (p.pid !== S.me || p.auto)) PB.q.push(p); }
+    if (!PB.busy) nextPickBanner();
+  }
+  function nextPickBanner() {
+    var g = S.game, el = $('pick-banner'); if (!el) return;
+    var p = PB.q.shift();
+    if (!p || !g || screenFor() !== 'draft' || S.view !== 'play' || S.fast) { PB.busy = false; PB.q = []; hidePickBanner(); return; }
+    PB.busy = true;
+    var n = (g.order || []).length || 1, round = Math.floor(p.n / n) + 1, mine = p.pid === S.me;
+    el.className = 'pick-banner pc' + pci(g, p.pid);
+    el.innerHTML = '<div class="pb-no"><span><small>PICK</small>' + (p.n + 1) + '</span></div><div style="min-width:0">' +
+      '<div class="pb-k">' + (p.auto ? '⏱ Time’s up · auto-pick' : 'The pick is in') + ' · Round ' + round + '</div>' +
+      '<div class="pb-who">' + (mine ? 'You were given' : 'With the ' + ordinal(p.n + 1) + ' pick, ' + esc(playerName(g, p.pid)) + ' selects') + '</div>' +
+      '<div class="pb-nm">' + esc(p.name) + '</div><div class="pb-sub">for ' + esc(p.sub) + '</div></div>';
+    el.hidden = false; void el.offsetWidth; el.classList.add('in');
+    /* flash the new square on the board too */
+    try { var cells = document.querySelectorAll('#board td'); cells.forEach(function (td) { if (td.textContent.indexOf(p.name) >= 0) { td.classList.remove('pb-fresh'); void td.offsetWidth; td.classList.add('pb-fresh'); } }); } catch (e) {}
+    var hold = PB.q.length ? 1500 : 2800;
+    clearTimeout(PB.timer);
+    PB.timer = setTimeout(function () { hidePickBanner(false, nextPickBanner); }, hold);
+  }
+  function hidePickBanner(now0, then) {
+    var el = $('pick-banner'); clearTimeout(PB.timer);
+    if (!el || el.hidden) { if (then) then(); return; }
+    if (now0) { el.hidden = true; el.className = 'pick-banner'; if (then) then(); return; }
+    el.classList.remove('in'); el.classList.add('out');
+    PB.timer = setTimeout(function () { el.hidden = true; el.className = 'pick-banner'; if (then) then(); }, 280);
+  }
   function renderDraft() {
     var g = S.game, d = derive(g, now()), t = TOPICS[g.topicId];
+    setTimeout(function () { if (S.game === g) pickBannerCheck(g); }, 0);
     var mine = d.current === S.me;
     var cd = d.countdownMs > 0;
     lgCheckRoom(g);
@@ -4164,7 +4218,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('countdown').hidden = !cd;
     $('clock').hidden = cd; $('bar').hidden = cd;
     if (cd) {
-      $('draft-meta').textContent = g.subs.length + ' rounds · ' + d.n + ' players · 1 minute per pick';
+      $('draft-meta').textContent = g.subs.length + ' rounds · ' + d.n + ' players · ' + (pickMs(g) === 60000 ? '1 minute' : pickMs(g) / 1000 + ' seconds') + ' per pick';
       $('draft-status').textContent = 'Get ready';
       $('cd-first').innerHTML = 'First pick: ' + pnameHtml(g, d.first) + (d.first === S.me ? ' (you)' : '');
       $('order').innerHTML = '<span class="mono">Round 1 →</span>' + g.order.map(function (pid) {
@@ -7420,6 +7474,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
     else if (act === 'list') { store('roster.list', t.getAttribute('data-list')); renderListPref(); }
     else if (act === 'room-list') setRoomList(t.getAttribute('data-list') === 'show');
+    else if (act === 'pick-banner') hidePickBanner(false, nextPickBanner);
     else if (act === 'room-time') setRoomTime(Number(t.getAttribute('data-sec')));
     else if (act === 'intro-close') { if (S.game) S.introClosed = gameId(S.game); hideIntro(); }
     else if (act === 'privacy') { store('roster.privacy', t.getAttribute('data-privacy')); renderPrivacy(); }
