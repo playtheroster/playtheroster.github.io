@@ -195,7 +195,20 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .draft-grid.wide-board.huge { grid-template-columns: minmax(0, 0.5fr) minmax(0, 1.5fr); }
 .pickbox { display: grid; gap: 14px; padding: 16px; background: var(--tint); border-radius: 14px; }
 /* Your turn: a gold glow around the screen, and a countdown bubble whenever the clock is scrolled out of view. */
-.pick-banner { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; z-index: 72; width: min(560px, calc(100% - 24px)); transform: translateX(-50%); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px 16px; background: #000000; color: #ffffff; border: 3px solid #ffb612; border-radius: 18px; box-shadow: 6px 6px 0 #ca2430; cursor: pointer; }
+.pick-ticker { position: fixed; left: 0; right: 0; bottom: 0; z-index: 69; display: flex; align-items: stretch; height: calc(28px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: #ca2430; color: #ffffff; border-top: 3px solid #ffb612; font-weight: 700; font-size: 0.8rem; pointer-events: none; }
+.pick-ticker .pt-tag { flex: 0 0 auto; display: flex; align-items: center; padding: 0 10px; background: #000000; color: #ffb612; font-weight: 800; font-size: 0.68rem; letter-spacing: 0.14em; }
+.pick-ticker .pt-win { flex: 1 1 auto; min-width: 0; overflow: hidden; display: flex; align-items: center; }
+.pick-ticker .pt-run { display: inline-flex; white-space: nowrap; will-change: transform; animation: ptRoll var(--pt-dur, 30s) linear infinite; }
+.pick-ticker .pt-run span { padding: 0 6px; }
+.pick-ticker .pt-run b { color: #ffb612; font-weight: 800; }
+.pick-ticker .pt-run .pt-new { background: #ffb612; color: #000000; border-radius: 6px; }
+.pick-ticker .pt-run .pt-new b { color: #000000; }
+.pick-ticker .pt-run i { font-style: normal; color: #ffb612; padding: 0 4px; }
+@keyframes ptRoll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .pick-ticker .pt-run { animation: none; } }
+html.has-ticker body { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+html.has-ticker .turn-bubble { bottom: calc(46px + env(safe-area-inset-bottom, 0px)); }
+.pick-banner { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; z-index: 72; width: min(560px, calc(100% - 24px)); transform: translateX(-50%); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px 16px; background: #000000; color: #ffffff; border: 3px solid #ffb612; border-radius: 18px; box-shadow: 6px 6px 0 #ca2430; pointer-events: none; }
 .pick-banner .pb-no { width: 58px; height: 58px; border-radius: 14px; display: grid; place-items: center; background: var(--pc, #ffb612); color: var(--pi, #000000); font-family: var(--font-display); font-size: 1.55rem; line-height: 1; border: 2px solid #ffffff; }
 .pick-banner .pb-no small { display: block; font-family: var(--font-body, inherit); font-weight: 800; font-size: 0.55rem; letter-spacing: 0.12em; opacity: 0.85; }
 .pick-banner .pb-k { font-weight: 800; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: #ffb612; }
@@ -1473,7 +1486,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <div class="waitbox" id="waitbox"></div>
                 <div class="turn-glow" id="turn-glow" hidden=""></div>
-                <div class="pick-banner" id="pick-banner" hidden="" role="status" aria-live="polite" data-act="pick-banner"></div>
+                <div class="pick-banner" id="pick-banner" hidden="" role="status" aria-live="polite"></div>
+                <div class="pick-ticker" id="pick-ticker" hidden="" aria-label="Every pick so far"><span class="pt-tag">PICKS</span><div class="pt-win"><div class="pt-run" id="pick-ticker-run"></div></div></div>
                 <button class="turn-bubble" id="turn-bubble" type="button" data-act="turn-bubble" aria-label="Your pick: time left" hidden=""><span><small>YOUR PICK</small><b id="turn-bubble-t">1:00</b></span></button>
                 <div class="browse" id="browse" hidden="">
                   <label class="mono label" for="browse-in" id="browse-label">Browse the answers while you wait</label>
@@ -4064,7 +4078,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     renderChat();
     var nd = $('net-diag'); if (nd && S.env.web) nd.hidden = !S.env.showRelay || !((S.game && S.game.mode === 'shared') || (!S.game && S.mode === 'room'));
     if (scr === 'lobby') renderLobby();
-    if (scr === 'draft') renderDraft(); else if (PB.busy || !$('pick-banner').hidden) { PB.q = []; PB.busy = false; hidePickBanner(true); }
+    if (scr === 'draft') renderDraft(); else { renderTicker(null); if (PB.busy || !$('pick-banner').hidden) { PB.q = []; PB.busy = false; hidePickBanner(true); } }
     if (scr === 'results') renderResults(); else document.documentElement.classList.remove('rv-on');
     if (fastOn) { var fname = S.fast.kind === 'irr' ? 'Mr. Irrelevant' : 'Fast Money'; $('console-label').textContent = S.fast.done ? fname + ' · results' : fname; renderFast(); }
     renderAccountBtn();
@@ -4196,7 +4210,8 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     el.hidden = false; void el.offsetWidth; el.classList.add('in');
     /* flash the new square on the board too */
     try { var cells = document.querySelectorAll('#board td'); cells.forEach(function (td) { if (td.textContent.indexOf(p.name) >= 0) { td.classList.remove('pb-fresh'); void td.offsetWidth; td.classList.add('pb-fresh'); } }); } catch (e) {}
-    var hold = PB.q.length ? 1500 : 2800;
+    /* shorter when it's now your turn, so it's out of the way quickly; taps always go through it */
+    var dd = derive(g, now()), hold = PB.q.length ? 1500 : dd.current === S.me ? 2000 : 2800;
     clearTimeout(PB.timer);
     PB.timer = setTimeout(function () { hidePickBanner(false, nextPickBanner); }, hold);
   }
@@ -4207,8 +4222,25 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     el.classList.remove('in'); el.classList.add('out');
     PB.timer = setTimeout(function () { el.hidden = true; el.className = 'pick-banner'; if (then) then(); }, 280);
   }
+  /* NFL-style ticker along the bottom: every pick so far, newest highlighted. Small, and taps go through it. */
+  function renderTicker(g) {
+    var el = $('pick-ticker'), run = $('pick-ticker-run'); if (!el) return;
+    var on = !!(g && S.view === 'play' && !S.fast && screenFor() === 'draft' && Array.isArray(g.picks) && g.picks.length && (g.order || []).length);
+    el.hidden = !on; document.documentElement.classList.toggle('has-ticker', on);
+    if (!on) { run._k = ''; return; }
+    var key = gameId(g) + ':' + g.picks.length; if (run._k === key) return; run._k = key;
+    var n = g.order.length, last = g.picks.length - 1;
+    var items = g.picks.slice().reverse().map(function (p) {
+      var r = Math.floor(p.n / n) + 1, k = p.n % n + 1;
+      return '<span' + (p.n === last ? ' class="pt-new"' : '') + '><b>' + r + '.' + k + '</b> ' + esc(playerName(g, p.pid)) + (p.pid === S.me ? ' (you)' : '') + ' · ' + esc(p.name) + ' <small>(' + esc(p.sub) + ')</small>' + (p.auto ? ' ⏱' : '') + '</span><i>★</i>';
+    }).join('');
+    run.innerHTML = items + items;   /* doubled so the loop is seamless */
+    var w = run.scrollWidth / 2; run.style.setProperty('--pt-dur', Math.max(12, w / 55).toFixed(1) + 's');
+    run.style.animation = 'none'; void run.offsetWidth; run.style.animation = '';
+  }
   function renderDraft() {
     var g = S.game, d = derive(g, now()), t = TOPICS[g.topicId];
+    renderTicker(g);
     setTimeout(function () { if (S.game === g) pickBannerCheck(g); }, 0);
     var mine = d.current === S.me;
     var cd = d.countdownMs > 0;
@@ -7474,7 +7506,6 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
     else if (act === 'list') { store('roster.list', t.getAttribute('data-list')); renderListPref(); }
     else if (act === 'room-list') setRoomList(t.getAttribute('data-list') === 'show');
-    else if (act === 'pick-banner') hidePickBanner(false, nextPickBanner);
     else if (act === 'room-time') setRoomTime(Number(t.getAttribute('data-sec')));
     else if (act === 'intro-close') { if (S.game) S.introClosed = gameId(S.game); hideIntro(); }
     else if (act === 'privacy') { store('roster.privacy', t.getAttribute('data-privacy')); renderPrivacy(); }
