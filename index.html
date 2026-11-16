@@ -4217,7 +4217,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     el.classList.remove('in'); el.classList.add('out');
     PB.timer = setTimeout(function () { el.hidden = true; el.className = 'pick-banner'; if (then) then(); }, 280);
   }
-  /* NFL-style ticker along the bottom: every pick so far, newest highlighted. Small, and taps go through it. */
+  /* NFL-style ticker along the bottom: every pick so far in draft order (1.01, 1.02 … 2.01), newest highlighted. Small, and taps go through it. */
   function renderTicker(g) {
     var el = $('pick-ticker'), run = $('pick-ticker-run'); if (!el) return;
     var on = !!(g && S.view === 'play' && !S.fast && screenFor() === 'draft' && Array.isArray(g.picks) && g.picks.length && (g.order || []).length);
@@ -4225,9 +4225,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     if (!on) { run._k = ''; return; }
     var key = gameId(g) + ':' + g.picks.length; if (run._k === key) return; run._k = key;
     var n = g.order.length, last = g.picks.length - 1;
-    var items = g.picks.slice().reverse().map(function (p) {
+    var items = g.picks.slice().sort(function (x, y) { return x.n - y.n; }).map(function (p) {
       var r = Math.floor(p.n / n) + 1, k = p.n % n + 1;
-      return '<span' + (p.n === last ? ' class="pt-new"' : '') + '><b>' + r + '.' + k + '</b> ' + esc(playerName(g, p.pid)) + (p.pid === S.me ? ' (you)' : '') + ' · ' + esc(p.name) + ' <small>(' + esc(p.sub) + ')</small>' + (p.auto ? ' ⏱' : '') + '</span><i>★</i>';
+      return '<span' + (p.n === last ? ' class="pt-new"' : '') + '><b>' + r + '.' + (k < 10 ? '0' : '') + k + '</b> ' + esc(playerName(g, p.pid)) + (p.pid === S.me ? ' (you)' : '') + ' · ' + esc(p.name) + ' <small>(' + esc(p.sub) + ')</small>' + (p.auto ? ' ⏱' : '') + '</span><i>★</i>';
     }).join('');
     run.innerHTML = items + items;   /* doubled so the loop is seamless */
     var w = run.scrollWidth / 2; run.style.setProperty('--pt-dur', Math.max(12, w / 55).toFixed(1) + 's');
