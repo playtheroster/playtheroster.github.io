@@ -4232,7 +4232,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   function slamPick(g, p) {
     slamClear();
     if (screenFor() !== 'draft' || S.view !== 'play' || S.fast) return;
-    var n = (g.order || []).length || 1, round = Math.floor(p.n / n) + 1, pc = 'pc' + pci(g, p.pid), mine = p.pid === S.me;
+    var n = (g.order || []).length || 1, round = Math.floor(p.n / n) + 1, inRd = p.n % n + 1, pickTag = round + '.' + (inRd < 10 ? '0' : '') + inRd, pc = 'pc' + pci(g, p.pid), mine = p.pid === S.me;
     $('slam-say').textContent = (mine ? 'You drafted ' : playerName(g, p.pid) + ' drafted ') + p.name + ' for ' + p.sub + '.';
     var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
     var card = $('slam-card'), dim = $('slam-dim'), LAND = 1250;
@@ -4278,7 +4278,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         if (fl.animate) SLAM.anims.push(fl.animate([{ opacity: 0.35 }, { opacity: 0 }], { duration: 800, easing: 'ease-out', fill: 'forwards' }));
       }
       /* DRAFTED stamp */
-      var st = document.createElement('div'); st.className = 'slam-stamp'; st.textContent = 'DRAFTED';
+      var st = document.createElement('div'); st.className = 'slam-stamp'; st.textContent = 'DRAFTED ' + pickTag;
       document.body.appendChild(st); SLAM.extras.push(st);
       st.style.left = (r.left + sx + r.width / 2 - st.offsetWidth / 2) + 'px'; st.style.top = (r.top + sy + r.height / 2 - st.offsetHeight / 2) + 'px';
       if (st.animate) SLAM.anims.push(st.animate([
