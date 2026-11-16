@@ -218,7 +218,9 @@ html.has-ticker .turn-bubble { bottom: calc(46px + env(safe-area-inset-bottom, 0
 @keyframes pbIn { from { transform: translate(-50%, -140%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 @keyframes pbOut { from { transform: translate(-50%, 0); opacity: 1; } to { transform: translate(-50%, -140%); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .pick-banner.in, .pick-banner.out { animation-duration: 0.01s; } }
-.board td.pb-fresh { animation: pbCell 1.6s ease-out; }
+.board td.pb-fresh { animation: pbCell 1.6s ease-out both; }
+.board td.pb-fresh strong { animation: pbPop 0.35s ease-out both; animation-delay: inherit; }
+@keyframes pbPop { 0% { transform: scale(1.18); } 100% { transform: scale(1); } }
 @keyframes pbCell { 0% { background: #ffb612; } 100% { background: transparent; } }
 .turn-glow { position: fixed; top: calc(-1 * env(safe-area-inset-top, 0px)); bottom: calc(-1 * env(safe-area-inset-bottom, 0px)); left: 0; right: 0; z-index: 70; pointer-events: none; box-shadow: inset 0 0 0 7px #ffb612, inset 0 0 36px 12px rgba(255, 182, 18, 0.7); animation: turnGlow 1.6s ease-in-out infinite; }
 .turn-glow.low { box-shadow: inset 0 0 0 7px #ca2430, inset 0 0 36px 12px rgba(202, 36, 48, 0.55); animation-duration: 0.7s; }
@@ -4189,8 +4191,11 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var id = gameId(g);
     if (PB.gid !== id) { PB.gid = id; PB.n = g.picks.length; PB.q = []; hidePickBanner(true); return; }   /* joining mid-draft doesn't replay old picks */
     if (g.picks.length < PB.n) { PB.n = g.picks.length; return; }
-    while (PB.n < g.picks.length) { var p = g.picks[PB.n]; PB.n++; if (p && (p.pid !== S.me || p.auto)) PB.q.push(p); }
-    if (!PB.busy) nextPickBanner();
+    var fresh = null;
+    while (PB.n < g.picks.length) { var p = g.picks[PB.n]; PB.n++; if (p && (p.pid !== S.me || p.auto)) fresh = p; }
+    if (!fresh) return;
+    /* the banner always matches the board: a new pick replaces whatever is showing, immediately */
+    PB.q = [fresh]; nextPickBanner();
   }
   function nextPickBanner() {
     var g = S.game, el = $('pick-banner'); if (!el) return;
@@ -4202,11 +4207,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     el.innerHTML = '<div class="pb-no">' + (p.n + 1) + '</div><div style="min-width:0">' +
       '<div class="pb-k">' + (p.auto ? '⏱ Auto-pick · ' : 'The pick is in · ') + 'Round ' + round + ' · ' + esc(p.sub) + '</div>' +
       '<div class="pb-nm">' + (mine ? 'You got ' : esc(playerName(g, p.pid)) + ' took ') + '<b>' + esc(p.name) + '</b></div></div>';
-    el.hidden = false; void el.offsetWidth; el.classList.add('in');
-    /* flash the new square on the board too */
-    try { var cells = document.querySelectorAll('#board td'); cells.forEach(function (td) { if (td.textContent.indexOf(p.name) >= 0) { td.classList.remove('pb-fresh'); void td.offsetWidth; td.classList.add('pb-fresh'); } }); } catch (e) {}
+    el.hidden = false; el.classList.remove('out'); void el.offsetWidth; el.classList.add('in');
     /* shorter when it's now your turn, so it's out of the way quickly; taps always go through it */
-    var dd = derive(g, now()), hold = PB.q.length ? 1500 : dd.current === S.me ? 2000 : 2800;
+    var dd = derive(g, now()), hold = dd.current === S.me ? 2000 : 2800;
     clearTimeout(PB.timer);
     PB.timer = setTimeout(function () { hidePickBanner(false, nextPickBanner); }, hold);
   }
@@ -4236,7 +4239,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   function renderDraft() {
     var g = S.game, d = derive(g, now()), t = TOPICS[g.topicId];
     renderTicker(g);
-    setTimeout(function () { if (S.game === g) pickBannerCheck(g); }, 0);
+    pickBannerCheck(g);
     var mine = d.current === S.me;
     var cd = d.countdownMs > 0;
     lgCheckRoom(g);
@@ -4387,12 +4390,23 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       h += '<tr class="pc' + pci(g, pid) + (up ? ' turn' : '') + (pid === S.me ? ' mine' : '') + '"><th scope="row">' + esc(playerName(g, pid)) + (pid === S.me ? '<small>you</small>' : '') + (up ? '<small class="up">on the clock</small>' : '') + '</th>' + g.subs.map(function (sub) {
         var p = filled(g, pid, sub), sc = p && scores ? scores['p' + p.n] : null;
         var irr = !!(p && sc && isIrrPick(g, p)), cell = p ? '<strong>' + esc(p.name) + '</strong>' + (sc ? scoreBadge(sc.score) : '') : '<span class="empty">—</span>';
-        return '<td class="' + (p ? 'has' : '') + (irr ? ' irr' : '') + '">' + (irr ? irrTape(cell) : cell) + '</td>';
+        return '<td class="' + (p ? 'has' : '') + (irr ? ' irr' : '') + freshAttr(g, p) + '">' + (irr ? irrTape(cell) : cell) + '</td>';
       }).join('') + '</tr>';
     });
     table.innerHTML = h + '</tbody>';
   }
+  /* The newest pick glows gold for 1.6s from the moment this device first sees it. The board is redrawn often, so each
+     redraw restarts the glow at the right point (negative animation-delay) instead of from the start. */
+  var FRESH_MS = 1600, FRESH = { gid: '', n: -1, at: 0 };
+  function freshAttr(g, p) {
+    if (!p || !g || g.status !== 'drafting') return '';
+    var last = g.picks.length - 1; if (p.n !== last) return '';
+    if (FRESH.n !== last) FRESH = { gid: FRESH.gid, n: last, at: now() };
+    var age = now() - FRESH.at; if (age >= FRESH_MS) return '';
+    return ' pb-fresh" style="animation-delay:-' + (age / 1000).toFixed(2) + 's';
+  }
   function renderBoard(table, g, d, scores) {
+    var fid = gameId(g); if (FRESH.gid !== fid) FRESH = { gid: fid, n: g.picks.length - 1, at: 0 };   /* joining mid-draft: no glow on old picks */
     var cols = g.order.length ? g.order : sortedPlayers(g).map(function (p) { return p.id; });
     table._args = [g, d, scores];
     var grid = table.closest ? table.closest('.draft-grid') : null;
@@ -4411,7 +4425,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         var inner = p ? (s ? scoreBadge(s.score) : '') + '<strong>' + esc(p.name) + '</strong>' + (p.auto ? '<span class="auto">auto</span>' : '') : '<span class="empty">—</span>';
         var irr = !!(p && s && isIrrPick(g, p)); if (irr) inner = irrTape(inner);
         var up = d && pid === d.current;
-        return '<td class="pc' + pci(g, pid) + (p ? ' has' : '') + (irr ? ' irr' : '') + (pid === S.me ? ' mine' : '') + (up ? ' turn' : '') + '" data-p="' + esc(playerName(g, pid) + (pid === S.me ? ' · you' : '') + (up ? ' · up' : '')) + '">' + inner + '</td>';
+        return '<td class="pc' + pci(g, pid) + (p ? ' has' : '') + (irr ? ' irr' : '') + (pid === S.me ? ' mine' : '') + (up ? ' turn' : '') + freshAttr(g, p) + '" data-p="' + esc(playerName(g, pid) + (pid === S.me ? ' · you' : '') + (up ? ' · up' : '')) + '">' + inner + '</td>';
       }).join('') + '</tr>';
     });
     table.innerHTML = h + '</tbody>';
