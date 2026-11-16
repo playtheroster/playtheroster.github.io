@@ -1575,7 +1575,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <div class="top10" id="top10"></div>
             </div>
             <div class="board-wrap"><table class="board" id="final-board"></table></div>
-            <p class="note best-key" id="best-key" hidden=""><span aria-hidden="true">🏆</span> Best pick available: when it was made, nothing left on the board would have scored higher in that subtopic.</p>
+            <p class="note best-key" id="best-key" hidden=""><span aria-hidden="true">🏆</span> Best pick available: when it was made, nothing left on the board would have scored more in any of that player’s open subtopics.</p>
             <div class="actions"><button class="btn primary" type="button" data-act="go-home">← Back to homepage</button><button class="btn" type="button" data-act="again" data-again2="1">Play again</button></div>
           </div>
         </div>
@@ -3988,15 +3988,20 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   function tier(x) { var v = Math.round((Number(x) || 0) * 10) / 10; return v >= 9 ? 5 : v >= 7.5 ? 4 : v >= 6 ? 3 : v >= 4 ? 2 : 1; }
   /* Mr. Irrelevant pick: the last-ranked answer for its subtopic. Only marked once scores are out. */
   function isIrrPick(g, p) { var t = TOPICS[g.topicId], r = t && t.ranks ? t.ranks[p.sub] : null; return !!(r && r.length > 1 && r[r.length - 1] === p.key); }
-  /* Best pick available: when it was made, nothing still on the board ranked higher for that subtopic. Results only. */
+  /* Best pick available: when it was made, no answer still on the board would have scored more in any of the
+     picker's open subtopics (not just the one they used). Compared on the list scores, so ties still count. Results only. */
   function isBestPick(g, p) {
-    var t = TOPICS[g.topicId], r = t && t.ranks ? t.ranks[p.sub] : null; if (!r) return false;
-    var at = r.indexOf(p.key); if (at < 0) return false;
-    var gone = {}; (g.picks || []).forEach(function (q) { if (q.n < p.n) gone[q.key] = 1; });
-    for (var i = 0; i < at; i++) if (!gone[r[i]]) return false;
+    var t = TOPICS[g.topicId]; if (!t || !t.ranks || !t.ranks[p.sub]) return false;
+    var gone = {}, used = {};
+    (g.picks || []).forEach(function (q) { if (q.n < p.n) { gone[q.key] = 1; if (q.pid === p.pid) used[q.sub] = 1; } });
+    var mine = quickScore(g.topicId, p.sub, p.key).score;
+    for (var j = 0; j < g.subs.length; j++) {
+      var sub = g.subs[j], r = t.ranks[sub]; if (used[sub] || !r) continue;
+      for (var i = 0; i < r.length; i++) if (!gone[r[i]]) { if (quickScore(g.topicId, sub, r[i]).score > mine) return false; break; }
+    }
     return true;
   }
-  var CUP = '<span class="best-cup" title="Best pick available: nothing left would have scored higher" aria-label="Best pick available">🏆</span>';
+  var CUP = '<span class="best-cup" title="Best pick available: nothing left would have scored more in any open slot" aria-label="Best pick available">🏆</span>';
   function irrTape(html) { return '<span class="irr-tape"><small>Mr. Irrelevant</small>' + html + '</span>'; }
   function scoreBadge(x, extra) { var t = tier(x); return '<span class="sc tier t' + t + (extra ? ' ' + extra : '') + '" title="' + TIER_NAMES[t] + '">' + fmt1(x) + '</span>'; }
   function pci(g, pid) { var ps = sortedPlayers(g); for (var i = 0; i < ps.length; i++) if (ps[i].id === pid) return i % 8; return 0; }
@@ -4745,7 +4750,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         rs += '<div><p class="mono" style="margin-bottom:4px;display:flex;align-items:center">' + pdot(g, r.pid) + esc(r.name) + '</p>' + g.subs.map(function (sub) {
           var p = filled(g, r.pid, sub); if (!p) return '';
           var s = scores['p' + p.n];
-          return '<div class="reason">' + scoreBadge(s ? s.score : 0) + '<span><strong>' + esc(p.name) + '</strong>' + (s && isBestPick(g, p) && !isIrrPick(g, p) ? ' <span class="best-cup inline" title="Best pick available: nothing left would have scored higher" aria-label="Best pick available">🏆</span>' : '') + ' · ' + esc(sub) + '</span><span class="why">' + esc(s ? s.reason : 'Not scored') + '</span></div>';
+          return '<div class="reason">' + scoreBadge(s ? s.score : 0) + '<span><strong>' + esc(p.name) + '</strong>' + (s && isBestPick(g, p) && !isIrrPick(g, p) ? ' <span class="best-cup inline" title="Best pick available: nothing left would have scored more in any open slot" aria-label="Best pick available">🏆</span>' : '') + ' · ' + esc(sub) + '</span><span class="why">' + esc(s ? s.reason : 'Not scored') + '</span></div>';
         }).join('') + '</div>';
       });
     } else rs = '<p class="note">Scores and reasons appear here once Claude has judged the draft.</p>';
