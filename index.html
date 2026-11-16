@@ -754,12 +754,14 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .bopt.taken { color: var(--muted); }
 .bopt.taken .nm { text-decoration: line-through; }
 .bopt.pick { cursor: pointer; }
-.irr-lock { justify-self: start; margin-top: 10px; max-width: 100%; white-space: normal; text-align: left; }
+.irr-lockin { justify-self: start; margin-top: 10px; max-width: 100%; white-space: normal; text-align: left; }
 @media (hover: hover) and (pointer: fine) { .bopt.pick:hover { background: var(--hi); color: var(--hi-ink); } }
 .bopt.pick.chosen, .bopt.pick.chosen:nth-child(odd) { background: var(--ink); color: var(--hi); }
 .bopt.pick.chosen .via { color: var(--hi); }
 .bopt .why { font-size: 0.8rem; text-align: right; }
 .seg.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.seg.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.seg.five .seg-btn { padding-left: 2px; padding-right: 2px; }
 .lobby-list { display: grid; gap: 8px; }
 .seg-btn:disabled { cursor: not-allowed; }
 .seg-btn:disabled:not([aria-checked="true"]) { opacity: 0.55; }
@@ -1087,7 +1089,9 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .past-subs { display: flex; flex-wrap: wrap; gap: 6px; }
 .past-subs span { padding: 5px 10px; border: 2px solid var(--edge); border-radius: 10px; font-weight: 700; font-size: 0.9rem; }
 .past-mine { margin: 0; font-weight: 700; }
-.past-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.past-acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 1400px) { .past-acts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .past-acts { grid-template-columns: minmax(0, 1fr); } }
 .past-act { display: grid; gap: 8px; align-content: start; padding: 12px; border-radius: 14px; background: var(--tint); }
 .past-act p { margin: 0; }
 .lg-owner { display: grid; gap: 10px; padding: 14px; border: 2.5px solid var(--edge); border-radius: 16px; }
@@ -1396,6 +1400,17 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note" id="lobby-list-note"></p>
               </div>
+              <div class="lobby-list">
+                <span class="mono label" id="time-room-label">Time per pick</span>
+                <div class="seg five" role="radiogroup" aria-labelledby="time-room-label" id="lobby-time-seg">
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-time" data-sec="30">30s</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-time" data-sec="45">45s</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="room-time" data-sec="60">60s</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-time" data-sec="75">75s</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-time" data-sec="90">90s</button>
+                </div>
+                <p class="note" id="lobby-time-note"></p>
+              </div>
               <div class="mm-box" id="mm-box" hidden="" aria-live="polite"></div>
               <div class="actions">
                 <button class="btn primary" type="button" id="start-btn" data-act="start">Start draft</button>
@@ -1532,7 +1547,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <ul class="list fast-list" id="fast-list" role="listbox" aria-label="Matching answers" hidden=""></ul>
               </div>
-              <button class="btn primary irr-lock" type="button" id="irr-lock-btn" data-act="irr-lock" hidden="">Lock in</button>
+              <button class="btn primary irr-lockin" type="button" id="irr-lock-btn" data-act="irr-lock" hidden="">Lock in</button>
               <p class="note" id="fast-note">Type, then tap an answer or press Enter for the top match.</p>
               <div class="irr-listopt" id="irr-listopt" hidden="">
                 <span class="mono label" id="irr-listopt-label">Show every answer?</span>
@@ -1786,6 +1801,10 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 
   /* ENGINE START */
   var PICK_SECONDS = TEST.pickSeconds || 60;
+  /* The room's host picks the time per pick; every other game uses 60 seconds. */
+  var PICK_CHOICES = [30, 45, 60, 75, 90];
+  function pickMs(g) { if (TEST.pickSeconds) return TEST.pickSeconds * 1000; var v = g ? Number(g.pickSec) : 0; return (PICK_CHOICES.indexOf(v) >= 0 ? v : 60) * 1000; }
+  function currentPickSec() { var v = Number(store('roster.pickSec')); return PICK_CHOICES.indexOf(v) >= 0 ? v : 60; }
   /* 5-second countdown (with the full-screen intro) before every draft: online, Offline vs AI and Practice. Tests turn it off unless they ask for it. */
   var COUNTDOWN_MS = TEST.countdownMs != null ? TEST.countdownMs : (window.__ROSTER_TEST__ ? 0 : 5000);
   var SUBS_PER_DAY = 5, MAX_PLAYERS = 8, MIN_PLAYERS = 2, GRACE_MS = 5000;
@@ -3666,7 +3685,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     g.picks.forEach(function (p) { if (!d.taken[p.key]) d.taken[p.key] = p; });
     if (g.status === 'drafting' && n > 0 && done === 0 && now < g.startedAt) {
       /* Countdown before the first pick: nobody is on the clock yet. */
-      d.countdownMs = g.startedAt - now; d.round = 1; d.remainingMs = PICK_SECONDS * 1000;
+      d.countdownMs = g.startedAt - now; d.round = 1; d.remainingMs = pickMs(g);
       d.first = g.order[0];
       return d;
     }
@@ -3676,7 +3695,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         d.current = g.order[snakeIndex(done, n)];
         d.round = Math.floor(done / n) + 1;
         d.turnStart = done ? (g.picks[done - 1].at || g.startedAt) : g.startedAt;
-        d.remainingMs = PICK_SECONDS * 1000 - (now - d.turnStart);
+        d.remainingMs = pickMs(g) - (now - d.turnStart);
       }
     }
     return d;
@@ -4108,6 +4127,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var host = g.hostId === S.me, shown = listShown(g);
     document.querySelectorAll('#lobby-list-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-list') === 'show') === shown)); b.disabled = !host; });
     $('lobby-list-note').textContent = (host ? '' : 'The host decides. ') + LIST_NOTES[shown ? 'show' : 'hide'];
+    var psec = pickMs(g) / 1000;
+    document.querySelectorAll('#lobby-time-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String(Number(b.getAttribute('data-sec')) === psec)); b.disabled = !host || g.mode !== 'shared'; });
+    $('lobby-time-note').textContent = (host ? '' : 'The host decides. ') + 'Each player gets ' + psec + ' seconds to make a pick.';
     var inRoom = !!g.players[S.me];
     $('start-btn').disabled = !inRoom || ps.length < MIN_PLAYERS;
     $('start-note').textContent = ps.length < MIN_PLAYERS ? 'You need at least ' + MIN_PLAYERS + ' players to start.' : '';
@@ -4239,7 +4261,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     glow.hidden = !on; glow.classList.toggle('low', low);
     bub.hidden = !on;
     if (on) {
-      var frac = Math.max(0, Math.min(1, rem / (PICK_SECONDS * 1000))), col = low ? '#ca2430' : '#ffb612';
+      var frac = Math.max(0, Math.min(1, rem / pickMs(S.game))), col = low ? '#ca2430' : '#ffb612';
       bub.style.background = 'conic-gradient(' + col + ' 0 ' + (frac * 100).toFixed(1) + '%, #444444 ' + (frac * 100).toFixed(1) + '% 100%)';
       bub.classList.toggle('low', low);
       var tt = fmtClock(rem); if ($('turn-bubble-t').textContent !== tt) $('turn-bubble-t').textContent = tt;
@@ -4665,7 +4687,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     }
     if (S.cdFor && S.cdFor === gameId(g)) { S.cdFor = ''; render(); return; }
     if (d.complete) { maybeScore(); return; }
-    var rem = d.remainingMs, frac = Math.max(0, Math.min(1, rem / (PICK_SECONDS * 1000)));
+    var rem = d.remainingMs, frac = Math.max(0, Math.min(1, rem / pickMs(g)));
     var low = rem <= 10000;
     $('clock-t').textContent = fmtClock(rem);
     $('clock').className = 'clock' + (low ? ' low' : '');
@@ -5003,6 +5025,13 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     document.querySelectorAll('.seg-btn[data-act="list"]').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-list') === lv)); });
     document.querySelectorAll('.list-note').forEach(function (n) { n.textContent = LIST_NOTES[lv]; });
   }
+  async function setRoomTime(sec) {
+    var g = S.game; if (!g || g.mode !== 'shared' || g.hostId !== S.me || g.status !== 'lobby' || PICK_CHOICES.indexOf(sec) < 0) return;
+    store('roster.pickSec', String(sec));
+    g.pickSec = sec; render();
+    try { await S.env.db.doc('rooms/' + g.code).update({ pickSec: sec }); }
+    catch (e) { setMsg('Couldn’t change the pick timer. Try again.', true); }
+  }
   async function setRoomList(show) {
     var g = S.game; if (!g || g.mode !== 'shared' || g.hostId !== S.me || g.status !== 'lobby') return;
     store('roster.list', show ? 'show' : 'hide');
@@ -5096,7 +5125,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     st.ph = 'draft';
     st.cur = D.ps[snakeIndex(st.shown, n)];
     st.round = Math.floor(st.shown / n) + 1;
-    st.rem = PICK_SECONDS * 1000 - (tt - (st.shown ? last : (r.start || r.t0)));
+    st.rem = pickMs({ pickSec: D.pickSec }) - (tt - (st.shown ? last : (r.start || r.t0)));
     return st;
   }
 
@@ -5158,7 +5187,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var ps = g.order.map(function (pid) { return { pid: pid, name: playerName(g, pid).replace(/ \(AI\)$/, ''), c: pci(g, pid) }; });
     var picks = g.picks.slice().sort(function (a, b) { return a.n - b.n; }).map(function (p) { return { n: p.n, pid: p.pid, sub: p.sub, name: p.name, sc: scores && scores['p' + p.n] ? Number(scores['p' + p.n].score) || 0 : null }; });
     var rows = scores ? standings(g, scores) : [];
-    return { tid: g.topicId, dk: g.dateKey || dateKey(new Date()), topic: TOPICS[g.topicId].name, date: fmtDay(g.dateKey || dateKey(new Date())), subs: g.subs.slice(), ps: ps, picks: picks, win: rows[0] ? { name: rows[0].name.replace(/ \(AI\)$/, ''), total: rows[0].total } : null, totals: rows.reduce(function (o, r) { o[r.pid] = r.total; return o; }, {}) };
+    return { pickSec: Number(g.pickSec) || 60, tid: g.topicId, dk: g.dateKey || dateKey(new Date()), topic: TOPICS[g.topicId].name, date: fmtDay(g.dateKey || dateKey(new Date())), subs: g.subs.slice(), ps: ps, picks: picks, win: rows[0] ? { name: rows[0].name.replace(/ \(AI\)$/, ''), total: rows[0].total } : null, totals: rows.reduce(function (o, r) { o[r.pid] = r.total; return o; }, {}) };
   }
   function dvRound(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
   function dvFit(ctx, text, maxW, font) { ctx.font = font; if (ctx.measureText(text).width <= maxW) return text; var t = text; while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1); return t + '…'; }
@@ -5506,7 +5535,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       for (var i = 0; i < 6 && !code; i++) { var c = newCode(); var ex = await db.doc('rooms/' + c).get({ quick: true }); if (!ex.exists) code = c; }
       if (!code) throw new Error('no code');
       /* The room and your seat in it are saved at the same time. */
-      await Promise.all([db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, past: !!day, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' }), db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name, code, spec.topicId))]);
+      await Promise.all([db.doc('rooms/' + code).set({ code: code, isPublic: !!isPublic, hostId: S.env.uid, status: 'lobby', pickSec: currentPickSec(), topicId: spec.topicId, subs: spec.subs, dateKey: spec.dateKey, past: !!day, createdAt: now(), order: [], startedAt: 0, showList: currentListPref() === 'show' }), db.doc('rooms/' + code + '/players/' + S.env.uid).set(playerDoc(name, code, spec.topicId))]);
       enterRoom(code);
       if (!fixedCode) statBump(function (r) { r.rooms = (r.rooms || 0) + 1; });
       return code;
@@ -5572,6 +5601,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
       g.dateKey = r.dateKey; g.past = !!r.past; g.order = Array.isArray(r.order) ? r.order.map(String) : []; g.startedAt = Number(r.startedAt) || 0;
       g.kicked = Array.isArray(r.kicked) ? r.kicked.map(String) : [];
       g.showList = r.showList !== false;
+      g.pickSec = PICK_CHOICES.indexOf(Number(r.pickSec)) >= 0 ? Number(r.pickSec) : 60;
       if (g.kicked.indexOf(S.me) >= 0) { kickedOut(code); return; }
       g.kicked.forEach(function (id) { delete g.players[id]; });
       afterChange();
@@ -6429,6 +6459,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
           '<button class="btn primary block" type="button" data-act="past-ai">Play vs AI</button></div>' +
         '<div class="past-act"><strong>With friends</strong><p>Create a private room for this day and share the code. Uses the name above.</p><button class="btn block" type="button" data-act="past-room">Create a room for this day</button></div>' +
         '<div class="past-act"><strong>Fast Money ⚡</strong><p>That day’s 60-second challenge. One try per day.</p><button class="btn block" type="button" data-act="past-fast">' + (pl2.fast != null ? 'See your result' : 'Play that day’s Fast Money') + '</button></div>' +
+        (function () { var fi = loadIrr('past:' + sel); return '<div class="past-act"><strong>Mr. Irrelevant 🚧</strong><p>Pick the least valuable answer for each subtopic. Stay under ' + fmt1(IRR_TARGET) + ' to win. No timer.</p><button class="btn block" type="button" data-act="past-irr">' + (fi && fi.done ? 'See your result' : fi ? 'Keep playing' : 'Play that day’s Mr. Irrelevant') + '</button></div>'; })() +
         '</div><p class="note">Just for fun: past days don’t count toward your stats or leagues.</p></div>';
     }
     body.innerHTML = cal + detail;
@@ -7389,6 +7420,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'create-room') createRoom(currentPrivacy() === 'public');
     else if (act === 'list') { store('roster.list', t.getAttribute('data-list')); renderListPref(); }
     else if (act === 'room-list') setRoomList(t.getAttribute('data-list') === 'show');
+    else if (act === 'room-time') setRoomTime(Number(t.getAttribute('data-sec')));
     else if (act === 'intro-close') { if (S.game) S.introClosed = gameId(S.game); hideIntro(); }
     else if (act === 'privacy') { store('roster.privacy', t.getAttribute('data-privacy')); renderPrivacy(); }
     else if (act === 'join-room') joinRoom($('room-code').value);
@@ -7449,6 +7481,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'past-ai') { var pb = $('past-bots'); if (pb && $('bot-count')) $('bot-count').value = pb.value; playOffline(parseInt(pb ? pb.value : '3', 10), false, S.ui.pastDay); }
     else if (act === 'past-room') createRoom(false, null, S.ui.pastDay);
     else if (act === 'past-fast') openFast(S.ui.pastDay);
+    else if (act === 'past-irr') { var pday = S.ui.pastDay, psp = pday && dailySpec(pday); if (psp && TOPICS[psp.topicId]) startIrr({ gid: 'past:' + pday, topicId: psp.topicId, subs: psp.subs.slice(), dateKey: pday, past: true, me: null, snap: null }); }
     else if (act === 'me-signin') { S.pendingLeague = function () { renderMe(); }; openAccount('Sign in to see your stats.'); }
     else if (act === 'open-me') { closeAccount(); gotoMode('me'); }
     else if (act === 'organizer') openOrganizer();
