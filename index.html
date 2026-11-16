@@ -324,6 +324,11 @@ html.on-clock.low-clock { background-color: #ca2430; }
 .board thead th.turn[class*="pc"] { background: var(--pc); color: var(--pi, var(--p-ink)); }
 .board td.has { box-shadow: inset 4px 0 0 var(--pc); }
 .board td.irr, .board td.irr.mine { background: repeating-linear-gradient(-45deg, #ffb612 0 12px, #000000 12px 24px); }
+.board td.best { position: relative; box-shadow: inset 4px 0 0 var(--pc), inset 0 0 0 2px rgba(214,160,0,.55); }
+.board.tp td.best { box-shadow: inset 0 0 0 2px rgba(214,160,0,.55); }
+.board td .best-cup { position: absolute; top: 3px; right: 4px; font-size: 0.78rem; line-height: 1; opacity: .9; pointer-events: none; }
+.best-cup.inline { font-size: 0.85em; }
+.best-key { margin: -4px 0 0; font-size: 0.85rem; }
 .board td .irr-tape { display: inline-block; max-width: 100%; background: #ffffff; color: #000000; border: 2px solid #000000; border-radius: 8px; padding: 3px 8px; }
 .board td .irr-tape strong { color: #000000; }
 .board td .irr-tape small { display: block; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #ca2430; line-height: 1.3; }
@@ -1570,6 +1575,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <div class="top10" id="top10"></div>
             </div>
             <div class="board-wrap"><table class="board" id="final-board"></table></div>
+            <p class="note best-key" id="best-key" hidden=""><span aria-hidden="true">🏆</span> Best pick available: when it was made, nothing left on the board would have scored higher in that subtopic.</p>
             <div class="actions"><button class="btn primary" type="button" data-act="go-home">← Back to homepage</button><button class="btn" type="button" data-act="again" data-again2="1">Play again</button></div>
           </div>
         </div>
@@ -3952,7 +3958,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   /* ENGINE END */
 
   if (TEST.exportEngine) {
-    window.__ROSTER_ENGINE__ = { TOPICS: TOPICS, TOPIC_DEFS: TOPIC_DEFS, autoSpec: autoSpec, validOverride: validOverride, SCHEDULE: SCHEDULE, norm: norm, search: search, resolveName: resolveName, dailySpec: dailySpec, topicForDay: topicForDay, snakeIndex: snakeIndex, derive: derive, pickError: pickError, makePick: makePick, autoChoice: autoChoice, botChoice: botChoice, quickScore: quickScore, builtinResults: builtinResults, normalizeScores: normalizeScores, orderByRank: orderByRank, draftAwards: draftAwards, standings: standings, fmt1: fmt1, scoringPrompt: scoringPrompt, rng: rng, PICK_SECONDS: PICK_SECONDS };
+    window.__ROSTER_ENGINE__ = { TOPICS: TOPICS, TOPIC_DEFS: TOPIC_DEFS, autoSpec: autoSpec, validOverride: validOverride, SCHEDULE: SCHEDULE, norm: norm, search: search, resolveName: resolveName, dailySpec: dailySpec, topicForDay: topicForDay, snakeIndex: snakeIndex, derive: derive, pickError: pickError, makePick: makePick, autoChoice: autoChoice, botChoice: botChoice, quickScore: quickScore, builtinResults: builtinResults, normalizeScores: normalizeScores, orderByRank: orderByRank, draftAwards: draftAwards, standings: standings, fmt1: fmt1, scoringPrompt: scoringPrompt, rng: rng, PICK_SECONDS: PICK_SECONDS, get S() { return S; } };
   }
 
   /* ================= APP ================= */
@@ -3982,6 +3988,15 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   function tier(x) { var v = Math.round((Number(x) || 0) * 10) / 10; return v >= 9 ? 5 : v >= 7.5 ? 4 : v >= 6 ? 3 : v >= 4 ? 2 : 1; }
   /* Mr. Irrelevant pick: the last-ranked answer for its subtopic. Only marked once scores are out. */
   function isIrrPick(g, p) { var t = TOPICS[g.topicId], r = t && t.ranks ? t.ranks[p.sub] : null; return !!(r && r.length > 1 && r[r.length - 1] === p.key); }
+  /* Best pick available: when it was made, nothing still on the board ranked higher for that subtopic. Results only. */
+  function isBestPick(g, p) {
+    var t = TOPICS[g.topicId], r = t && t.ranks ? t.ranks[p.sub] : null; if (!r) return false;
+    var at = r.indexOf(p.key); if (at < 0) return false;
+    var gone = {}; (g.picks || []).forEach(function (q) { if (q.n < p.n) gone[q.key] = 1; });
+    for (var i = 0; i < at; i++) if (!gone[r[i]]) return false;
+    return true;
+  }
+  var CUP = '<span class="best-cup" title="Best pick available: nothing left would have scored higher" aria-label="Best pick available">🏆</span>';
   function irrTape(html) { return '<span class="irr-tape"><small>Mr. Irrelevant</small>' + html + '</span>'; }
   function scoreBadge(x, extra) { var t = tier(x); return '<span class="sc tier t' + t + (extra ? ' ' + extra : '') + '" title="' + TIER_NAMES[t] + '">' + fmt1(x) + '</span>'; }
   function pci(g, pid) { var ps = sortedPlayers(g); for (var i = 0; i < ps.length; i++) if (ps[i].id === pid) return i % 8; return 0; }
@@ -4479,8 +4494,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       var up = d && pid === d.current;
       h += '<tr class="pc' + pci(g, pid) + (up ? ' turn' : '') + (pid === S.me ? ' mine' : '') + '"><th scope="row">' + esc(playerName(g, pid)) + (pid === S.me ? '<small>you</small>' : '') + (up ? '<small class="up">on the clock</small>' : '') + '</th>' + g.subs.map(function (sub) {
         var p = filled(g, pid, sub), sc = p && scores ? scores['p' + p.n] : null;
-        var irr = !!(p && sc && isIrrPick(g, p)), cell = p ? '<strong>' + esc(p.name) + '</strong>' + (sc ? scoreBadge(sc.score) : '') : '<span class="empty">—</span>';
-        return '<td class="' + (p ? 'has' : '') + (irr ? ' irr' : '') + freshAttr(g, p) + '">' + (irr ? irrTape(cell) : cell) + '</td>';
+        var irr = !!(p && sc && isIrrPick(g, p)), best = !irr && !!(p && sc && isBestPick(g, p)), cell = p ? '<strong>' + esc(p.name) + '</strong>' + (sc ? scoreBadge(sc.score) : '') : '<span class="empty">—</span>';
+        if (best) cell += CUP;
+        return '<td class="' + (p ? 'has' : '') + (irr ? ' irr' : '') + (best ? ' best' : '') + freshAttr(g, p) + '">' + (irr ? irrTape(cell) : cell) + '</td>';
       }).join('') + '</tr>';
     });
     table.innerHTML = h + '</tbody>';
@@ -4514,8 +4530,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         var s = p && scores ? scores['p' + p.n] : null;
         var inner = p ? (s ? scoreBadge(s.score) : '') + '<strong>' + esc(p.name) + '</strong>' + (p.auto ? '<span class="auto">auto</span>' : '') : '<span class="empty">—</span>';
         var irr = !!(p && s && isIrrPick(g, p)); if (irr) inner = irrTape(inner);
+        var best = !irr && !!(p && s && isBestPick(g, p)); if (best) inner += CUP;
         var up = d && pid === d.current;
-        return '<td class="pc' + pci(g, pid) + (p ? ' has' : '') + (irr ? ' irr' : '') + (pid === S.me ? ' mine' : '') + (up ? ' turn' : '') + freshAttr(g, p) + '" data-p="' + esc(playerName(g, pid) + (pid === S.me ? ' · you' : '') + (up ? ' · up' : '')) + '">' + inner + '</td>';
+        return '<td class="pc' + pci(g, pid) + (p ? ' has' : '') + (irr ? ' irr' : '') + (best ? ' best' : '') + (pid === S.me ? ' mine' : '') + (up ? ' turn' : '') + freshAttr(g, p) + '" data-p="' + esc(playerName(g, pid) + (pid === S.me ? ' · you' : '') + (up ? ' · up' : '')) + '">' + inner + '</td>';
       }).join('') + '</tr>';
     });
     table.innerHTML = h + '</tbody>';
@@ -4728,12 +4745,13 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
         rs += '<div><p class="mono" style="margin-bottom:4px;display:flex;align-items:center">' + pdot(g, r.pid) + esc(r.name) + '</p>' + g.subs.map(function (sub) {
           var p = filled(g, r.pid, sub); if (!p) return '';
           var s = scores['p' + p.n];
-          return '<div class="reason">' + scoreBadge(s ? s.score : 0) + '<span><strong>' + esc(p.name) + '</strong> · ' + esc(sub) + '</span><span class="why">' + esc(s ? s.reason : 'Not scored') + '</span></div>';
+          return '<div class="reason">' + scoreBadge(s ? s.score : 0) + '<span><strong>' + esc(p.name) + '</strong>' + (s && isBestPick(g, p) && !isIrrPick(g, p) ? ' <span class="best-cup inline" title="Best pick available: nothing left would have scored higher" aria-label="Best pick available">🏆</span>' : '') + ' · ' + esc(sub) + '</span><span class="why">' + esc(s ? s.reason : 'Not scored') + '</span></div>';
         }).join('') + '</div>';
       });
     } else rs = '<p class="note">Scores and reasons appear here once Claude has judged the draft.</p>';
     $('reasons').innerHTML = rs;
     renderBoard($('final-board'), g, null, scores);
+    $('best-key').hidden = !$('final-board').querySelector('td.best');
     renderAwards(g, scores);
     renderTop10(g);
     var inGame = !!g.players[S.me];
