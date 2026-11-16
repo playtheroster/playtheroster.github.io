@@ -1174,7 +1174,12 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 /* ---------- Draft video: the whole draft board in real time, as a 9:16 video ---------- */
 #dv-slot-home { padding-block: 0 28px; }
 .dv-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.dv-box { display: grid; gap: 14px; padding: 18px; border: 3px solid var(--edge); border-radius: 20px; background: var(--surface); }
+.dv-box { display: grid; gap: 10px; justify-items: start; }
+.dv-toggle { background: none; border: 0; padding: 2px 0; font: inherit; font-size: 0.8rem; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.dv-toggle:hover { color: var(--ink, inherit); }
+.dv-toggle[aria-expanded="true"] .dv-caret { display: inline-block; transform: rotate(180deg); }
+.dv-body { display: grid; gap: 14px; justify-self: stretch; padding: 14px; border: 2px solid var(--line); border-radius: 14px; background: var(--surface); }
+.dv-body[hidden] { display: none; }
 .dv-head { display: grid; gap: 12px; }
 .dv-head h3 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 2rem; line-height: 1; color: var(--accent); }
 .dv-head .note { margin: 4px 0 0; }
@@ -1243,10 +1248,11 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 
   <section class="wrap" id="dv-slot-home" hidden="">
       <div class="dv-box" id="dv-box" hidden="">
+        <button class="dv-toggle" type="button" id="dv-toggle" data-act="dv-toggle" aria-expanded="false" aria-controls="dv-body"><span id="dv-toggle-label">Download the draft video</span> <span aria-hidden="true" class="dv-caret">▾</span></button>
+        <div class="dv-body" id="dv-body" hidden="">
         <div class="dv-head">
           <div>
             <span class="mono" id="dv-kicker" hidden></span>
-            <h3>Download the draft</h3>
             <p class="note" id="dv-note"></p>
           </div>
           <div class="dv-actions">
@@ -1276,6 +1282,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
             </div>
             <p class="note">The preview plays the whole draft sped up; the download runs at real speed. Drag the board on the preview to put it anywhere. Green screen lets TikTok or CapCut cut the background out so the board sits over your own video.</p>
           </div>
+        </div>
         </div>
       </div>
   </section>
@@ -1541,7 +1548,6 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               </div>
               <button class="btn primary block" type="button" id="irr-btn" data-act="irr-start">Play Mr. Irrelevant</button>
             </div>
-            <div id="dv-slot-results"></div>
             <div class="awards" id="awards" hidden=""></div>
             <div class="scorebox" id="scorebox"></div>
             <div class="results-grid">
@@ -1575,6 +1581,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <div class="top10" id="top10"></div>
             </div>
             <div class="board-wrap"><table class="board" id="final-board"></table></div>
+            <div id="dv-slot-results"></div>
             <p class="note best-key" id="best-key" hidden=""><span aria-hidden="true">🏆</span> Best pick available: when it was made, nothing left on the board would have scored more in any of that player’s open subtopics.</p>
             <div class="actions"><button class="btn primary" type="button" data-act="go-home">← Back to homepage</button><button class="btn" type="button" data-act="again" data-again2="1">Play again</button></div>
           </div>
@@ -5521,11 +5528,17 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     if (box.parentNode !== slot) slot.appendChild(box);
     $('dv-slot-home').hidden = !atHome;
     var key = atResults ? 'g:' + gameId(S.game) : atHome ? 'h:' + lr.t0 : '';
-    if (S.ui.dvFor !== key) { S.ui.dvFor = key; $('dv-editor').hidden = true; $('dv-open').textContent = 'Adjust the look'; if (!DV.busy) $('dv-msg').textContent = ''; DV.rec = null; DV.blob = null; $('dv-share').hidden = true; }
+    if (S.ui.dvFor !== key) { S.ui.dvFor = key; dvCollapse(true); $('dv-editor').hidden = true; $('dv-open').textContent = 'Adjust the look'; if (!DV.busy) $('dv-msg').textContent = ''; DV.rec = null; DV.blob = null; $('dv-share').hidden = true; }
     box.hidden = !(atResults || atHome);
     $('dv-dismiss').hidden = !atHome;
     $('dv-kicker').textContent = atHome ? 'Your last draft · ' + lr.D.topic : ''; $('dv-kicker').hidden = !atHome;
+    $('dv-toggle-label').textContent = atHome ? 'Download your last draft video' : 'Download the draft video';
     dvTick();
+  }
+  function dvCollapse(shut) {
+    var body = $('dv-body'), open = shut ? false : body.hidden;
+    body.hidden = !open; $('dv-toggle').setAttribute('aria-expanded', String(open));
+    if (!open && !$('dv-editor').hidden) { $('dv-editor').hidden = true; $('dv-open').textContent = 'Adjust the look'; }
   }
   function dvTick() {
     var box = $('dv-box'); if (!box || box.hidden) return;
@@ -7619,6 +7632,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'chat-quick') sendChat(t.getAttribute('data-text'));
     else if (act === 'level') { store('roster.level', t.getAttribute('data-level')); renderLevels(); }
     else if (act === 'dv-open') dvOpen();
+    else if (act === 'dv-toggle') dvCollapse(false);
     else if (act === 'dv-rec') dvRecord();
     else if (act === 'dv-bg') { var bp = dvPref(); bp.bg = t.getAttribute('data-bg'); dvSave(bp); dvRenderControls(); }
     else if (act === 'dv-pos') { var pp = dvPref(); pp.y = { top: 0.04, middle: 0.5, bottom: 0.96 }[t.getAttribute('data-pos')]; pp.x = 0.5; dvSave(pp); }
