@@ -1174,6 +1174,23 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 /* ---------- Draft video: the whole draft board in real time, as a 9:16 video ---------- */
 #dv-slot-home { padding-block: 0 28px; }
 .dv-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tut-ring { position: fixed; z-index: 65; pointer-events: none; border: 3px solid #ffb612; border-radius: 14px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3); }
+.tut-card { position: fixed; z-index: 70; left: 50%; transform: translateX(-50%); width: min(440px, calc(100% - 24px)); display: grid; gap: 10px; padding: 14px 16px 16px; background: var(--surface); color: var(--ink); border: 3px solid var(--edge); border-radius: 16px; box-shadow: 6px 6px 0 #ca2430; }
+.tut-card.bottom { bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+.tut-card.top { top: calc(12px + env(safe-area-inset-top, 0px)); }
+.tut-card.pop { animation: tutPop 0.25s ease-out; }
+@keyframes tutPop { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%); } }
+.tut-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.tut-top .mono { color: #ca2430; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.tut-x { background: none; border: 0; padding: 0; font: inherit; font-size: 0.78rem; color: var(--muted); text-decoration: underline; cursor: pointer; }
+#tut-text { margin: 0; font-size: 1rem; line-height: 1.45; text-wrap: pretty; }
+.tut-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.tut-acts:empty { display: none; }
+.tut-acts .btn { min-height: 40px; }
+.tut-wait { font-size: 0.8rem; color: var(--muted); }
+.tut-pill { position: fixed; z-index: 70; left: 12px; bottom: calc(40px + env(safe-area-inset-bottom, 0px)); max-width: calc(100% - 24px); padding: 7px 14px; border-radius: 999px; background: #000000; color: #ffffff; font-size: 0.82rem; font-weight: 700; pointer-events: none; box-shadow: 0 3px 0 #ca2430; }
+.btn.tut-cta { border-style: dashed; }
+@media (prefers-reduced-motion: reduce) { .tut-card.pop { animation: none; } }
 .dv-box { display: grid; gap: 10px; justify-items: start; }
 .dv-toggle { background: none; border: 0; padding: 2px 0; font: inherit; font-size: 0.8rem; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .dv-toggle:hover { color: var(--ink, inherit); }
@@ -1242,6 +1259,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
         <button class="btn" type="button" data-act="goto-mode" data-mode="fast">Daily Fast Money ⚡</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="past">Past Days 📅</button>
         <button class="btn" type="button" data-act="goto-mode" data-mode="irr" id="hero-irr">Mr. Irrelevant</button>
+        <button class="btn tut-cta" type="button" data-act="tut-start">New here? Learn how to play 🎓</button>
       </div>
     </div>
   </section>
@@ -1751,11 +1769,19 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   </section>
 
   <!-- RULES -->
+  <div class="tut-ring" id="tut-ring" hidden=""></div>
+  <div class="tut-card" id="tut-card" hidden="" role="dialog" aria-label="Tutorial" aria-live="polite">
+    <div class="tut-top"><span class="mono" id="tut-step">Tutorial</span><button class="tut-x" type="button" data-act="tut-skip" id="tut-skip">Skip tutorial</button></div>
+    <p id="tut-text"></p>
+    <div class="tut-acts" id="tut-acts"></div>
+  </div>
+  <div class="tut-pill" id="tut-pill" hidden=""></div>
   <section class="section" id="how">
     <div class="wrap">
       <div class="section-head">
         <h2 class="display">How to play</h2>
         <p class="how-lede">Build the best team of five for today’s topic, one pick at a time, while your friends try to steal your answers first. Highest score wins.</p>
+        <button class="btn primary" type="button" data-act="tut-start" style="justify-self:start">Try the 2-minute tutorial 🎓</button>
       </div>
       <div class="how">
         <div class="card">
@@ -1864,7 +1890,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
   var PICK_SECONDS = TEST.pickSeconds || 60;
   /* The room's host picks the time per pick; every other game uses 60 seconds. */
   var PICK_CHOICES = [30, 45, 60, 75, 90];
-  function pickMs(g) { if (TEST.pickSeconds) return TEST.pickSeconds * 1000; var v = g ? Number(g.pickSec) : 0; return (PICK_CHOICES.indexOf(v) >= 0 ? v : 60) * 1000; }
+  function pickMs(g) { if (g && g.tutorial) return 3600000; if (TEST.pickSeconds) return TEST.pickSeconds * 1000; var v = g ? Number(g.pickSec) : 0; return (PICK_CHOICES.indexOf(v) >= 0 ? v : 60) * 1000; }
   function currentPickSec() { var v = Number(store('roster.pickSec')); return PICK_CHOICES.indexOf(v) >= 0 ? v : 60; }
   /* 5-second countdown (with the full-screen intro) before every draft: online, Offline vs AI and Practice. Tests turn it off unless they ask for it. */
   var COUNTDOWN_MS = TEST.countdownMs != null ? TEST.countdownMs : (window.__ROSTER_TEST__ ? 0 : 5000);
@@ -4134,7 +4160,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var topicId = g ? g.topicId : inv ? inv.topicId : TODAY.topicId, subs = g ? g.subs : inv ? inv.subs : TODAY.subs, t = TOPICS[topicId];
     var mineOn = g && g.players[S.me] && g.status === 'drafting';
     $('tb-name').textContent = t.name;
-    var tbl = document.querySelector('#topic-banner .banner-main .mono'); if (tbl) tbl.textContent = g && g.practice ? 'Practice topic' : g && g.past ? 'Topic from ' + fmtDay(g.dateKey) : inv && inv.past ? 'Topic from ' + fmtDay(inv.dateKey) : 'Topic';
+    var tbl = document.querySelector('#topic-banner .banner-main .mono'); if (tbl) tbl.textContent = g && g.tutorial ? 'Tutorial topic' : g && g.practice ? 'Practice topic' : g && g.past ? 'Topic from ' + fmtDay(g.dateKey) : inv && inv.past ? 'Topic from ' + fmtDay(inv.dateKey) : 'Topic';
     if (!g && S.fast) {
       var ft = TOPICS[S.fast.topicId];
       $('tb-name').textContent = ft.name; $('tb-q').textContent = ft.q;
@@ -4448,7 +4474,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   /* Your turn: glow around the screen and a countdown bubble that stays put while you scroll. */
   function turnAlert() {
     var g = S.game, on = false, rem = 0;
-    if (g && g.status === 'drafting' && !S.fast && S.view === 'play' && screenFor() === 'draft' && g.players[S.me]) {
+    if (g && g.status === 'drafting' && !S.fast && S.view === 'play' && screenFor() === 'draft' && g.players[S.me] && !g.tutorial) {
       var d = derive(g, now());
       if (!(d.countdownMs > 0) && !d.complete && d.current === S.me) { on = true; rem = d.remainingMs; }
     }
@@ -4904,7 +4930,8 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     if (d.complete) { maybeScore(); return; }
     var rem = d.remainingMs, frac = Math.max(0, Math.min(1, rem / pickMs(g)));
     var low = rem <= 10000;
-    $('clock-t').textContent = fmtClock(rem);
+    if (g.tutorial) { rem = pickMs(g); low = false; frac = 1; }
+    $('clock-t').textContent = g.tutorial ? '∞' : fmtClock(rem);
     $('clock').className = 'clock' + (low ? ' low' : '');
     $('bar').className = 'bar' + (low ? ' low' : '');
     $('bar-i').style.width = (frac * 100).toFixed(1) + '%';
@@ -4924,6 +4951,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   }
   function scheduleBot(d) {
     if (S.botForN === d.done) return;
+    if (S.game && S.game.tutorial && tutHoldBots()) return;   /* the tutorial lets the AI pick only once the coach has explained the board */
     S.botForN = d.done;
     var n = d.done, pid = d.current;
     clearTimeout(S.botTimer);
@@ -4931,7 +4959,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       var g = S.game; if (!g || g.mode !== 'local' || g.picks.length !== n) return;
       var c = botChoice(g, pid, Math.random);
       if (c) submitPick(pid, c.sub, c.key, false);
-    }, TEST.botDelay || (2000 + Math.random() * 2000));
+    }, TEST.botDelay || (S.game && S.game.tutorial ? 2600 : 2000 + Math.random() * 2000));
   }
   function afterChange() { render(); if (S.ui.open) renderList(); }
 
@@ -5205,7 +5233,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     var id = gameId(g);
     S.scoring = { state: 'running', msg: '', forGame: id };
     render();
-    if (!S.env.sample) { await applyResults(g, id, builtinResults(g), ''); return; }
+    if (!S.env.sample || g.tutorial) { await applyResults(g, id, builtinResults(g), ''); return; }
     try {
       var raw = await S.env.sample.json(scoringPrompt(g), { modelTier: 'default' });
       if (!S.game || gameId(S.game) !== id) return;
@@ -5674,6 +5702,110 @@ If you want to offset all timestamps of a track such that the first one is zero,
     S.lastSettings = { mode: 'local', count: count, practice: !!practice, level: level, day: day };
     setMsg('');
     render();
+  }
+
+  /* ---------- Learn how to play: a guided draft against one AI on Animals. A coach card walks through each part of
+     the real draft screen and results, ringing the part it's talking about. Counts as practice (no stats or streaks). ---------- */
+  var TUT = { on: false, i: 0, at: 0, gid: '', key: '', raf: 0, iv: 0, scrolledFor: -1, tries: 0, lastScroll: 0 };
+  function tutMine(g) { return g.picks.filter(function (p) { return p.pid === S.me; }).length; }
+  function tutBot(g) { var id = Object.keys(g.players).filter(function (k) { return g.players[k].bot; })[0]; return id ? playerName(g, id) : 'the AI'; }
+  function tutShown(el) { return !!(el && el.getClientRects().length && !el.closest('[hidden]')); }
+  var TUT_STEPS = [
+    { id: 'welcome', scr: 'draft', el: '#topic-banner', next: 'Let’s go', html: function (g) { return '<b>Welcome to The Roster!</b> You and <b>' + esc(tutBot(g)) + '</b> are drafting the same topic: <b>' + esc(TOPICS[g.topicId].name) + '</b>. Take turns picking, and whoever builds the best team of five wins.'; } },
+    { id: 'subs', scr: 'draft', el: '#chips', done: function (g) { return !!S.ui.sub || tutMine(g) > 0; }, html: function (g) { return 'Every topic has <b>5 subtopics</b>: ' + g.subs.map(esc).join(', ') + '. You need one answer for each. <b>Tap a subtopic</b> to fill it. Speed is a good place to start.'; } },
+    { id: 'answer', scr: 'draft', el: '#combo', pos: 'top', done: function (g) { return !!S.ui.chosen || tutMine(g) > 0; }, html: function (g) { var sub = S.ui.sub || 'that subtopic'; return 'Now choose an animal for <b>' + esc(sub) + '</b>. Type to search, or open the list with the arrow. Each answer scores 1 to 10 depending on where it ranks for that subtopic' + (sub === 'Speed' ? ', so think cheetah or falcon.' : '.'); } },
+    { id: 'lock', scr: 'draft', el: '#lock-btn', done: function (g) { return tutMine(g) > 0; }, html: function () { return 'Nothing counts until you lock it in. Tap <b>' + esc($('lock-btn').textContent || 'Lock in') + '</b>.'; } },
+    { id: 'board', scr: 'draft', el: '#board', wait: 2300, next: 'Next', html: function (g) { return 'Your pick lands on the <b>draft board</b>. Every answer can only be drafted once, so if ' + esc(tutBot(g)) + ' takes the one you wanted, it’s gone.'; } },
+    { id: 'snake', scr: 'draft', el: '#order', done: function (g) { return g.picks.length >= 3; }, waitNote: true, html: function (g) { return 'It’s a <b>snake draft</b>: the order flips every round, so ' + esc(tutBot(g)) + ' gets <b>two picks in a row</b> now and you get the next two. Watch the board.'; } },
+    { id: 'clock', scr: 'draft', el: '#clock', wait: 2300, next: 'Next', html: function () { return 'In real games every pick has a <b>clock</b>: 30 to 90 seconds, set by whoever makes the room. If it runs out, you get a random answer. There’s no clock in the tutorial, so take your time.'; } },
+    { id: 'tip', scr: 'draft', el: '#pickbox', next: 'Got it', html: function () { return 'Now finish your team. <b>Tip:</b> grab the answers your opponent is most likely to take first, and put each one in the subtopic where it’s strongest. A great answer in the wrong subtopic scores less.'; } },
+    { id: 'play', scr: 'draft', mini: true, done: function () { return screenFor() === 'results'; }, html: function (g) { return '🎓 Finish your team · ' + tutMine(g) + ' of ' + g.subs.length + ' picked'; } },
+    { id: 'score', scr: 'results', el: '#standings', next: 'Next', html: function (g) { return '<b>The scores are in!</b> Each answer scores <b>1.0 to 10.0</b> for its subtopic, so a perfect team scores ' + (g.subs.length * 10) + '. Highest total wins.'; } },
+    { id: 'reasons', scr: 'results', el: '#reasons', next: 'Next', html: function () { return '<b>Pick-by-pick</b> shows what every answer scored, and where it ranked on that subtopic’s list.'; } },
+    { id: 'final', scr: 'results', el: '#final-board', next: 'Next', html: function () { return 'On the final board, a <b>🏆</b> marks a pick that was the best one still available when it was made. Yellow-and-black stripes mark <b>Mr. Irrelevant</b>: the very last answer on a list.'; } },
+    { id: 'done', scr: 'results', el: null, pos: 'bottom', end: true, html: function () { return '<b>That’s the game!</b> A new topic drops every day at midnight. Ready for the real thing?'; } }
+  ];
+  function tutIdx(id) { for (var i = 0; i < TUT_STEPS.length; i++) if (TUT_STEPS[i].id === id) return i; return -1; }
+  function tutHoldBots() { return TUT.on && TUT.i < tutIdx('snake'); }
+  function tutStart() {
+    var tid = TOPICS.animals ? 'animals' : Object.keys(TOPICS)[0];
+    playOffline(1, true, null, { topicId: tid, subs: TOPICS[tid].subs.slice(0, SUBS_PER_DAY), dateKey: dateKey(new Date()) });
+    var g = S.game; if (!g) return;
+    g.tutorial = true; g.botLevel = 'easy'; g.startedAt = now(); g.order = ['you'].concat(Object.keys(g.players).filter(function (k) { return k !== 'you'; }));
+    S.lastSettings = null;
+    TUT.on = true; TUT.i = 0; TUT.at = now(); TUT.gid = gameId(g); TUT.key = ''; TUT.scrolledFor = -1;
+    clearInterval(TUT.iv); TUT.iv = setInterval(tutTick, 200);
+    render(); window.scrollTo(0, 0); tutTick();
+  }
+  function tutEnd(finished) {
+    if (finished) store('roster.tutDone', '1');
+    TUT.on = false; clearInterval(TUT.iv); TUT.iv = 0; cancelAnimationFrame(TUT.raf); TUT.raf = 0;
+    $('tut-card').hidden = true; $('tut-ring').hidden = true; $('tut-pill').hidden = true;
+  }
+  function tutGo(i) { TUT.i = i; TUT.at = now(); TUT.key = ''; tutTick(); }
+  function tutTick() {
+    if (!TUT.on) return;
+    var g = S.game;
+    if (!g || !g.tutorial || gameId(g) !== TUT.gid || S.fast) { tutEnd(false); return; }
+    var scr = screenFor();
+    if (scr === 'results' && TUT_STEPS[TUT.i].scr === 'draft') { TUT.i = tutIdx('score'); TUT.at = now(); TUT.key = ''; }
+    var st = TUT_STEPS[TUT.i];
+    while (st.done && st.done(g) && TUT.i < TUT_STEPS.length - 1) { TUT.i++; TUT.at = now(); TUT.key = ''; st = TUT_STEPS[TUT.i]; }
+    var card = $('tut-card'), ring = $('tut-ring'), pill = $('tut-pill');
+    var waiting = st.wait && now() - TUT.at < st.wait;
+    if (st.scr !== scr || waiting) { card.hidden = true; ring.hidden = true; pill.hidden = true; return; }
+    var html = st.html(g);
+    if (st.mini) {
+      card.hidden = true; ring.hidden = true; pill.hidden = false;
+      if (pill.textContent !== html) pill.textContent = html;
+      return;
+    }
+    pill.hidden = true;
+    var key = TUT.i + '|' + html;
+    if (TUT.key !== key) {
+      var fresh = TUT.key.split('|')[0] !== String(TUT.i);
+      TUT.key = key;
+      var shown = TUT_STEPS.filter(function (x) { return !x.mini; }), num = shown.indexOf(st) + 1;
+      $('tut-step').textContent = 'Tutorial · ' + num + ' of ' + shown.length;
+      $('tut-text').innerHTML = html;
+      $('tut-skip').hidden = !!st.end;
+      $('tut-acts').innerHTML = st.end
+        ? '<button class="btn primary small" type="button" data-act="tut-to" data-to="offline">Play today’s topic vs AI</button><button class="btn small" type="button" data-act="tut-to" data-to="room">Play with friends</button><button class="btn small" type="button" data-act="tut-to" data-to="home">Homepage</button>'
+        : st.next ? '<button class="btn primary small" type="button" data-act="tut-next">' + esc(st.next) + '</button>'
+        : st.waitNote ? '<span class="tut-wait">Waiting for ' + esc(tutBot(g)) + '…</span>' : '';
+      card.hidden = false;
+      if (fresh) { card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop'); }
+    }
+    /* bring the part into view; try again a few times while the page is still laying out (results fill in over a moment) */
+    if (TUT.scrolledFor !== TUT.i) { TUT.scrolledFor = TUT.i; TUT.tries = 0; TUT.lastScroll = 0; }
+    var el0 = st.el ? document.querySelector(st.el) : null;
+    var settled = TUT.lastY === scrollY; TUT.lastY = scrollY;
+    if (TUT.tries < 4 && now() - TUT.lastScroll > 700 && (settled || !TUT.tries) && tutShown(el0)) {
+      var rr = el0.getBoundingClientRect();
+      if (TUT.tries === 0 || rr.top < 40 || rr.top > innerHeight * 0.75) {
+        TUT.tries++; TUT.lastScroll = now();
+        var r0 = el0.getBoundingClientRect(), smooth = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+        var y = st.pos === 'top' ? r0.top + scrollY - innerHeight * 0.42 : r0.height > innerHeight * 0.6 ? r0.top + scrollY - 70 : r0.top + scrollY + r0.height / 2 - innerHeight * 0.4;
+        if (r0.top < 60 || r0.bottom > innerHeight - 200 || st.pos === 'top') window.scrollTo({ top: Math.max(0, y), behavior: smooth ? 'smooth' : 'auto' });
+      } else TUT.tries = 4;
+    }
+    if (!TUT.raf) TUT.raf = requestAnimationFrame(tutPlace);
+  }
+  function tutPlace() {
+    TUT.raf = 0;
+    if (!TUT.on) return;
+    var st = TUT_STEPS[TUT.i], card = $('tut-card'), ring = $('tut-ring');
+    if (card.hidden) { ring.hidden = true; return; }
+    var el = st.el ? document.querySelector(st.el) : null, side = st.pos || 'bottom';
+    if (tutShown(el)) {
+      var r = el.getBoundingClientRect(), pad = 6;
+      ring.hidden = false;
+      ring.style.left = (r.left - pad) + 'px'; ring.style.top = (r.top - pad) + 'px';
+      ring.style.width = (r.width + pad * 2) + 'px'; ring.style.height = (r.height + pad * 2) + 'px';
+      if (!st.pos) side = (r.top + Math.min(r.height, innerHeight) / 2) > innerHeight * 0.52 ? 'top' : 'bottom';
+    } else ring.hidden = true;
+    if (!card.classList.contains(side)) { card.classList.remove('top', 'bottom'); card.classList.add(side); }
+    TUT.raf = requestAnimationFrame(tutPlace);
   }
 
   /* ---------- online rooms ---------- */
@@ -7663,6 +7795,10 @@ If you want to offset all timestamps of a track such that the first one is zero,
       else { S.ui.kickArm = { pid: kp, at: now() }; render(); setTimeout(function () { if (S.ui.kickArm && S.ui.kickArm.pid === kp && now() - S.ui.kickArm.at >= 5000) { S.ui.kickArm = null; if (S.game) render(); } }, 5100); }
     }
     else if (act === 'leave') leaveGame(false);
+    else if (act === 'tut-start') tutStart();
+    else if (act === 'tut-next') tutGo(Math.min(TUT.i + 1, TUT_STEPS.length - 1));
+    else if (act === 'tut-skip') { tutEnd(false); leaveGame(false); }
+    else if (act === 'tut-to') { var to = t.getAttribute('data-to'); tutEnd(true); leaveGame(to !== 'home'); if (to === 'home') return; S.view = 'home'; gotoMode(to); }
     else if (act === 'copy-link') {
       var inp = $('share-link');
       var done = function () { setMsg('Link copied.'); };
