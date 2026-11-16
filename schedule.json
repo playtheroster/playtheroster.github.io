@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794601782240,
+ "updatedAt": 1794836950084,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -291,6 +291,16 @@
     "Interior scoring",
     "Passing",
     "Rebounding"
+   ]
+  },
+  "2026-11-16": {
+   "topicId": "holidays",
+   "subs": [
+    "Decorations",
+    "Fun",
+    "Music",
+    "Global reach",
+    "Food"
    ]
   }
  },
