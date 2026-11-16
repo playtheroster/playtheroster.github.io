@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794836950084,
+ "updatedAt": 1794837046750,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -294,13 +294,33 @@
    ]
   },
   "2026-11-16": {
-   "topicId": "holidays",
+   "topicId": "2020s-movies",
    "subs": [
-    "Decorations",
-    "Fun",
-    "Music",
-    "Global reach",
-    "Food"
+    "Oscars",
+    "Box office",
+    "Rewatchability",
+    "Critics score",
+    "Buzz"
+   ]
+  },
+  "2026-11-17": {
+   "topicId": "rock-stars",
+   "subs": [
+    "Vocals",
+    "Looks",
+    "Stage presence",
+    "Wildness",
+    "Hits"
+   ]
+  },
+  "2026-11-18": {
+   "topicId": "celebrity-couples",
+   "subs": [
+    "Chemistry",
+    "Power couple",
+    "Iconic",
+    "Staying power",
+    "Fan favorite"
    ]
   }
  },
