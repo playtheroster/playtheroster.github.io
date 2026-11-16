@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794837046750,
+ "updatedAt": 1794837071486,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -314,13 +314,13 @@
    ]
   },
   "2026-11-18": {
-   "topicId": "celebrity-couples",
+   "topicId": "universities",
    "subs": [
-    "Chemistry",
-    "Power couple",
-    "Iconic",
-    "Staying power",
-    "Fan favorite"
+    "Career opportunities",
+    "Social scene",
+    "Sports culture",
+    "Campus life",
+    "Academic reputation"
    ]
   }
  },
