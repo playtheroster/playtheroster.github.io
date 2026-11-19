@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1794837071486,
+ "updatedAt": 1795099063078,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -321,6 +321,16 @@
     "Sports culture",
     "Campus life",
     "Academic reputation"
+   ]
+  },
+  "2026-11-19": {
+   "topicId": "sitcom-characters",
+   "subs": [
+    "Likability",
+    "Humor",
+    "Fame",
+    "Character arc",
+    "Quotability"
    ]
   }
  },
