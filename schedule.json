@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1795203049718,
+ "updatedAt": 1795203098952,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -523,6 +523,16 @@
     "Singalong",
     "Showstopper factor",
     "Crowd energy"
+   ]
+  },
+  "2026-11-20": {
+   "topicId": "painters",
+   "subs": [
+    "Influence",
+    "Innovation",
+    "Auction value",
+    "Fame",
+    "Technique"
    ]
   }
  }
