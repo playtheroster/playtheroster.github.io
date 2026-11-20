@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1795099063078,
+ "updatedAt": 1795203049718,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -331,6 +331,16 @@
     "Fame",
     "Character arc",
     "Quotability"
+   ]
+  },
+  "2026-11-20": {
+   "topicId": "nba-pgs",
+   "subs": [
+    "Scoring ability",
+    "Clutch performance",
+    "Court vision",
+    "Perimeter defense",
+    "Ball handling"
    ]
   }
  },
