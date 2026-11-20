@@ -171,6 +171,9 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .legend .lg { display: inline-flex; align-items: center; font-weight: 700; font-size: 0.92rem; min-width: 0; overflow-wrap: anywhere; }
 .legend .sc.tier { padding: 2px 8px; font-family: var(--font-mono); font-size: 0.74rem; }
 .tag { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
+.tag.ai { border-color: #ca2430; color: #ca2430; }
+#lobby-ai .seg { margin-bottom: 4px; }
+#add-ai-btn { justify-self: start; }
 .tag.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 /* Draft */
@@ -1465,6 +1468,16 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
               <span class="mono" id="lobby-count">Players</span>
               <ul class="players" id="lobby-players"></ul>
               <p class="lobby-league" id="lobby-league" hidden=""></p>
+              <div class="lobby-list" id="lobby-ai" hidden="">
+                <span class="mono label" id="ai-room-label">Add AI players</span>
+                <div class="seg" role="radiogroup" aria-labelledby="ai-room-label" id="lobby-ai-seg">
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="ai-level" data-level="easy">Easy</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="ai-level" data-level="medium">Medium</button>
+                  <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="ai-level" data-level="hard">Hard</button>
+                </div>
+                <button class="btn small" type="button" data-act="add-ai" id="add-ai-btn">+ Add AI player</button>
+                <p class="note" id="lobby-ai-note"></p>
+              </div>
               <div class="lobby-list">
                 <span class="mono label" id="list-room-label">Show draft options?</span>
                 <div class="seg two" role="radiogroup" aria-labelledby="list-room-label" id="lobby-list-seg">
@@ -3831,7 +3844,8 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   }
   function botChoice(g, pid, rand) {
     var d = derive(g, 0), t = TOPICS[g.topicId];
-    var L = BOT_LEVELS[g.botLevel] || BOT_LEVELS.medium, W = L.weights;
+    var lvl = (g.players[pid] && g.players[pid].level) || g.botLevel || 'medium';
+    var L = BOT_LEVELS[lvl] || BOT_LEVELS.medium, W = L.weights;
     var open = g.subs.filter(function (s) { return !filled(g, pid, s); });
     if (!open.length) return null;
     var options = [];
@@ -4002,7 +4016,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
   var S = {
     env: { ready: false, db: null, user: null, sample: null, uid: null, canWrite: null },
     game: null, me: null, unsub: [],
-    ui: { sub: null, chosen: null, open: false, active: -1, results: [], turnN: -1, query: '' },
+    ui: { sub: null, chosen: null, open: false, active: -1, results: [], turnN: -1, query: '', aiLevel: 'medium' },
     botTimer: null, botForN: -1, autoDone: {},
     scoring: { state: 'idle', msg: '', forGame: '' }, scoreWaitSince: 0,
     account: { loaded: false, profile: null, games: [] },
@@ -4208,7 +4222,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
 
   /* ---------- lobby ---------- */
   function sortedPlayers(g) {
-    return Object.keys(g.players).map(function (id) { return { id: id, name: g.players[id].name, joinedAt: g.players[id].joinedAt || 0, bot: g.players[id].bot }; })
+    return Object.keys(g.players).map(function (id) { return { id: id, name: g.players[id].name, joinedAt: g.players[id].joinedAt || 0, bot: g.players[id].bot, level: g.players[id].level }; })
       .sort(function (a, b) { return (a.joinedAt - b.joinedAt) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0); });
   }
   function renderLobby() {
@@ -4221,9 +4235,12 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('lobby-count').textContent = 'Players · ' + ps.length + ' of ' + MAX_PLAYERS;
     var canKick = g.mode === 'shared' && g.hostId === S.me && g.status === 'lobby';
     $('lobby-players').innerHTML = ps.map(function (p, i) {
-      return '<li>' + avatar(p.name, i % 8) + '<span class="pn">' + esc(p.name) + '</span>' +
-        (p.id === S.me ? '<span class="mono tag">You</span>' : '') + (p.id === g.hostId ? '<span class="mono tag">Host</span>' : '') +
-        (canKick && p.id !== S.me ? (function () { var armed = S.ui.kickArm && S.ui.kickArm.pid === p.id && now() - S.ui.kickArm.at < 5000; return '<button type="button" class="btn small kick' + (armed ? ' armed' : '') + '" data-act="kick" data-pid="' + esc(p.id) + '" aria-label="' + (armed ? 'Confirm removing ' : 'Remove ') + esc(p.name) + ' from the room">' + (armed ? 'Tap again to remove' : 'Remove') + '</button>'; })() : '') + '</li>';
+      var tags = (p.id === S.me ? '<span class="mono tag">You</span>' : '') + (p.id === g.hostId ? '<span class="mono tag">Host</span>' : '') +
+        (p.bot ? '<span class="mono tag ai">🤖 ' + esc(LEVEL_NAMES[p.level] || 'Medium') + '</span>' : '');
+      var btn = '';
+      if (canKick && p.bot) btn = '<button type="button" class="btn small kick" data-act="rmbot" data-pid="' + esc(p.id) + '" aria-label="Remove ' + esc(p.name) + ' from the room">Remove</button>';
+      else if (canKick && p.id !== S.me) { var armed = S.ui.kickArm && S.ui.kickArm.pid === p.id && now() - S.ui.kickArm.at < 5000; btn = '<button type="button" class="btn small kick' + (armed ? ' armed' : '') + '" data-act="kick" data-pid="' + esc(p.id) + '" aria-label="' + (armed ? 'Confirm removing ' : 'Remove ') + esc(p.name) + ' from the room">' + (armed ? 'Tap again to remove' : 'Remove') + '</button>'; }
+      return '<li>' + avatar(p.name, i % 8) + '<span class="pn">' + esc(p.name) + '</span>' + tags + btn + '</li>';
     }).join('') || '<li><span class="pn">Waiting for players</span></li>';
     var host = g.hostId === S.me, shown = listShown(g);
     document.querySelectorAll('#lobby-list-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-list') === 'show') === shown)); b.disabled = !host; });
@@ -4233,6 +4250,11 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     $('lobby-time-note').textContent = (host ? '' : 'The host decides. ') + 'Each player gets ' + psec + ' seconds to make a pick.';
     var inRoom = !!g.players[S.me];
     $('start-btn').disabled = !inRoom || ps.length < MIN_PLAYERS;
+    var full = ps.length >= MAX_PLAYERS, nbot = ps.filter(function (p) { return p.bot; }).length;
+    $('lobby-ai').hidden = !(canKick);
+    document.querySelectorAll('#lobby-ai-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-level') === (S.ui.aiLevel || 'medium'))); });
+    $('add-ai-btn').disabled = full;
+    $('lobby-ai-note').textContent = full ? 'The room is full (' + MAX_PLAYERS + ' players).' : 'AI players draft on their own, at the skill level you pick. Their picks are run from your device, so keep this page open.' + (nbot ? ' (' + nbot + ' in the room.)' : '');
     $('start-note').textContent = ps.length < MIN_PLAYERS ? 'You need at least ' + MIN_PLAYERS + ' players to start.' : '';
   }
 
@@ -4941,7 +4963,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       if (p && p.bot) scheduleBot(d);
       else if (rem <= 0 && !S.autoDone[d.done]) { S.autoDone[d.done] = 1; doAuto(cur); }
     } else {
-      if (rem <= 0 && cur === S.me && !S.autoDone[d.done]) { S.autoDone[d.done] = 1; doAuto(cur); }
+      var curP = g.players[cur];
+      if (curP && curP.bot && g.hostId === S.me) scheduleRoomBot(d);
+      else if (rem <= 0 && cur === S.me && !S.autoDone[d.done]) { S.autoDone[d.done] = 1; doAuto(cur); }
       else if (rem <= -GRACE_MS && cur !== S.me && g.players[S.me] && !S.autoDone[d.done]) { S.autoDone[d.done] = 1; doAuto(cur); }
     }
   }
@@ -4960,6 +4984,21 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       var c = botChoice(g, pid, Math.random);
       if (c) submitPick(pid, c.sub, c.key, false);
     }, TEST.botDelay || (S.game && S.game.tutorial ? 2600 : 2000 + Math.random() * 2000));
+  }
+  /* Online rooms: the host's page is the one that makes every AI participant's pick (the bots have no device of
+     their own), so their picks sync to everyone through the relay like a human's. If the host drops, any present
+     player auto-fills a stalled bot after the grace period, so the draft never hangs. */
+  function scheduleRoomBot(d) {
+    if (S.botForN === d.done) return;
+    S.botForN = d.done;
+    var n = d.done, pid = d.current;
+    clearTimeout(S.botTimer);
+    S.botTimer = setTimeout(function () {
+      var g = S.game; if (!g || g.mode !== 'shared' || g.hostId !== S.me || g.picks.length !== n) return;
+      var dd = derive(g, now()); if (dd.current !== pid || dd.countdownMs > 0) return;
+      var c = botChoice(g, pid, Math.random);
+      if (c) submitPick(pid, c.sub, c.key, false);
+    }, TEST.botDelay || (2500 + Math.random() * 3000));
   }
   function afterChange() { render(); if (S.ui.open) renderList(); }
 
@@ -5962,7 +6001,7 @@ If you want to offset all timestamps of a track such that the first one is zero,
     S.unsub.push(db.collection('rooms/' + code + '/players').onSnapshot(function (s) {
       if (S.game !== g) return;
       var ps = {};
-      s.docs.forEach(function (d) { if ((g.kicked || []).indexOf(d.id) >= 0) return; var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; if (typeof v.acct === 'string' && /^[A-Za-z0-9_-]{6,128}$/.test(v.acct)) { ps[d.id].acct = v.acct; if (v.fresh === true) ps[d.id].fresh = true; } });
+      s.docs.forEach(function (d) { if ((g.kicked || []).indexOf(d.id) >= 0) return; var v = d.data() || {}; ps[d.id] = { name: clean(v.name) || 'Player', joinedAt: Number(v.joinedAt) || 0 }; if (typeof v.acct === 'string' && /^[A-Za-z0-9_-]{6,128}$/.test(v.acct)) { ps[d.id].acct = v.acct; if (v.fresh === true) ps[d.id].fresh = true; } if (v.bot === true) { ps[d.id].bot = true; ps[d.id].level = BOT_LEVELS[v.level] ? v.level : 'medium'; } });
       g.players = ps;
       afterChange();
     }, onErr));
@@ -6002,6 +6041,29 @@ If you want to offset all timestamps of a track such that the first one is zero,
       await S.env.db.doc('rooms/' + g.code + '/players/' + pid).delete();
       setMsg(name + ' was removed from the room.');
     } catch (e) { setMsg('Couldn’t remove ' + name + '. Try again.', true); }
+  }
+  var ROOM_BOT_NAMES = ['Nova', 'Atlas', 'Blitz', 'Echo', 'Rook', 'Vega', 'Juno', 'Orbit', 'Pixel', 'Turbo', 'Bolt', 'Sage'];
+  function freeBotName(g) {
+    var used = {}; Object.keys(g.players).forEach(function (id) { used[String(g.players[id].name || '').replace(/ \(AI\)$/, '')] = 1; });
+    var free = ROOM_BOT_NAMES.filter(function (n) { return !used[n]; });
+    return (free.length ? free[Math.floor(Math.random() * free.length)] : 'AI ' + (Object.keys(g.players).length + 1)) + ' (AI)';
+  }
+  async function addBot() {
+    var g = S.game;
+    if (!g || g.mode !== 'shared' || g.hostId !== S.me || g.status !== 'lobby') return;
+    if (sortedPlayers(g).length >= MAX_PLAYERS) { setMsg('The room is full (' + MAX_PLAYERS + ' players).', true); return; }
+    var level = BOT_LEVELS[S.ui.aiLevel] ? S.ui.aiLevel : 'medium';
+    var id = 'ai' + Math.random().toString(36).slice(2, 10);
+    try {
+      await S.env.db.doc('rooms/' + g.code + '/players/' + id).set({ name: freeBotName(g), joinedAt: now(), bot: true, level: level });
+      setMsg('');
+    } catch (e) { setMsg('Couldn’t add an AI player. Try again.', true); }
+  }
+  async function removeBot(pid) {
+    var g = S.game;
+    if (!g || g.mode !== 'shared' || g.hostId !== S.me || g.status !== 'lobby') return;
+    if (!g.players[pid] || !g.players[pid].bot) return;
+    try { await S.env.db.doc('rooms/' + g.code + '/players/' + pid).delete(); } catch (e) { setMsg('Couldn’t remove that AI player. Try again.', true); }
   }
   function kickedOut(code) {
     leaveGame(true);
@@ -7789,6 +7851,9 @@ If you want to offset all timestamps of a track such that the first one is zero,
     else if (act === 'mm-wait') { if (S.mm) { S.mm.offerAt = Math.floor((now() - S.mm.since) / 1000) + MM_OFFER; renderMm(); } }
     else if (act === 'mm-ai') { S.mm = null; var bc = $('bot-count'); playOffline(parseInt(bc ? bc.value : '3', 10) || 3); }
     else if (act === 'start') startDraft();
+    else if (act === 'ai-level') { S.ui.aiLevel = t.getAttribute('data-level'); render(); }
+    else if (act === 'add-ai') addBot();
+    else if (act === 'rmbot') removeBot(t.getAttribute('data-pid'));
     else if (act === 'kick') {
       var kp = t.getAttribute('data-pid');
       if (S.ui.kickArm && S.ui.kickArm.pid === kp && now() - S.ui.kickArm.at < 5000) kickPlayer(kp);
