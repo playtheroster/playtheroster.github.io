@@ -1478,7 +1478,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 <button class="btn small" type="button" data-act="add-ai" id="add-ai-btn">+ Add AI player</button>
                 <p class="note" id="lobby-ai-note"></p>
               </div>
-              <div class="lobby-list">
+              <p class="note lobby-guest-settings" id="lobby-guest-settings" hidden=""></p>
+              <div class="lobby-list" id="lobby-list-block">
                 <span class="mono label" id="list-room-label">Show draft options?</span>
                 <div class="seg two" role="radiogroup" aria-labelledby="list-room-label" id="lobby-list-seg">
                   <button type="button" class="seg-btn" role="radio" aria-checked="true" data-act="room-list" data-list="show">Yes</button>
@@ -1486,7 +1487,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
                 </div>
                 <p class="note" id="lobby-list-note"></p>
               </div>
-              <div class="lobby-list">
+              <div class="lobby-list" id="lobby-time-block">
                 <span class="mono label" id="time-room-label">Time per pick</span>
                 <div class="seg five" role="radiogroup" aria-labelledby="time-room-label" id="lobby-time-seg">
                   <button type="button" class="seg-btn" role="radio" aria-checked="false" data-act="room-time" data-sec="30">30s</button>
@@ -4243,11 +4244,19 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       return '<li>' + avatar(p.name, i % 8) + '<span class="pn">' + esc(p.name) + '</span>' + tags + btn + '</li>';
     }).join('') || '<li><span class="pn">Waiting for players</span></li>';
     var host = g.hostId === S.me, shown = listShown(g);
-    document.querySelectorAll('#lobby-list-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-list') === 'show') === shown)); b.disabled = !host; });
-    $('lobby-list-note').textContent = (host ? '' : 'The host decides. ') + LIST_NOTES[shown ? 'show' : 'hide'];
     var psec = pickMs(g) / 1000;
-    document.querySelectorAll('#lobby-time-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String(Number(b.getAttribute('data-sec')) === psec)); b.disabled = !host || g.mode !== 'shared'; });
-    $('lobby-time-note').textContent = (host ? '' : 'The host decides. ') + 'Each player gets ' + psec + ' seconds to make a pick.';
+    /* Only the host sees and sets the room settings. Everyone else gets a short read-only summary of what the host chose. */
+    $('lobby-list-block').hidden = !host;
+    $('lobby-time-block').hidden = !host;
+    $('lobby-guest-settings').hidden = host;
+    if (host) {
+      document.querySelectorAll('#lobby-list-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String((b.getAttribute('data-list') === 'show') === shown)); });
+      $('lobby-list-note').textContent = LIST_NOTES[shown ? 'show' : 'hide'];
+      document.querySelectorAll('#lobby-time-seg .seg-btn').forEach(function (b) { b.setAttribute('aria-checked', String(Number(b.getAttribute('data-sec')) === psec)); b.disabled = g.mode !== 'shared'; });
+      $('lobby-time-note').textContent = 'Each player gets ' + psec + ' seconds to make a pick.';
+    } else {
+      $('lobby-guest-settings').textContent = 'The host sets the room options. ' + psec + ' seconds per pick · draft options ' + (shown ? 'shown' : 'hidden') + '.';
+    }
     var inRoom = !!g.players[S.me];
     $('start-btn').disabled = !inRoom || ps.length < MIN_PLAYERS;
     var full = ps.length >= MAX_PLAYERS, nbot = ps.filter(function (p) { return p.bot; }).length;
