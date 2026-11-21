@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1795203098952,
+ "updatedAt": 1795298074422,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -341,6 +341,26 @@
     "Court vision",
     "Perimeter defense",
     "Ball handling"
+   ]
+  },
+  "2026-11-22": {
+   "topicId": "sports",
+   "subs": [
+    "Toughness",
+    "Strategy",
+    "Athleticism",
+    "Global popularity",
+    "Watchability"
+   ]
+  },
+  "2026-11-23": {
+   "topicId": "chicken-dishes",
+   "subs": [
+    "Taste",
+    "Spiciest",
+    "Longest prep",
+    "Most calories",
+    "Most expensive"
    ]
   }
  },
