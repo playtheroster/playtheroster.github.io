@@ -964,6 +964,8 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 .band-clock { flex: 0 0 auto; }
 .band-hero .tagline { font-size: clamp(2.6rem, 5.6vw, 4.6rem); line-height: 0.92; color: #ffffff; }
 .band-hero .mark { background: transparent; color: var(--hi); box-shadow: none; transform: none; padding: 0; display: block; }
+.tagline .ow { color: var(--hi); -webkit-text-stroke: 2px var(--ink); text-stroke: 2px var(--ink); paint-order: stroke fill; }
+.winner p { font-variant-numeric: tabular-nums; }
 .band-hero .lede { color: rgba(255, 255, 255, 0.92); margin-top: 14px; }
 .band-clock { display: grid; justify-items: end; gap: 6px; }
 .band-clock .mono { color: #ffffff; }
@@ -1228,7 +1230,7 @@ button.bsub[aria-pressed="true"] { box-shadow: 0 0 0 3px #000000, 0 3px 0 rgba(0
 </header>
 <div class="wrap band-hero" id="band-hero">
   <div>
-    <h1 class="display tagline">Build Your Roster. <span class="mark">Beat Your Friends.</span></h1>
+    <h1 class="display tagline">Build Your <span class="ow">Roster.</span> <span class="mark">Beat Your Friends.</span></h1>
     <p class="lede">Draft the best roster from today's topic and prove your friends wrong.</p>
   </div>
   <div class="band-clock"><span class="mono">New topic in</span><span class="display" id="band-next">--:--:--</span><span class="streak-chip" id="streak-chip" hidden=""></span></div>
@@ -4772,6 +4774,26 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     rvEl.tabIndex = -1; try { if (!rvEl.contains(document.activeElement) || document.activeElement === rvEl) rvEl.focus({ preventScroll: true }); } catch (e) {}
     if (run) run();
   }
+  function countUpResults(g) {
+    var gid = gameId(g); S.counted = S.counted || {};
+    if (S.counted[gid]) return;
+    var main = $('results-main'); if (!main || main.hidden) return;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { S.counted[gid] = 1; return; }
+    var els = [].slice.call(main.querySelectorAll('.cu[data-to]'));
+    if (!els.length) return;
+    S.counted[gid] = 1;
+    var targets = els.map(function (el) { return { el: el, to: parseFloat(el.getAttribute('data-to')) || 0 }; });
+    targets.forEach(function (t) { t.el.textContent = '0.0'; });
+    var t0 = performance.now(), dur = 900;
+    function ease(x) { return 1 - Math.pow(1 - x, 3); }
+    function step(now) {
+      var k = Math.min(1, (now - t0) / dur), e = ease(k);
+      targets.forEach(function (t) { t.el.textContent = (t.to * e).toFixed(1); });
+      if (k < 1) requestAnimationFrame(step);
+      else targets.forEach(function (t) { t.el.textContent = t.to.toFixed(1); });
+    }
+    requestAnimationFrame(step);
+  }
   function renderResults() {
     var g = S.game, res = g.results;
     var revealing = revealOn(g) && !revealDone(g);
@@ -4788,7 +4810,7 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
       $('winner').className = 'winner pcw pc' + pci(g, top[0].pid);
       $('winner').style.setProperty('--pc', wc[0]);
       $('winner').style.background = wc.length > 1 ? 'linear-gradient(90deg, ' + wc.map(function (c, i) { return c + ' ' + (i * 100 / wc.length) + '% ' + ((i + 1) * 100 / wc.length) + '%'; }).join(', ') + ')' : '';
-      $('winner').innerHTML = '<span class="mono">' + (top.length > 1 ? 'Shared win' : 'Winner') + '</span><h3 class="display">' + esc(top.map(function (r) { return r.name; }).join(' & ')) + '</h3><p>' + fmt1(top[0].total) + ' of ' + (g.subs.length * 10) + ' points' + (g.mode === 'local' ? ' · vs ' + (LEVEL_NAMES[g.botLevel] || 'Medium') + ' AI' : '') + '</p>';
+      $('winner').innerHTML = '<span class="mono">' + (top.length > 1 ? 'Shared win' : 'Winner') + '</span><h3 class="display">' + esc(top.map(function (r) { return r.name; }).join(' & ')) + '</h3><p><span class="cu" data-to="' + fmt1(top[0].total) + '">' + fmt1(top[0].total) + '</span> of ' + (g.subs.length * 10) + ' points' + (g.mode === 'local' ? ' · vs ' + (LEVEL_NAMES[g.botLevel] || 'Medium') + ' AI' : '') + '</p>';
       var quick = res.source === 'builtin';
       var why = quick ? (S.scoring.msg ? S.scoring.msg + ' ' : '') + 'These scores come from The Roster’s built-in shortlists, not Claude.' : '';
       sb.innerHTML = '<span class="mono">' + (quick ? 'Quick score' : 'Claude’s verdict') + '</span><p>' + esc(res.summary || 'Every pick has been scored.') + '</p>' +
@@ -4806,8 +4828,9 @@ F("no1-draft-picks","No. 1 Draft Picks","No. 1 pick","Which No. 1 picks make the
     }
     $('standings').innerHTML = rows.map(function (r) {
       var avg = g.subs.length ? r.total / g.subs.length : 0;
-      return '<li class="pc' + pci(g, r.pid) + (res && r.rank === 1 ? ' top' : '') + '"><span class="rk">' + (res ? r.rank : '–') + '</span><span class="nm">' + avatar(r.name, pci(g, r.pid)) + '<span>' + esc(r.name) + (r.pid === S.me ? ' (you)' : '') + '</span></span><span class="tot">' + (res ? fmt1(r.total) : '—') + ' <small>/ ' + (g.subs.length * 10) + '</small></span>' + (res ? '<span class="sc tier avg t' + tier(avg) + '" title="Average per pick: ' + TIER_NAMES[tier(avg)] + '">' + fmt1(avg) + ' avg</span>' : '<span></span>') + '</li>';
+      return '<li class="pc' + pci(g, r.pid) + (res && r.rank === 1 ? ' top' : '') + '"><span class="rk">' + (res ? r.rank : '–') + '</span><span class="nm">' + avatar(r.name, pci(g, r.pid)) + '<span>' + esc(r.name) + (r.pid === S.me ? ' (you)' : '') + '</span></span><span class="tot">' + (res ? '<span class="cu" data-to="' + fmt1(r.total) + '">' + fmt1(r.total) + '</span>' : '—') + ' <small>/ ' + (g.subs.length * 10) + '</small></span>' + (res ? '<span class="sc tier avg t' + tier(avg) + '" title="Average per pick: ' + TIER_NAMES[tier(avg)] + '">' + fmt1(avg) + ' avg</span>' : '<span></span>') + '</li>';
     }).join('');
+    if (res && !revealing) countUpResults(g);
     var rs = '';
     if (res) {
       rows.forEach(function (r) {
