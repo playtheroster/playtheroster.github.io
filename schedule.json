@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1795446984525,
+ "updatedAt": 1795478289521,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -354,12 +354,12 @@
    ]
   },
   "2026-11-23": {
-   "topicId": "famous-irish",
+   "topicId": "famous-canadians",
    "subs": [
     "Talent",
     "Influence",
-    "Charm",
     "Legacy",
+    "Likability",
     "Fame"
    ]
   }
