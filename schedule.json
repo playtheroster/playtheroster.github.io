@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1795298074422,
+ "updatedAt": 1795446984525,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -354,13 +354,13 @@
    ]
   },
   "2026-11-23": {
-   "topicId": "chicken-dishes",
+   "topicId": "famous-irish",
    "subs": [
-    "Taste",
-    "Spiciest",
-    "Longest prep",
-    "Most calories",
-    "Most expensive"
+    "Talent",
+    "Influence",
+    "Charm",
+    "Legacy",
+    "Fame"
    ]
   }
  },
