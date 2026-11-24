@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1795479247843,
+ "updatedAt": 1795479272262,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -404,13 +404,13 @@
    ]
   },
   "2026-11-30": {
-   "topicId": "ice-cream",
+   "topicId": "mlb-pitchers",
    "subs": [
-    "Uniqueness",
-    "Refreshing",
-    "Toppings pairing",
-    "Taste",
-    "Classic status"
+    "Durability",
+    "Big-game performance",
+    "Control",
+    "Velocity",
+    "Strikeouts"
    ]
   }
  },
