@@ -1,7 +1,7 @@
 {
  "version": 1,
  "from": "2026-10-15",
- "updatedAt": 1795478289521,
+ "updatedAt": 1795479247843,
  "days": {
   "2026-10-15": {
    "topicId": "fast-food",
@@ -354,13 +354,63 @@
    ]
   },
   "2026-11-23": {
+   "topicId": "european-cities",
+   "subs": [
+    "Food scene",
+    "History",
+    "Tourism",
+    "Nightlife",
+    "Population"
+   ]
+  },
+  "2026-11-24": {
    "topicId": "famous-canadians",
    "subs": [
-    "Talent",
-    "Influence",
     "Legacy",
     "Likability",
-    "Fame"
+    "Influence",
+    "Fame",
+    "Talent"
+   ]
+  },
+  "2026-11-25": {
+   "topicId": "sports-rivalries",
+   "subs": [
+    "Fan passion",
+    "History",
+    "Star power",
+    "Bad blood",
+    "Stakes"
+   ]
+  },
+  "2026-11-27": {
+   "topicId": "thanksgiving",
+   "subs": [
+    "Crowd-pleaser",
+    "Taste",
+    "Leftover value",
+    "Tradition",
+    "Effort worth it"
+   ]
+  },
+  "2026-11-28": {
+   "topicId": "fried-foods",
+   "subs": [
+    "Crunch",
+    "Taste",
+    "Messiest",
+    "Most expensive",
+    "Most calories"
+   ]
+  },
+  "2026-11-30": {
+   "topicId": "ice-cream",
+   "subs": [
+    "Uniqueness",
+    "Refreshing",
+    "Toppings pairing",
+    "Taste",
+    "Classic status"
    ]
   }
  },
